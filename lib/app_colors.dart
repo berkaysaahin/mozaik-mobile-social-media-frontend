@@ -1,0 +1,14 @@
+import 'package:flutter/material.dart';
+
+class AppColors {
+  static const Color lightGray = Color(0xFFF5EFFF);
+  static const Color darkGray = Color(0xFF9BABB8);
+  static const Color ashGray = Color(0xFF9CAEA9);
+  static const Color vanDyke = Color(0xFF38302E);
+  static const Color battleshipGray = Color(0xFF788585);
+  static const Color platinum = Color(0xFFE5E6E4);
+  static const Color timberWolf = Color(0xFFCFD2CD);
+  static const Color silver = Color(0xFFA6A2A2);
+  static const Color teupeGray = Color(0xFF847577);
+  static const Color charcoal = Color(0xFF2f3e46);
+}
