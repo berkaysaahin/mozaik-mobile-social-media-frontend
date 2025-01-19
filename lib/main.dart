@@ -1,8 +1,10 @@
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:mozaik/app_colors.dart';
 import 'package:mozaik/components/bottom_nav_bar.dart';
+import 'package:mozaik/components/custom_app_bar.dart';
 import 'package:mozaik/pages/discover.dart';
 import 'package:mozaik/pages/home.dart';
 import 'package:mozaik/pages/messages.dart';
@@ -55,30 +57,85 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  late final PageController _pageController;
   int selectedIndex = 0;
-  static const List<Widget> pages = <Widget>[
-    HomePage(),
-    DiscoverPage(),
-    MessagesPage(),
-    NotificationsPage(),
-    ProfilePage(),
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: selectedIndex);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  static const List<Map<String, dynamic>> appBarConfigs = [
+    {
+      'title': 'Home',
+      'leftIcon': FluentIcons.options_24_filled,
+      'rightIcon': Icons.notifications,
+    },
+    {
+      'title': 'Discover',
+      'leftIcon': Icons.search,
+      'rightIcon': Icons.filter_alt,
+    },
+    {
+      'title': 'Messages',
+      'leftIcon': Icons.menu,
+      'rightIcon': Icons.search,
+    },
+    {
+      'title': 'Notifications',
+      'leftIcon': Icons.menu,
+      'rightIcon': Icons.search,
+    },
+    {
+      'title': 'Profile',
+      'leftIcon': Icons.settings,
+      'rightIcon': Icons.edit,
+    },
   ];
+
+  void onItemTapped(int index) {
+    setState(() {
+      selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    void onItemTapped(int index) {
-      setState(() {
-        selectedIndex = index;
-      });
-    }
+    final appBarConfig = appBarConfigs[selectedIndex];
 
     return Scaffold(
-      body: IndexedStack(
-        index: selectedIndex,
-        children: pages,
+      appBar: CustomAppBar(
+        title: appBarConfig["title"],
+        leftIcon: Icon(appBarConfig["leftIcon"]),
+        rightIcon: Icon(appBarConfig["rightIcon"]),
+      ),
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: (value) {
+          setState(() {
+            selectedIndex = value;
+          });
+        },
+        children: const [
+          HomePage(),
+          DiscoverPage(),
+          MessagesPage(),
+          NotificationsPage(),
+          ProfilePage(),
+        ],
       ),
       bottomNavigationBar: BottomNavBar(
         currentIndex: selectedIndex,
-        onTap: onItemTapped,
+        onTap: (value) {
+          _pageController.jumpToPage(value);
+        },
       ),
     );
   }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mozaik/app_colors.dart';
+import 'package:mozaik/components/custom_app_bar.dart';
 
 class DiscoverPage extends StatelessWidget {
   const DiscoverPage({super.key});
@@ -7,7 +7,8 @@ class DiscoverPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: Center(
+      color: const Color.fromARGB(41, 229, 230, 228),
+      child: const Center(
         child: Text('Discover Page'),
       ),
     );
