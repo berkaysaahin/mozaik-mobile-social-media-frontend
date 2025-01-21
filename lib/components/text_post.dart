@@ -1,3 +1,4 @@
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:mozaik/app_colors.dart';
 
@@ -8,7 +9,7 @@ class TextPost extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      height: 200,
+      height: 245,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(6),
         border: const Border(
@@ -20,59 +21,121 @@ class TextPost extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: Row(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Align(
-              alignment: Alignment.topLeft,
-              child: CircleAvatar(
-                radius: 24,
-                backgroundColor: AppColors.platinum,
-                child: const Icon(
-                  Icons.person,
-                  color: AppColors.charcoal,
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CircleAvatar(
+                  backgroundColor: AppColors.ashGray,
+                  child: ClipOval(
+                    child: Image.network(
+                      "https://pbs.twimg.com/profile_images/1805704376872300545/6Iatj0HI_400x400.jpg",
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
-              ),
+                const SizedBox(
+                  width: 16,
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Row(
+                        children: [
+                          Text(
+                            'Herhangi bir adam',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 4,
+                          ),
+                          Text(
+                            '@herhangibiradam',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 4,
+                          ),
+                          Text(
+                            '6h',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Container(
+                        height: 135,
+                        width: double.maxFinite,
+                        child: Text(
+                          'I saw Thom Yorke in a grocery store in Los Angeles yesterday. I told him how cool it was to meet him in person, but I didn’t want to be a douche and bother him and ask him for photos or anything. He said, “Oh, like you’re doing now?” I was taken aback, and all I could say was “Huh?” but he kept cutting me off and going “huh? huh? huh?”',
+                          style: Theme.of(context).textTheme.bodyLarge,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 6,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            SizedBox(
-              width: 16,
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Row(
                     children: [
-                      Text(
-                        'Berkay Şahin',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      SizedBox(
-                        width: 4,
+                      IconButton(
+                        icon: const Icon(FluentIcons.heart_16_regular),
+                        onPressed: () {},
                       ),
                       Text(
-                        '@berkaysahin',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      SizedBox(
-                        width: 4,
-                      ),
-                      Text(
-                        '6h',
+                        '12',
                         style: Theme.of(context).textTheme.labelMedium,
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  Container(
-                    height: 130,
-                    width: double.maxFinite,
-                    child: Text(
-                      'Im actually so happy that mmj got this cover bc ive been wanting  for a long time for mmj to cover a more badass/vbs-like song, and to break the standards of a mmj song, which is usually cutesy and poppy and wtv',
-                      style: Theme.of(context).textTheme.bodyLarge,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 6,
-                    ),
+                  Row(
+                    children: [
+                      IconButton(
+                        icon:
+                            const Icon(FluentIcons.arrow_repeat_all_16_regular),
+                        onPressed: () {},
+                      ),
+                      Text(
+                        '10',
+                        style: Theme.of(context).textTheme.labelMedium,
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(FluentIcons.chat_16_regular),
+                        onPressed: () {},
+                      ),
+                      Text(
+                        '3',
+                        style: Theme.of(context).textTheme.labelMedium,
+                      ),
+                    ],
+                  ),
+                  IconButton(
+                    icon: const Icon(FluentIcons.arrow_right_16_regular),
+                    onPressed: () {},
                   ),
                 ],
               ),

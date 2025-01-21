@@ -3,9 +3,9 @@ import 'package:mozaik/app_colors.dart';
 import 'package:mozaik/components/custom_app_bar.dart';
 import 'package:mozaik/components/text_post.dart';
 
-class HomePage extends StatelessWidget {
+class FollowingPage extends StatelessWidget {
   final ScrollController scrollController;
-  const HomePage({super.key, required this.scrollController});
+  const FollowingPage({super.key, required this.scrollController});
 
   @override
   Widget build(BuildContext context) {
