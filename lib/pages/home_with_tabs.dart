@@ -49,18 +49,18 @@ class _HomeWithTabsState extends State<HomeWithTabs> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Use ValueListenableBuilder to rebuild the TabBar visibility dynamically
         ValueListenableBuilder<bool>(
           valueListenable: widget.isTabBarVisibleNotifier,
           builder: (context, isVisible, child) {
             return isVisible
                 ? TabBar(
+                    indicatorSize: TabBarIndicatorSize.tab,
                     overlayColor:
                         const WidgetStatePropertyAll<Color>(Colors.transparent),
                     splashFactory: NoSplash.splashFactory,
                     enableFeedback: false,
                     controller: widget.tabController,
-                    indicatorColor: AppColors.ashGray,
+                    indicatorColor: AppColors.ashBlue,
                     labelColor: Colors.black,
                     unselectedLabelColor: Colors.grey,
                     tabs: const [

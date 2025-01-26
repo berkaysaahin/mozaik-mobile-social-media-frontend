@@ -4,29 +4,33 @@ import 'package:mozaik/app_colors.dart';
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Widget? leftIcon;
   final Widget? rightIcon;
-  final String title;
+  final Widget? customWidget;
+  final String? title;
   final VoidCallback? onLeftIconTap;
   final VoidCallback? onRightIconTap;
-  final int selectedIndex;
+  final int? selectedIndex;
   final TabController? tabController;
-  final ValueNotifier<bool> isTabBarVisibleNotifier;
+  final ValueNotifier<bool>? isTabBarVisibleNotifier;
 
   const CustomAppBar({
     super.key,
     this.leftIcon,
     this.rightIcon,
-    required this.title,
+    this.title,
     this.onLeftIconTap,
     this.onRightIconTap,
-    required this.selectedIndex,
+    this.selectedIndex,
     this.tabController,
-    required this.isTabBarVisibleNotifier,
+    this.isTabBarVisibleNotifier,
+    this.customWidget,
   });
 
   @override
   Widget build(BuildContext context) {
+    final ValueNotifier<bool> effectiveNotifier =
+        isTabBarVisibleNotifier ?? ValueNotifier(false);
     return ValueListenableBuilder<bool>(
-      valueListenable: isTabBarVisibleNotifier,
+      valueListenable: effectiveNotifier,
       builder: (context, isTabBarVisible, child) {
         return Container(
           decoration: !isTabBarVisible
@@ -40,18 +44,24 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 )
               : null,
           child: AppBar(
-            title: Text(
-              title,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
+            title: customWidget ??
+                (title != null
+                    ? Text(
+                        title!,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      )
+                    : null),
             centerTitle: true,
             leading: Padding(
               padding: const EdgeInsets.all(8.0),
               child: CircleAvatar(
-                backgroundColor: AppColors.ashGray,
+                backgroundColor: AppColors.ashBlue,
                 child: ClipOval(
                   child: Image.network(
-                    "https://pbs.twimg.com/profile_images/1805704376872300545/6Iatj0HI_400x400.jpg",
+                    "https://static.wikia.nocookie.net/projectsekai/images/f/ff/Dramaturgy_Game_Cover.png/revision/latest?cb=20201227073615",
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -62,6 +72,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 IconButton(
                   icon: rightIcon!,
                   onPressed: onRightIconTap,
+                ),
+              if (leftIcon != null)
+                IconButton(
+                  icon: leftIcon!,
+                  onPressed: onLeftIconTap,
                 ),
             ],
           ),

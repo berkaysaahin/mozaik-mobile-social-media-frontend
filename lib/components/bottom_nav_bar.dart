@@ -33,6 +33,7 @@ class BottomNavBar extends StatelessWidget {
             fontSize: 13,
             textBaseline: TextBaseline.alphabetic),
         showUnselectedLabels: false,
+        showSelectedLabels: false,
         selectedItemColor: AppColors.charcoal,
         unselectedItemColor: AppColors.charcoal,
         selectedFontSize: 13,

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:mozaik/app_colors.dart';
-import 'package:mozaik/components/custom_app_bar.dart';
 import 'package:mozaik/components/text_post.dart';
 
 class HomePage extends StatelessWidget {
@@ -17,7 +16,7 @@ class HomePage extends StatelessWidget {
             [
               Container(
                 color: const Color.fromARGB(41, 229, 230, 228),
-                child: Column(
+                child: const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     TextPost(),

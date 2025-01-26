@@ -28,10 +28,10 @@ class TextPost extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 CircleAvatar(
-                  backgroundColor: AppColors.ashGray,
+                  backgroundColor: AppColors.ashBlue,
                   child: ClipOval(
                     child: Image.network(
-                      "https://pbs.twimg.com/profile_images/1805704376872300545/6Iatj0HI_400x400.jpg",
+                      "https://static.wikia.nocookie.net/projectsekai/images/f/ff/Dramaturgy_Game_Cover.png/revision/latest?cb=20201227073615",
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -58,7 +58,7 @@ class TextPost extends StatelessWidget {
                           Text(
                             '@herhangibiradam',
                             style: TextStyle(
-                              fontSize: 12,
+                              fontSize: 14,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -68,14 +68,14 @@ class TextPost extends StatelessWidget {
                           Text(
                             '6h',
                             style: TextStyle(
-                              fontSize: 10,
+                              fontSize: 12,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 6),
-                      Container(
+                      SizedBox(
                         height: 135,
                         width: double.maxFinite,
                         child: Text(

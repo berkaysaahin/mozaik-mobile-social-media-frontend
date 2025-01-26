@@ -5,9 +5,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:mozaik/app_colors.dart';
 import 'package:mozaik/components/bottom_nav_bar.dart';
 import 'package:mozaik/components/custom_app_bar.dart';
+import 'package:mozaik/components/search_bar.dart';
+import 'package:mozaik/pages/direct_message.dart';
 import 'package:mozaik/pages/discover.dart';
-import 'package:mozaik/pages/following.dart';
-import 'package:mozaik/pages/home.dart';
 import 'package:mozaik/pages/home_with_tabs.dart';
 import 'package:mozaik/pages/messages.dart';
 import 'package:mozaik/pages/notifications.dart';
@@ -31,10 +31,15 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      routes: {
+        '/directMessage': (context) =>
+            const DirectMessagePage(), // Maps '/directMessage' to DirectMessagePage
+      },
       title: 'Motsaich',
       theme: ThemeData(
         textTheme: GoogleFonts.montserratTextTheme(),
-        primaryColor: AppColors.ashGray,
+        primaryColor: AppColors.ashBlue,
+        focusColor: AppColors.platinum,
         splashColor: Colors.transparent,
         highlightColor: Colors.transparent,
         useMaterial3: true,
@@ -74,29 +79,25 @@ class _MyHomePageState extends State<MyHomePage>
 
   static const List<Map<String, dynamic>> appBarConfigs = [
     {
-      'title': 'Home',
+      'title': 'Mozaik Role',
       'rightIcon': FluentIcons.more_vertical_24_regular,
     },
     {
-      'title': 'Discover',
       'leftIcon': Icons.search,
       'rightIcon': Icons.filter_alt,
+      'customWidget': CustomSearchBar(),
     },
     {
       'title': 'Messages',
       'leftIcon': Icons.menu,
-      'rightIcon': Icons.search,
+      'rightIcon': FluentIcons.add_24_regular,
     },
     {
       'title': 'Notifications',
       'leftIcon': Icons.menu,
-      'rightIcon': Icons.search,
+      'rightIcon': FluentIcons.arrow_sort_24_regular,
     },
-    {
-      'title': 'Profile',
-      'leftIcon': Icons.settings,
-      'rightIcon': Icons.edit,
-    },
+    {},
   ];
 
   void onItemTapped(int index) {
@@ -111,13 +112,16 @@ class _MyHomePageState extends State<MyHomePage>
     final appBarConfig = appBarConfigs[selectedIndex];
 
     return Scaffold(
-      appBar: CustomAppBar(
-        title: appBarConfig['title'],
-        rightIcon: Icon(appBarConfig['rightIcon']),
-        selectedIndex: selectedIndex,
-        tabController: _tabController,
-        isTabBarVisibleNotifier: isTabBarVisible,
-      ),
+      appBar: selectedIndex != 4
+          ? CustomAppBar(
+              title: appBarConfig['title'],
+              rightIcon: Icon(appBarConfig['rightIcon']),
+              selectedIndex: selectedIndex,
+              tabController: _tabController,
+              isTabBarVisibleNotifier: isTabBarVisible,
+              customWidget: appBarConfig['customWidget'],
+            )
+          : null,
       body: PageView(
         controller: _pageController,
         physics:
