@@ -30,11 +30,9 @@ class _HomeWithTabsState extends State<HomeWithTabs> {
   void _onScroll() {
     if (_scrollController.position.userScrollDirection ==
         ScrollDirection.reverse) {
-      // Scrolling down
       widget.isTabBarVisibleNotifier.value = false;
     } else if (_scrollController.position.userScrollDirection ==
         ScrollDirection.forward) {
-      // Scrolling up
       widget.isTabBarVisibleNotifier.value = true;
     }
   }
@@ -60,7 +58,7 @@ class _HomeWithTabsState extends State<HomeWithTabs> {
                     splashFactory: NoSplash.splashFactory,
                     enableFeedback: false,
                     controller: widget.tabController,
-                    indicatorColor: AppColors.ashBlue,
+                    indicatorColor: AppColors.battleshipGray,
                     labelColor: Colors.black,
                     unselectedLabelColor: Colors.grey,
                     tabs: const [
@@ -68,7 +66,7 @@ class _HomeWithTabsState extends State<HomeWithTabs> {
                       Tab(text: "Following"),
                     ],
                   )
-                : const SizedBox.shrink(); // Placeholder for hidden TabBar
+                : const SizedBox.shrink();
           },
         ),
         Expanded(

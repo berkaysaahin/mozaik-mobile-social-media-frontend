@@ -1,5 +1,6 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:mozaik/app_colors.dart';
@@ -20,7 +21,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
+  await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
 
@@ -32,17 +33,39 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       routes: {
-        '/directMessage': (context) =>
-            const DirectMessagePage(), // Maps '/directMessage' to DirectMessagePage
+        '/directMessage': (context) => const DirectMessagePage(),
       },
       title: 'Motsaich',
       theme: ThemeData(
-        textTheme: GoogleFonts.montserratTextTheme(),
+        textTheme: GoogleFonts.montserratTextTheme(
+          Theme.of(context).textTheme,
+        ).copyWith(
+          bodyLarge: GoogleFonts.montserrat(
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+            height: 1.5,
+            letterSpacing: 0.5,
+          ),
+          titleMedium: GoogleFonts.montserrat(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+          labelMedium: GoogleFonts.montserrat(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: Colors.grey,
+          ),
+        ),
         primaryColor: AppColors.ashBlue,
         focusColor: AppColors.platinum,
         splashColor: Colors.transparent,
         highlightColor: Colors.transparent,
         useMaterial3: true,
+        textSelectionTheme: const TextSelectionThemeData(
+          cursorColor: AppColors.platinum,
+          selectionColor: AppColors.platinum,
+          selectionHandleColor: AppColors.platinum,
+        ),
       ),
       home: const MyHomePage(),
     );
@@ -124,8 +147,7 @@ class _MyHomePageState extends State<MyHomePage>
           : null,
       body: PageView(
         controller: _pageController,
-        physics:
-            const NeverScrollableScrollPhysics(), // Prevent swipe navigation
+        physics: const NeverScrollableScrollPhysics(),
         children: [
           HomeWithTabs(
             tabController: _tabController,

@@ -11,4 +11,7 @@ class AppColors {
   static const Color silver = Color(0xFFA6A2A2);
   static const Color teupeGray = Color(0xFF847577);
   static const Color charcoal = Color(0xFF2f3e46);
+  static const Color amanojaku = Color(0xFF758694);
+  static const Color weeping = Color(0xFFF5F5F5);
+  static const Color background = Color.fromARGB(41, 229, 230, 228);
 }
