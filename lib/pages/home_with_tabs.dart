@@ -60,6 +60,10 @@ class _HomeWithTabsState extends State<HomeWithTabs> {
                     controller: widget.tabController,
                     indicatorColor: AppColors.battleshipGray,
                     labelColor: Colors.black,
+                    labelStyle:
+                        Theme.of(context).textTheme.labelLarge?.copyWith(
+                              fontSize: 17,
+                            ),
                     unselectedLabelColor: Colors.grey,
                     tabs: const [
                       Tab(text: "Home"),

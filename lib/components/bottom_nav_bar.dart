@@ -1,4 +1,5 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mozaik/app_colors.dart';
 
@@ -23,7 +24,7 @@ class BottomNavBar extends StatelessWidget {
           ),
         ),
       ),
-      height: 76,
+      height: 64,
       alignment: Alignment.topCenter,
       child: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
@@ -38,39 +39,43 @@ class BottomNavBar extends StatelessWidget {
         unselectedItemColor: AppColors.charcoal,
         selectedFontSize: 13,
         unselectedFontSize: 13,
+        iconSize: 26,
         enableFeedback: false,
         currentIndex: currentIndex,
         onTap: onTap,
         items: [
           BottomNavigationBarItem(
             icon: currentIndex == 0
-                ? const Icon(FluentIcons.home_24_filled)
-                : const Icon(FluentIcons.home_24_regular),
+                ? const Icon(FluentIcons.home_32_filled)
+                : const Icon(FluentIcons.home_32_regular),
             label: 'Home',
           ),
           BottomNavigationBarItem(
             icon: currentIndex == 1
-                ? const Icon(FluentIcons.search_24_filled)
-                : const Icon(FluentIcons.search_24_regular),
+                ? const Icon(FluentIcons.search_32_filled)
+                : const Icon(FluentIcons.search_32_regular),
             label: 'Search',
           ),
           BottomNavigationBarItem(
             icon: currentIndex == 2
-                ? const Icon(FluentIcons.chat_24_filled)
-                : const Icon(FluentIcons.chat_24_regular),
+                ? const Icon(CupertinoIcons.text_bubble_fill)
+                : const Icon(CupertinoIcons.text_bubble),
             label: 'Messages',
           ),
           BottomNavigationBarItem(
-            icon: currentIndex == 3
-                ? const Icon(FluentIcons.alert_24_filled)
-                : const Icon(FluentIcons.alert_24_regular),
-            label: 'Notifications',
-          ),
-          BottomNavigationBarItem(
-            icon: currentIndex == 4
-                ? const Icon(FluentIcons.person_24_filled)
-                : const Icon(FluentIcons.person_24_regular),
-            label: 'Profile',
+            icon: CircleAvatar(
+              radius: 16,
+              backgroundColor: AppColors.ashBlue,
+              child: ClipOval(
+                child: Image.network(
+                  "https://static.wikia.nocookie.net/projectsekai/images/f/ff/Dramaturgy_Game_Cover.png/revision/latest?cb=20201227073615",
+                  width: 40, // Match the CircleAvatar size
+                  height: 40,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            label: "Profile",
           ),
         ],
       ),

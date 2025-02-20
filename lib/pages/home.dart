@@ -58,7 +58,7 @@ class _HomePageState extends State<HomePage> {
               (context, index) {
                 final post = posts[index];
                 return Container(
-                  color: const Color.fromARGB(41, 229, 230, 228),
+                  color: AppColors.background,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

@@ -53,10 +53,10 @@ class _DirectMessagePageState extends State<DirectMessagePage> {
       appBar: CustomAppBar(
         leftIcon: const Icon(FluentIcons.arrow_left_24_regular),
         rightIcon: const Icon(FluentIcons.more_vertical_24_regular),
-        onLeftIconTap: () {
+        onLeftIconTap: (BuildContext context) {
           Navigator.pop(context);
         },
-        onRightIconTap: () {},
+        onRightIconTap: (BuildContext context) {},
         title: "Eve",
       ),
       body: Column(

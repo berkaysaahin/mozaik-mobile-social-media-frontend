@@ -1,4 +1,5 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -11,7 +12,6 @@ import 'package:mozaik/pages/direct_message.dart';
 import 'package:mozaik/pages/discover.dart';
 import 'package:mozaik/pages/home_with_tabs.dart';
 import 'package:mozaik/pages/messages.dart';
-import 'package:mozaik/pages/notifications.dart';
 import 'package:mozaik/pages/profile.dart';
 import 'firebase_options.dart';
 
@@ -100,25 +100,23 @@ class _MyHomePageState extends State<MyHomePage>
     super.dispose();
   }
 
-  static const List<Map<String, dynamic>> appBarConfigs = [
+  static List<Map<String, dynamic>> appBarConfigs = [
     {
-      'title': 'Mozaik Role',
-      'rightIcon': FluentIcons.more_vertical_24_regular,
+      'title': 'Mozaik',
+      'rightIcon': CupertinoIcons.bell,
+      'onRightIconTap': (BuildContext context) {
+        _showNotificationsTab(context);
+      },
     },
     {
       'leftIcon': Icons.search,
       'rightIcon': Icons.filter_alt,
-      'customWidget': CustomSearchBar(),
+      'customWidget': const CustomSearchBar(),
     },
     {
       'title': 'Messages',
       'leftIcon': Icons.menu,
       'rightIcon': FluentIcons.add_24_regular,
-    },
-    {
-      'title': 'Notifications',
-      'leftIcon': Icons.menu,
-      'rightIcon': FluentIcons.arrow_sort_24_regular,
     },
     {},
   ];
@@ -135,10 +133,11 @@ class _MyHomePageState extends State<MyHomePage>
     final appBarConfig = appBarConfigs[selectedIndex];
 
     return Scaffold(
-      appBar: selectedIndex != 4
+      appBar: selectedIndex != 3
           ? CustomAppBar(
               title: appBarConfig['title'],
               rightIcon: Icon(appBarConfig['rightIcon']),
+              onRightIconTap: appBarConfig['onRightIconTap'],
               selectedIndex: selectedIndex,
               tabController: _tabController,
               isTabBarVisibleNotifier: isTabBarVisible,
@@ -155,7 +154,6 @@ class _MyHomePageState extends State<MyHomePage>
           ),
           const DiscoverPage(),
           const MessagesPage(),
-          const NotificationsPage(),
           const ProfilePage(),
         ],
       ),
@@ -163,6 +161,128 @@ class _MyHomePageState extends State<MyHomePage>
         currentIndex: selectedIndex,
         onTap: onItemTapped,
       ),
+    );
+  }
+
+  static void _showNotificationsTab(BuildContext context) {
+    showDialog(
+      barrierColor: Colors.transparent,
+      context: context,
+      builder: (context) {
+        return Stack(
+          children: [
+            // Transparent background to capture taps outside the dialog
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.of(context)
+                      .pop(); // Close the dialog on outside tap
+                },
+                child: Container(
+                  color: Colors.transparent,
+                ),
+              ),
+            ),
+            // Notifications tab positioned below the icon and colliding with the bottom nav bar
+            Positioned(
+              top:
+                  kToolbarHeight, // Adjust this value to position below the icon
+              left: 32, // Left padding
+              right: 0, // No right padding
+              bottom: 320, // Collide with the bottom nav bar
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Material(
+                  elevation: 1,
+                  // Remove elevation
+                  color: AppColors.background,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      color: AppColors.background,
+                      border: Border.all(
+                        color: AppColors.platinum,
+                        width: 0.6,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.all(16),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Notifications',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Divider(
+                          height: 0.6,
+                          color: AppColors.platinum,
+                        ),
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount:
+                                10, // Replace with actual notifications count
+                            itemBuilder: (context, index) {
+                              return ListTile(
+                                leading: const Icon(Icons.notifications),
+                                title: Text('Notification $index'),
+                                subtitle: const Text(
+                                    'This is a sample notification.'),
+                                onTap: () {
+                                  // Handle notification tap
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                        const Divider(
+                          height: 0.6,
+                          color: AppColors.platinum,
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Row(
+                            children: [
+                              Icon(
+                                FluentIcons.checkmark_24_regular,
+                                size: 26,
+                              ),
+                              Text(
+                                " Mark all as read",
+                                style: TextStyle(
+                                  color: AppColors.charcoal,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Spacer(),
+                              Text(
+                                "View all",
+                                style: TextStyle(
+                                  color: AppColors.charcoal,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

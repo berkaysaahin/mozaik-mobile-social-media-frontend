@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:mozaik/app_colors.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final Widget? leftIcon;
-  final Widget? rightIcon;
+  final Icon? leftIcon;
+  final Icon? rightIcon;
   final Widget? customWidget;
   final String? title;
-  final VoidCallback? onLeftIconTap;
-  final VoidCallback? onRightIconTap;
+  final Function(BuildContext)? onLeftIconTap;
+  final Function(BuildContext)? onRightIconTap;
   final int? selectedIndex;
   final TabController? tabController;
   final ValueNotifier<bool>? isTabBarVisibleNotifier;
@@ -44,41 +44,43 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 )
               : null,
           child: AppBar(
-            title: customWidget ??
-                (title != null
-                    ? Text(
-                        title!,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      )
-                    : null),
+            title: title != null
+                ? Text(
+                    title!,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
+                : null,
             centerTitle: true,
-            leading: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: CircleAvatar(
-                backgroundColor: AppColors.ashBlue,
-                child: ClipOval(
-                  child: Image.network(
-                    "https://static.wikia.nocookie.net/projectsekai/images/f/ff/Dramaturgy_Game_Cover.png/revision/latest?cb=20201227073615",
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-            ),
             actions: [
               if (rightIcon != null)
                 IconButton(
                   icon: rightIcon!,
-                  onPressed: onRightIconTap,
-                ),
-              if (leftIcon != null)
-                IconButton(
-                  icon: leftIcon!,
-                  onPressed: onLeftIconTap,
+                  onPressed: () {
+                    if (onRightIconTap != null) {
+                      onRightIconTap!(context); // Pass context here
+                    }
+                  },
                 ),
             ],
+            leading: leftIcon != null
+                ? IconButton(
+                    icon: leftIcon!,
+                    onPressed: () {
+                      if (onLeftIconTap != null) {
+                        onLeftIconTap!(context); // Pass context here
+                      }
+                    },
+                  )
+                : null,
+            bottom: customWidget != null
+                ? PreferredSize(
+                    preferredSize: const Size.fromHeight(56),
+                    child: customWidget!,
+                  )
+                : null,
           ),
         );
       },

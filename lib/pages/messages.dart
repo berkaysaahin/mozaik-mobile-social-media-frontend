@@ -15,7 +15,7 @@ class MessagesPage extends StatelessWidget {
           delegate: SliverChildListDelegate(
             [
               Container(
-                color: const Color.fromARGB(41, 229, 230, 228),
+                color: AppColors.background,
                 child: const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
