@@ -1,3 +1,5 @@
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mozaik/app_colors.dart';
 import 'package:mozaik/components/rounded_rectangle_button.dart';
@@ -130,10 +132,55 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           Align(
                             alignment: Alignment.bottomRight,
-                            child: RoundedRectangleButton(
-                              text: 'Follow',
-                              onPressed: () {},
-                              backgroundColor: AppColors.charcoal,
+                            child: Row(
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: AppColors.backgroundDarker,
+                                      width: 2,
+                                    ),
+                                  ),
+                                  child: CircleAvatar(
+                                    backgroundColor: AppColors.background,
+                                    radius: 18,
+                                    child: IconButton(
+                                        onPressed: () {},
+                                        icon: const Icon(
+                                            color: AppColors.charcoal,
+                                            size: 20,
+                                            FluentIcons.edit_24_regular)),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: AppColors.backgroundDarker,
+                                      width: 2,
+                                    ),
+                                  ),
+                                  child: CircleAvatar(
+                                    backgroundColor: AppColors.background,
+                                    radius: 18,
+                                    child: IconButton(
+                                        onPressed: () {},
+                                        icon: const Icon(
+                                            color: AppColors.charcoal,
+                                            size: 20,
+                                            CupertinoIcons.envelope)),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                RoundedRectangleButton(
+                                  elevation: 0,
+                                  text: 'Follow',
+                                  onPressed: () {},
+                                  backgroundColor: AppColors.primary,
+                                ),
+                              ],
                             ),
                           )
                         ],
@@ -247,7 +294,21 @@ class _ProfilePageState extends State<ProfilePage> {
                                       ],
                                     ),
                                     const SizedBox(
-                                      height: 24,
+                                      height: 18,
+                                    ),
+                                    const Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 16),
+                                      child: Text(
+                                        "kono omoi o kitto kasarete sekai no naka",
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w100),
+                                        maxLines: 2,
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: 18,
                                     ),
                                     const Row(
                                       children: [

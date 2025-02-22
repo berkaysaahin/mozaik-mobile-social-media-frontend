@@ -60,7 +60,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   icon: rightIcon!,
                   onPressed: () {
                     if (onRightIconTap != null) {
-                      onRightIconTap!(context); // Pass context here
+                      onRightIconTap!(context);
                     }
                   },
                 ),
@@ -70,7 +70,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                     icon: leftIcon!,
                     onPressed: () {
                       if (onLeftIconTap != null) {
-                        onLeftIconTap!(context); // Pass context here
+                        onLeftIconTap!(context);
                       }
                     },
                   )

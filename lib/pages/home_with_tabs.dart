@@ -58,7 +58,7 @@ class _HomeWithTabsState extends State<HomeWithTabs> {
                     splashFactory: NoSplash.splashFactory,
                     enableFeedback: false,
                     controller: widget.tabController,
-                    indicatorColor: AppColors.battleshipGray,
+                    indicatorColor: AppColors.primary,
                     labelColor: Colors.black,
                     labelStyle:
                         Theme.of(context).textTheme.labelLarge?.copyWith(

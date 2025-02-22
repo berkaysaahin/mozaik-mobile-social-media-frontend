@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mozaik/app_colors.dart';
 
-class TextPost extends StatelessWidget {
+class TextPost extends StatefulWidget {
   final String username;
   final String handle;
   final String content;
@@ -26,6 +26,44 @@ class TextPost extends StatelessWidget {
   });
 
   @override
+  State<TextPost> createState() => _TextPostState();
+}
+
+class _TextPostState extends State<TextPost> {
+  late ValueNotifier<bool> _isLikedNotifier;
+  late ValueNotifier<int> _likesNotifier;
+  late ValueNotifier<bool> _isSharedNotifier;
+  late ValueNotifier<int> _sharesNotifier;
+
+  @override
+  void initState() {
+    super.initState();
+    _isLikedNotifier = ValueNotifier(false);
+    _likesNotifier = ValueNotifier(widget.likes);
+    _isSharedNotifier = ValueNotifier(false);
+    _sharesNotifier = ValueNotifier(widget.retweets);
+  }
+
+  void _toggleLike() {
+    _isLikedNotifier.value = !_isLikedNotifier.value;
+    _likesNotifier.value += _isLikedNotifier.value ? 1 : -1;
+  }
+
+  void _toggleShare() {
+    _isSharedNotifier.value = !_isSharedNotifier.value;
+    _sharesNotifier.value += _isSharedNotifier.value ? 1 : -1;
+  }
+
+  @override
+  void dispose() {
+    _isLikedNotifier.dispose();
+    _likesNotifier.dispose();
+    _isSharedNotifier.dispose();
+    _sharesNotifier.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
@@ -43,17 +81,15 @@ class TextPost extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Profile Image and User Info in a Row
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Profile Image
                 CircleAvatar(
                   radius: 24,
                   backgroundColor: AppColors.ashBlue,
                   child: ClipOval(
                     child: Image.network(
-                      profilePic,
+                      widget.profilePic,
                       fit: BoxFit.cover,
                       width: 48,
                       height: 48,
@@ -68,14 +104,12 @@ class TextPost extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 10),
-                // Username, Handle, and Timestamp in a Column
                 Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Username and Handle in a Row
                     Text(
-                      username,
+                      widget.username,
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -85,7 +119,7 @@ class TextPost extends StatelessWidget {
                       children: [
                         const SizedBox(width: 4),
                         Text(
-                          '@$handle',
+                          '@${widget.handle}',
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey[600],
@@ -93,7 +127,7 @@ class TextPost extends StatelessWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          formatTimestamp(timestamp),
+                          formatTimestamp(widget.timestamp),
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey[600],
@@ -102,14 +136,13 @@ class TextPost extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 6),
-                    // Post Content
                   ],
                 ),
               ],
             ),
             const SizedBox(height: 16),
             Text(
-              content,
+              widget.content,
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     fontSize: 16,
                     fontWeight: FontWeight.w400,
@@ -122,7 +155,6 @@ class TextPost extends StatelessWidget {
             const SizedBox(
               height: 16,
             ),
-            // Action Buttons in a Row
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
@@ -130,18 +162,32 @@ class TextPost extends StatelessWidget {
                 children: [
                   _buildActionButton(
                     icon: CupertinoIcons.bubble_left,
-                    count: comments,
+                    count: widget.comments,
                     onTap: () {},
                   ),
-                  _buildActionButton(
-                    icon: CupertinoIcons.arrow_2_squarepath,
-                    count: retweets,
-                    onTap: () {},
+                  ValueListenableBuilder<bool>(
+                    valueListenable: _isSharedNotifier,
+                    builder: (context, isShared, child) {
+                      return _buildActionButton(
+                        icon: CupertinoIcons.arrow_2_squarepath,
+                        color: isShared ? AppColors.primary : Colors.grey,
+                        count: _sharesNotifier.value,
+                        onTap: _toggleShare,
+                      );
+                    },
                   ),
-                  _buildActionButton(
-                    icon: CupertinoIcons.heart,
-                    count: likes,
-                    onTap: () {},
+                  ValueListenableBuilder<bool>(
+                    valueListenable: _isLikedNotifier,
+                    builder: (context, isLiked, child) {
+                      return _buildActionButton(
+                        icon: isLiked
+                            ? CupertinoIcons.heart_fill
+                            : CupertinoIcons.heart,
+                        color: isLiked ? Colors.red : Colors.grey,
+                        count: _likesNotifier.value,
+                        onTap: _toggleLike,
+                      );
+                    },
                   ),
                   IconButton(
                     icon: const Icon(CupertinoIcons.arrow_right),
@@ -156,11 +202,11 @@ class TextPost extends StatelessWidget {
     );
   }
 
-  // Reusable Action Button Widget
   Widget _buildActionButton({
     required IconData icon,
     required int count,
     required VoidCallback onTap,
+    Color? color,
   }) {
     return GestureDetector(
       onTap: onTap,
@@ -170,7 +216,7 @@ class TextPost extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 20),
+            Icon(icon, size: 24, color: color ?? Colors.grey),
             const SizedBox(width: 4),
             Text(
               count.toString(),

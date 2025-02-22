@@ -157,7 +157,7 @@ class _DirectMessagePageState extends State<DirectMessagePage> {
                   mini: true,
                   focusElevation: 0,
                   shape: const CircleBorder(),
-                  backgroundColor: AppColors.amanojaku,
+                  backgroundColor: AppColors.primary,
                   onPressed: () {},
                   child: const Icon(
                     FluentIcons.arrow_right_24_filled,
@@ -199,8 +199,8 @@ class _DirectMessagePageState extends State<DirectMessagePage> {
                   categoryViewConfig: CategoryViewConfig(
                     backgroundColor: AppColors.amanojaku,
                     iconColor: Colors.white,
-                    iconColorSelected: AppColors.charcoal,
-                    indicatorColor: AppColors.charcoal,
+                    iconColorSelected: AppColors.primary,
+                    indicatorColor: AppColors.primary,
                     dividerColor: Colors.white,
                   ),
                 ),

@@ -35,8 +35,8 @@ class BottomNavBar extends StatelessWidget {
             textBaseline: TextBaseline.alphabetic),
         showUnselectedLabels: false,
         showSelectedLabels: false,
-        selectedItemColor: AppColors.charcoal,
-        unselectedItemColor: AppColors.charcoal,
+        selectedItemColor: AppColors.primary,
+        unselectedItemColor: AppColors.primary,
         selectedFontSize: 13,
         unselectedFontSize: 13,
         iconSize: 26,
@@ -58,8 +58,8 @@ class BottomNavBar extends StatelessWidget {
           ),
           BottomNavigationBarItem(
             icon: currentIndex == 2
-                ? const Icon(CupertinoIcons.text_bubble_fill)
-                : const Icon(CupertinoIcons.text_bubble),
+                ? const Icon(CupertinoIcons.bubble_right_fill)
+                : const Icon(CupertinoIcons.bubble_right),
             label: 'Messages',
           ),
           BottomNavigationBarItem(
@@ -69,7 +69,7 @@ class BottomNavBar extends StatelessWidget {
               child: ClipOval(
                 child: Image.network(
                   "https://static.wikia.nocookie.net/projectsekai/images/f/ff/Dramaturgy_Game_Cover.png/revision/latest?cb=20201227073615",
-                  width: 40, // Match the CircleAvatar size
+                  width: 40,
                   height: 40,
                   fit: BoxFit.cover,
                 ),

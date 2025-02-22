@@ -12,6 +12,7 @@ import 'package:mozaik/pages/direct_message.dart';
 import 'package:mozaik/pages/discover.dart';
 import 'package:mozaik/pages/home_with_tabs.dart';
 import 'package:mozaik/pages/messages.dart';
+import 'package:mozaik/pages/notifications.dart';
 import 'package:mozaik/pages/profile.dart';
 import 'firebase_options.dart';
 
@@ -56,7 +57,7 @@ class MyApp extends StatelessWidget {
             color: Colors.grey,
           ),
         ),
-        primaryColor: AppColors.ashBlue,
+        primaryColor: AppColors.primary,
         focusColor: AppColors.platinum,
         splashColor: Colors.transparent,
         highlightColor: Colors.transparent,
@@ -171,30 +172,24 @@ class _MyHomePageState extends State<MyHomePage>
       builder: (context) {
         return Stack(
           children: [
-            // Transparent background to capture taps outside the dialog
             Positioned.fill(
               child: GestureDetector(
                 onTap: () {
-                  Navigator.of(context)
-                      .pop(); // Close the dialog on outside tap
+                  Navigator.of(context).pop();
                 },
                 child: Container(
                   color: Colors.transparent,
                 ),
               ),
             ),
-            // Notifications tab positioned below the icon and colliding with the bottom nav bar
             Positioned(
-              top:
-                  kToolbarHeight, // Adjust this value to position below the icon
-              left: 32, // Left padding
-              right: 0, // No right padding
-              bottom: 320, // Collide with the bottom nav bar
+              top: kToolbarHeight,
+              left: 32,
+              right: 0,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: Material(
                   elevation: 1,
-                  // Remove elevation
                   color: AppColors.background,
                   child: Container(
                     decoration: BoxDecoration(
@@ -206,6 +201,7 @@ class _MyHomePageState extends State<MyHomePage>
                       ),
                     ),
                     child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Padding(
@@ -227,50 +223,66 @@ class _MyHomePageState extends State<MyHomePage>
                           height: 0.6,
                           color: AppColors.platinum,
                         ),
-                        Expanded(
-                          child: ListView.builder(
-                            itemCount:
-                                10, // Replace with actual notifications count
-                            itemBuilder: (context, index) {
-                              return ListTile(
-                                leading: const Icon(Icons.notifications),
-                                title: Text('Notification $index'),
-                                subtitle: const Text(
-                                    'This is a sample notification.'),
-                                onTap: () {
-                                  // Handle notification tap
-                                },
-                              );
-                            },
+                        Flexible(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxHeight: 360),
+                            child: ListView.builder(
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: 2,
+                              itemBuilder: (context, index) {
+                                return ListTile(
+                                  leading: const Icon(Icons.notifications),
+                                  title: Text('Notification $index'),
+                                  subtitle: const Text(
+                                      'This is a sample notification.'),
+                                  onTap: () {},
+                                );
+                              },
+                            ),
                           ),
                         ),
                         const Divider(
                           height: 0.6,
                           color: AppColors.platinum,
                         ),
-                        const Padding(
-                          padding: EdgeInsets.all(8.0),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
                           child: Row(
                             children: [
-                              Icon(
+                              const Icon(
                                 FluentIcons.checkmark_24_regular,
                                 size: 26,
+                                color: AppColors.primary,
                               ),
-                              Text(
-                                " Mark all as read",
-                                style: TextStyle(
-                                  color: AppColors.charcoal,
-                                  fontWeight: FontWeight.bold,
+                              TextButton(
+                                onPressed: () {},
+                                child: const Text(
+                                  " Mark all as read",
+                                  style: TextStyle(
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
-                              Spacer(),
-                              Text(
-                                "View all",
-                                style: TextStyle(
-                                  color: AppColors.charcoal,
-                                  fontWeight: FontWeight.bold,
+                              const Spacer(),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context, rootNavigator: true)
+                                      .push(
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const NotificationsPage(),
+                                    ),
+                                  );
+                                },
+                                child: const Text(
+                                  "View all",
+                                  style: TextStyle(
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              ),
+                              )
                             ],
                           ),
                         ),
