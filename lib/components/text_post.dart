@@ -2,6 +2,7 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mozaik/app_colors.dart';
+import 'package:mozaik/components/post_button.dart';
 
 class TextPost extends StatefulWidget {
   final String username;
@@ -30,37 +31,32 @@ class TextPost extends StatefulWidget {
 }
 
 class _TextPostState extends State<TextPost> {
-  late ValueNotifier<bool> _isLikedNotifier;
-  late ValueNotifier<int> _likesNotifier;
-  late ValueNotifier<bool> _isSharedNotifier;
-  late ValueNotifier<int> _sharesNotifier;
+  late int _likes;
+  late bool _isLiked;
+  late int _shares;
+  late bool _isShared;
 
   @override
   void initState() {
     super.initState();
-    _isLikedNotifier = ValueNotifier(false);
-    _likesNotifier = ValueNotifier(widget.likes);
-    _isSharedNotifier = ValueNotifier(false);
-    _sharesNotifier = ValueNotifier(widget.retweets);
+    _likes = widget.likes;
+    _isLiked = false;
+    _shares = widget.retweets;
+    _isShared = false;
   }
 
   void _toggleLike() {
-    _isLikedNotifier.value = !_isLikedNotifier.value;
-    _likesNotifier.value += _isLikedNotifier.value ? 1 : -1;
+    setState(() {
+      _isLiked = !_isLiked;
+      _likes += _isLiked ? 1 : -1;
+    });
   }
 
   void _toggleShare() {
-    _isSharedNotifier.value = !_isSharedNotifier.value;
-    _sharesNotifier.value += _isSharedNotifier.value ? 1 : -1;
-  }
-
-  @override
-  void dispose() {
-    _isLikedNotifier.dispose();
-    _likesNotifier.dispose();
-    _isSharedNotifier.dispose();
-    _sharesNotifier.dispose();
-    super.dispose();
+    setState(() {
+      _isShared = !_isShared;
+      _shares += _isShared ? 1 : -1;
+    });
   }
 
   @override
@@ -105,7 +101,6 @@ class _TextPostState extends State<TextPost> {
                 ),
                 const SizedBox(width: 10),
                 Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
@@ -152,42 +147,30 @@ class _TextPostState extends State<TextPost> {
               overflow: TextOverflow.ellipsis,
               maxLines: 6,
             ),
-            const SizedBox(
-              height: 16,
-            ),
+            const SizedBox(height: 16),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _buildActionButton(
+                  PostButton(
                     icon: CupertinoIcons.bubble_left,
                     count: widget.comments,
                     onTap: () {},
                   ),
-                  ValueListenableBuilder<bool>(
-                    valueListenable: _isSharedNotifier,
-                    builder: (context, isShared, child) {
-                      return _buildActionButton(
-                        icon: CupertinoIcons.arrow_2_squarepath,
-                        color: isShared ? AppColors.primary : Colors.grey,
-                        count: _sharesNotifier.value,
-                        onTap: _toggleShare,
-                      );
-                    },
+                  PostButton(
+                    icon: CupertinoIcons.arrow_2_squarepath,
+                    color: _isShared ? AppColors.primary : Colors.grey,
+                    count: _shares,
+                    onTap: _toggleShare,
                   ),
-                  ValueListenableBuilder<bool>(
-                    valueListenable: _isLikedNotifier,
-                    builder: (context, isLiked, child) {
-                      return _buildActionButton(
-                        icon: isLiked
-                            ? CupertinoIcons.heart_fill
-                            : CupertinoIcons.heart,
-                        color: isLiked ? Colors.red : Colors.grey,
-                        count: _likesNotifier.value,
-                        onTap: _toggleLike,
-                      );
-                    },
+                  PostButton(
+                    icon: _isLiked
+                        ? CupertinoIcons.heart_fill
+                        : CupertinoIcons.heart,
+                    color: _isLiked ? Colors.red : Colors.grey,
+                    count: _likes,
+                    onTap: _toggleLike,
                   ),
                   IconButton(
                     icon: const Icon(CupertinoIcons.arrow_right),
@@ -195,32 +178,6 @@ class _TextPostState extends State<TextPost> {
                   ),
                 ],
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildActionButton({
-    required IconData icon,
-    required int count,
-    required VoidCallback onTap,
-    Color? color,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: SizedBox(
-        width: 52,
-        height: 36,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 24, color: color ?? Colors.grey),
-            const SizedBox(width: 4),
-            Text(
-              count.toString(),
-              style: const TextStyle(fontSize: 14),
             ),
           ],
         ),

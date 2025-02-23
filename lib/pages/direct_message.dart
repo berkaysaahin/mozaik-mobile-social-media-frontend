@@ -57,40 +57,72 @@ class _DirectMessagePageState extends State<DirectMessagePage> {
           Navigator.pop(context);
         },
         onRightIconTap: (BuildContext context) {},
-        title: "Eve",
+        customWidget: Align(
+          alignment: Alignment.centerLeft,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircleAvatar(
+                radius: 20.0,
+                backgroundImage: NetworkImage(
+                    "https://static.wikia.nocookie.net/projectsekai/images/f/ff/Dramaturgy_Game_Cover.png/revision/latest?cb=20201227073615"),
+              ),
+              SizedBox(
+                width: 8,
+              ),
+              Text(
+                "Some Corp Comp",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
       body: Column(
         children: [
+          const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text(
+              "Today",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                color: AppColors.amanojaku,
+              ),
+            ),
+          ),
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               children: const [
                 Align(
                   alignment: Alignment.centerLeft,
                   child: MessageBubble(
-                    text:
-                        "Hi there!theretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretheretherethere",
+                    text: "Hi you can send your cv",
                     isSent: false,
                   ),
                 ),
                 Align(
                   alignment: Alignment.centerRight,
                   child: MessageBubble(
-                    text: "Hello! How are you?",
+                    text: "I'm sending",
                     isSent: true,
                   ),
                 ),
                 Align(
                   alignment: Alignment.centerLeft,
                   child: MessageBubble(
-                    text: "I'm good, thanks. You?",
+                    text: "Ok but we won't check go fuck yourself",
                     isSent: false,
                   ),
                 ),
                 Align(
                   alignment: Alignment.centerRight,
                   child: MessageBubble(
-                    text: "Doing great!",
+                    text: "ok thank you have a great day",
                     isSent: true,
                   ),
                 ),

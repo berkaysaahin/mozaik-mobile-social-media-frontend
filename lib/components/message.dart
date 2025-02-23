@@ -10,7 +10,6 @@ class MessageComponent extends StatelessWidget {
       onTap: () => Navigator.pushNamed(context, '/directMessage'),
       child: Container(
         width: double.infinity,
-        height: 70,
         decoration: const BoxDecoration(
           border: Border(
             bottom: BorderSide(
@@ -20,62 +19,79 @@ class MessageComponent extends StatelessWidget {
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              const CircleAvatar(
-                radius: 30.0,
-                backgroundImage: NetworkImage(
-                    "https://static.wikia.nocookie.net/projectsekai/images/f/ff/Dramaturgy_Game_Cover.png/revision/latest?cb=20201227073615"),
-              ),
-              const SizedBox(
-                width: 16,
-              ),
-              SizedBox(
-                width: MediaQuery.of(context).size.width - 100,
-                child: const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          'Eve',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          softWrap: true,
-                        ),
-                        SizedBox(
-                          width: 4,
-                        ),
-                        Text(
-                          '@evemusic',
-                          style: TextStyle(
-                            fontSize: 14,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          softWrap: true,
-                        ),
-                      ],
-                    ),
-                    Text(
-                      "You've been hoping to get something dramatic out of this storyline.",
-                      style: TextStyle(
-                        fontSize: 16,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                      softWrap: true,
-                    ),
-                  ],
+          padding: const EdgeInsets.all(16),
+          child: SizedBox(
+            height: 52,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const CircleAvatar(
+                  radius: 30.0,
+                  backgroundImage: NetworkImage(
+                      "https://static.wikia.nocookie.net/projectsekai/images/f/ff/Dramaturgy_Game_Cover.png/revision/latest?cb=20201227073615"),
                 ),
-              ),
-            ],
+                const SizedBox(
+                  width: 4,
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width - 150,
+                  child: const Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            'Eve',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            softWrap: true,
+                          ),
+                          SizedBox(
+                            width: 4,
+                          ),
+                          Text(
+                            '@evemusic',
+                            style: TextStyle(
+                                fontSize: 14,
+                                color: AppColors.amanojaku,
+                                fontWeight: FontWeight.w300),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            softWrap: true,
+                          ),
+                        ],
+                      ),
+                      Text(
+                        "You've been hoping to get something dramatic out of this storyline.",
+                        style: TextStyle(
+                          fontSize: 16,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        softWrap: true,
+                      ),
+                    ],
+                  ),
+                ),
+                const Center(
+                  child: Text(
+                    'feb 20',
+                    style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w300,
+                        color: AppColors.amanojaku),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    softWrap: true,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

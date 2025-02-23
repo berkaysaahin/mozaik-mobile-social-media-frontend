@@ -44,15 +44,30 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 )
               : null,
           child: AppBar(
-            title: title != null
-                ? Text(
+            leading: leftIcon != null
+                ? IconButton(
+                    icon: leftIcon!,
+                    onPressed: () {
+                      if (onLeftIconTap != null) {
+                        onLeftIconTap!(context);
+                      }
+                    },
+                  )
+                : null,
+            title: Stack(
+              alignment: Alignment.centerLeft,
+              children: [
+                if (title != null)
+                  Text(
                     title!,
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
-                  )
-                : null,
+                  ),
+                if (customWidget != null) customWidget!,
+              ],
+            ),
             centerTitle: true,
             actions: [
               if (rightIcon != null)
@@ -65,22 +80,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   },
                 ),
             ],
-            leading: leftIcon != null
-                ? IconButton(
-                    icon: leftIcon!,
-                    onPressed: () {
-                      if (onLeftIconTap != null) {
-                        onLeftIconTap!(context);
-                      }
-                    },
-                  )
-                : null,
-            bottom: customWidget != null
-                ? PreferredSize(
-                    preferredSize: const Size.fromHeight(56),
-                    child: customWidget!,
-                  )
-                : null,
           ),
         );
       },

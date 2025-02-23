@@ -150,7 +150,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                         icon: const Icon(
                                             color: AppColors.charcoal,
                                             size: 20,
-                                            FluentIcons.edit_24_regular)),
+                                            Icons.edit)),
                                   ),
                                 ),
                                 const SizedBox(width: 12),
@@ -170,7 +170,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                         icon: const Icon(
                                             color: AppColors.charcoal,
                                             size: 20,
-                                            CupertinoIcons.envelope)),
+                                            Icons.email)),
                                   ),
                                 ),
                                 const SizedBox(width: 12),
