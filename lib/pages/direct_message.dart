@@ -57,7 +57,7 @@ class _DirectMessagePageState extends State<DirectMessagePage> {
           Navigator.pop(context);
         },
         onRightIconTap: (BuildContext context) {},
-        customWidget: Align(
+        customWidget: const Align(
           alignment: Alignment.centerLeft,
           child: Row(
             mainAxisSize: MainAxisSize.min,

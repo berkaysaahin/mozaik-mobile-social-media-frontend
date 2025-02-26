@@ -11,9 +11,12 @@ import 'package:mozaik/components/search_bar.dart';
 import 'package:mozaik/pages/direct_message.dart';
 import 'package:mozaik/pages/discover.dart';
 import 'package:mozaik/pages/home_with_tabs.dart';
+import 'package:mozaik/pages/login.dart';
 import 'package:mozaik/pages/messages.dart';
 import 'package:mozaik/pages/notifications.dart';
+import 'package:mozaik/pages/pick_username.dart';
 import 'package:mozaik/pages/profile.dart';
+import 'package:mozaik/pages/register.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -34,7 +37,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       routes: {
+        '/home': (context) => const MyHomePage(),
         '/directMessage': (context) => const DirectMessagePage(),
+        '/login': (context) => const LoginPage(),
+        '/register': (context) => const RegisterPage(),
+        '/username': (context) => const PickUsernamePage(),
       },
       title: 'Motsaich',
       theme: ThemeData(
@@ -60,6 +67,7 @@ class MyApp extends StatelessWidget {
         primaryColor: AppColors.primary,
         focusColor: AppColors.platinum,
         splashColor: Colors.transparent,
+        splashFactory: NoSplash.splashFactory,
         highlightColor: Colors.transparent,
         useMaterial3: true,
         textSelectionTheme: const TextSelectionThemeData(
@@ -134,6 +142,86 @@ class _MyHomePageState extends State<MyHomePage>
     final appBarConfig = appBarConfigs[selectedIndex];
 
     return Scaffold(
+      drawer: SafeArea(
+        child: Drawer(
+          backgroundColor: AppColors.background,
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: <Widget>[
+              Container(
+                height: 100,
+                decoration: BoxDecoration(
+                  color: AppColors.background,
+                  // Remove border
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Text(
+                    'Menu',
+                    style: TextStyle(
+                      color: AppColors.teupeGray,
+                      fontSize: 24,
+                    ),
+                  ),
+                ),
+              ),
+              ListTile(
+                title: const Text(
+                  'Home',
+                  style: TextStyle(
+                    color: AppColors.teupeGray,
+                    fontSize: 20,
+                  ),
+                ),
+                onTap: () {
+                  // Navigate to the home screen
+                  Navigator.pop(context); // Close the drawer
+                },
+              ),
+              ListTile(
+                title: const Text(
+                  'Settings',
+                  style: TextStyle(
+                    color: AppColors.teupeGray,
+                    fontSize: 20,
+                  ),
+                ),
+                onTap: () {
+                  // Navigate to the settings screen
+                  Navigator.pop(context); // Close the drawer
+                },
+              ),
+              ListTile(
+                title: const Text(
+                  'Login',
+                  style: TextStyle(
+                    color: AppColors.teupeGray,
+                    fontSize: 20,
+                  ),
+                ),
+                onTap: () {
+                  // Handle logout
+                  Navigator.pushNamed(context, '/login');
+                  // Close the drawer
+                },
+              ),
+              ListTile(
+                title: const Text(
+                  'Logout',
+                  style: TextStyle(
+                    color: AppColors.teupeGray,
+                    fontSize: 20,
+                  ),
+                ),
+                onTap: () {
+                  // Handle logout
+                  Navigator.pop(context); // Close the drawer
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
       appBar: selectedIndex != 3
           ? CustomAppBar(
               title: appBarConfig['title'],

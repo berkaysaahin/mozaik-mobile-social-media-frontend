@@ -26,17 +26,19 @@ class _FollowingPageState extends State<FollowingPage> {
   Future<void> fetchPosts() async {
     try {
       final fetchedPosts = await PostService.fetchPosts();
-      setState(() {
-        posts = fetchedPosts;
-        isLoading = false;
-        errorMessage = null;
-      });
-    } catch (e) {
-      setState(() {
-        isLoading = false;
-        errorMessage = 'Failed to load posts: $e';
-      });
       if (mounted) {
+        setState(() {
+          posts = fetchedPosts;
+          isLoading = false;
+          errorMessage = null;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+          errorMessage = 'Failed to load posts: $e';
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to load posts: $e')),
         );
@@ -91,8 +93,10 @@ class _FollowingPageState extends State<FollowingPage> {
                         username: post.username,
                         handle: post.handle,
                         content: post.content,
-                        likes: post.likes,
-                        retweets: post.retweets,
+                        likeCount: post.likeCount,
+                        reblogCount: post.reblogCount,
+                        hasLiked: post.hasLiked,
+                        hasReblogged: post.hasReblogged,
                         comments: post.comments,
                         timestamp: post.timestamp,
                         profilePic: post.profilePic,
@@ -108,7 +112,7 @@ class _FollowingPageState extends State<FollowingPage> {
         SliverFillRemaining(
           hasScrollBody: false,
           child: Container(
-            color: AppColors.platinum,
+            color: AppColors.background,
             alignment: Alignment.center,
           ),
         ),

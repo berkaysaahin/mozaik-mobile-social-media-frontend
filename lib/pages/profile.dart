@@ -1,5 +1,3 @@
-import 'package:fluentui_system_icons/fluentui_system_icons.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mozaik/app_colors.dart';
 import 'package:mozaik/components/rounded_rectangle_button.dart';
@@ -28,7 +26,6 @@ class _ProfilePageState extends State<ProfilePage> {
     email: 'loading@example.com',
     profilePic: '',
     cover: '',
-    password: "0",
     createdAt: DateTime(2, 2, 2, 2),
   );
 
@@ -358,8 +355,10 @@ class _ProfilePageState extends State<ProfilePage> {
                             username: post.username,
                             handle: post.handle,
                             content: post.content,
-                            likes: post.likes,
-                            retweets: post.retweets,
+                            likeCount: post.likeCount,
+                            reblogCount: post.reblogCount,
+                            hasLiked: post.hasLiked,
+                            hasReblogged: post.hasReblogged,
                             comments: post.comments,
                             timestamp: post.timestamp,
                             profilePic: post.profilePic,

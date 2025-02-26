@@ -8,7 +8,7 @@ class UserService {
 
   static Future<User> fetchUserByHandle(String handle) async {
     final response =
-        await http.get(Uri.parse('$baseUrl/api/user?handle=$handle'));
+        await http.get(Uri.parse('$baseUrl/api/users/user?handle=$handle'));
 
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);

@@ -7,7 +7,8 @@ class PostService {
   static String baseUrl = dotenv.env['HOST_URL']!;
 
   static Future<List<Post>> fetchPosts() async {
-    final response = await http.get(Uri.parse('$baseUrl/posts'));
+    final response = await http.get(Uri.parse(
+        '$baseUrl/api/posts/get?user_id=ca4739ee-02a9-495f-ad96-e8bb851024d2'));
 
     if (response.statusCode == 200) {
       final List<dynamic> jsonData = json.decode(response.body);
@@ -18,7 +19,8 @@ class PostService {
   }
 
   static Future<List<Post>> fetchPostsByUser(String handle) async {
-    final response = await http.get(Uri.parse('$baseUrl/posts/user/$handle'));
+    final response =
+        await http.get(Uri.parse('$baseUrl/api/posts/user/$handle'));
 
     if (response.statusCode == 200) {
       final List<dynamic> jsonData = json.decode(response.body);

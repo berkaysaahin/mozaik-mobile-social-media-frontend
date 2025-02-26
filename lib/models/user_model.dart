@@ -3,7 +3,6 @@ class User {
   final String username;
   final String handle;
   final String email;
-  final String password;
   final DateTime createdAt;
   final String profilePic;
   final String cover;
@@ -13,7 +12,6 @@ class User {
     required this.username,
     required this.handle,
     required this.email,
-    required this.password,
     required this.createdAt,
     required this.profilePic,
     required this.cover,
@@ -25,7 +23,6 @@ class User {
       username: json['username'],
       handle: json['handle'],
       email: json['email'],
-      password: json['password'],
       profilePic: json['profile_picture'],
       cover: json['cover'],
       createdAt: DateTime.parse(json['createdAt']),

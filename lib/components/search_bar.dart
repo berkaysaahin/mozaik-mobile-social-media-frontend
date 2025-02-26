@@ -25,12 +25,15 @@ class CustomSearchBar extends StatelessWidget implements PreferredSizeWidget {
         alignment: Alignment.centerLeft,
         child: Padding(
           padding: const EdgeInsets.only(left: 16),
-          child: Text(
-            hintText,
-            style: const TextStyle(
-              fontWeight: FontWeight.w100,
-              fontStyle: FontStyle.italic,
-              fontSize: 14,
+          child: TextField(
+            decoration: InputDecoration(
+              hintText: hintText,
+              hintStyle: const TextStyle(
+                fontWeight: FontWeight.w100,
+                fontStyle: FontStyle.italic,
+                fontSize: 14,
+              ),
+              border: InputBorder.none,
             ),
           ),
         ),

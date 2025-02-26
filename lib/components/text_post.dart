@@ -8,22 +8,27 @@ class TextPost extends StatefulWidget {
   final String username;
   final String handle;
   final String content;
-  final int likes;
-  final int retweets;
+  final int likeCount; // Updated: Like count from the backend
+  final int reblogCount; // Updated: Reblog count from the backend
   final int comments;
   final DateTime timestamp;
   final String profilePic;
+  final bool hasLiked; // Updated: Whether the current user has liked the post
+  final bool
+      hasReblogged; // Updated: Whether the current user has reblogged the post
 
   const TextPost({
     super.key,
     required this.username,
     required this.handle,
     required this.content,
-    required this.likes,
-    required this.retweets,
+    required this.likeCount,
+    required this.reblogCount,
     required this.comments,
     required this.timestamp,
     required this.profilePic,
+    required this.hasLiked,
+    required this.hasReblogged,
   });
 
   @override
@@ -39,10 +44,14 @@ class _TextPostState extends State<TextPost> {
   @override
   void initState() {
     super.initState();
-    _likes = widget.likes;
-    _isLiked = false;
-    _shares = widget.retweets;
-    _isShared = false;
+    _likes =
+        widget.likeCount; // Initialize with the like count from the backend
+    _isLiked =
+        widget.hasLiked; // Initialize with the like status from the backend
+    _shares =
+        widget.reblogCount; // Initialize with the reblog count from the backend
+    _isShared = widget
+        .hasReblogged; // Initialize with the reblog status from the backend
   }
 
   void _toggleLike() {
@@ -50,6 +59,7 @@ class _TextPostState extends State<TextPost> {
       _isLiked = !_isLiked;
       _likes += _isLiked ? 1 : -1;
     });
+    // Call your backend API to update the like status
   }
 
   void _toggleShare() {
@@ -57,6 +67,7 @@ class _TextPostState extends State<TextPost> {
       _isShared = !_isShared;
       _shares += _isShared ? 1 : -1;
     });
+    // Call your backend API to update the reblog status
   }
 
   @override

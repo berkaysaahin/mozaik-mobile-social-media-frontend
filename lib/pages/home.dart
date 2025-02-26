@@ -66,8 +66,10 @@ class _HomePageState extends State<HomePage> {
                         username: post.username,
                         handle: post.handle,
                         content: post.content,
-                        likes: post.likes,
-                        retweets: post.retweets,
+                        likeCount: post.likeCount,
+                        reblogCount: post.reblogCount,
+                        hasLiked: post.hasLiked,
+                        hasReblogged: post.hasReblogged,
                         comments: post.comments,
                         timestamp: post.timestamp,
                         profilePic: post.profilePic,
@@ -83,7 +85,7 @@ class _HomePageState extends State<HomePage> {
         SliverFillRemaining(
           hasScrollBody: false,
           child: Container(
-            color: AppColors.platinum,
+            color: AppColors.background,
             alignment: Alignment.center,
           ),
         ),
