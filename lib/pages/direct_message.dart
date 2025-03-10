@@ -52,11 +52,11 @@ class _DirectMessagePageState extends State<DirectMessagePage> {
     return Scaffold(
       appBar: CustomAppBar(
         leftIcon: const Icon(FluentIcons.arrow_left_24_regular),
-        rightIcon: const Icon(FluentIcons.more_vertical_24_regular),
+        rightWidget: const Icon(FluentIcons.more_vertical_24_regular),
         onLeftIconTap: (BuildContext context) {
           Navigator.pop(context);
         },
-        onRightIconTap: (BuildContext context) {},
+        onRightWidgetTap: (BuildContext context) {},
         customWidget: const Align(
           alignment: Alignment.centerLeft,
           child: Row(

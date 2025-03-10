@@ -19,7 +19,6 @@ class _RegisterPageState extends State<RegisterPage> {
 
   void _register() {
     if (_formKey.currentState!.validate()) {
-      // Perform login logic here
       final email = _emailController.text;
       final password = _passwordController.text;
       print('Email: $email, Password: $password');
@@ -120,29 +119,26 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     const SizedBox(height: 24),
                     Material(
-                      color: AppColors.primary, // Background color
+                      color: AppColors.primary,
                       shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(8), // Rounded corners
+                        borderRadius: BorderRadius.circular(8),
                         side: const BorderSide(
-                          // Border color
-                          width: 1, // Border width
+                          width: 1,
                         ),
                       ),
                       child: InkWell(
                         onTap: _register,
-                        splashFactory:
-                            NoSplash.splashFactory, // Remove splash effect
+                        splashFactory: NoSplash.splashFactory,
                         child: const SizedBox(
                           width: double.infinity,
-                          height: 56, // Adjust height as needed
+                          height: 56,
                           child: Center(
                             child: Text(
                               'Sign Up',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
-                                color: Colors.white, // Text color
+                                color: Colors.white,
                               ),
                             ),
                           ),
@@ -156,8 +152,8 @@ class _RegisterPageState extends State<RegisterPage> {
                       children: [
                         Expanded(
                           child: Divider(
-                            color: Colors.grey, // Line color
-                            thickness: 1, // Line thickness
+                            color: Colors.grey,
+                            thickness: 1,
                           ),
                         ),
                         Padding(
@@ -173,8 +169,8 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                         Expanded(
                           child: Divider(
-                            color: Colors.grey, // Line color
-                            thickness: 1, // Line thickness
+                            color: Colors.grey,
+                            thickness: 1,
                           ),
                         ),
                       ],
@@ -183,21 +179,16 @@ class _RegisterPageState extends State<RegisterPage> {
                       height: 24,
                     ),
                     Material(
-                      color: AppColors.background, // Background color
+                      color: AppColors.background,
                       shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(8), // Rounded corners
+                        borderRadius: BorderRadius.circular(8),
                         side: const BorderSide(
-                          // Border color
-                          width: 0.5, // Border width
+                          width: 0.5,
                         ),
                       ),
                       child: InkWell(
-                        onTap: () {
-                          // Handle button press
-                        },
-                        splashFactory:
-                            NoSplash.splashFactory, // Remove splash effect
+                        onTap: () {},
+                        splashFactory: NoSplash.splashFactory,
                         child: Stack(
                           children: [
                             Padding(
@@ -210,16 +201,14 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                             const SizedBox(
                               width: double.infinity,
-                              height: 48, // Adjust height as needed
+                              height: 48,
                               child: Center(
                                 child: Text(
                                   'Continue with Google',
                                   style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w700,
-                                      color: AppColors.battleshipGray
-                                      // Text color
-                                      ),
+                                      color: AppColors.battleshipGray),
                                 ),
                               ),
                             ),
@@ -231,21 +220,16 @@ class _RegisterPageState extends State<RegisterPage> {
                       height: 24,
                     ),
                     Material(
-                      color: AppColors.background, // Background color
+                      color: AppColors.background,
                       shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(8), // Rounded corners
+                        borderRadius: BorderRadius.circular(8),
                         side: const BorderSide(
-                          // Border color
-                          width: 0.5, // Border width
+                          width: 0.5,
                         ),
                       ),
                       child: InkWell(
-                        onTap: () {
-                          // Handle button press
-                        },
-                        splashFactory:
-                            NoSplash.splashFactory, // Remove splash effect
+                        onTap: () {},
+                        splashFactory: NoSplash.splashFactory,
                         child: Stack(
                           children: [
                             Padding(
@@ -258,16 +242,14 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                             const SizedBox(
                               width: double.infinity,
-                              height: 48, // Adjust height as needed
+                              height: 48,
                               child: Center(
                                 child: Text(
                                   'Continue with Facebook',
                                   style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w800,
-                                      color:
-                                          AppColors.battleshipGray // Text color
-                                      ),
+                                      color: AppColors.battleshipGray),
                                 ),
                               ),
                             ),
@@ -296,11 +278,9 @@ class _RegisterPageState extends State<RegisterPage> {
                     onTap: () {
                       Navigator.pushNamed(context, '/login');
                     },
-                    splashFactory:
-                        NoSplash.splashFactory, // Remove splash effect
+                    splashFactory: NoSplash.splashFactory,
                     child: const Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 2, vertical: 8), // Add padding if needed
+                      padding: EdgeInsets.symmetric(horizontal: 2, vertical: 8),
                       child: Text(
                         "Sign In",
                         style: TextStyle(
@@ -308,7 +288,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           fontWeight: FontWeight.w600,
                           color: AppColors.primary,
                         ),
-                        textAlign: TextAlign.start, // Align text to the start
+                        textAlign: TextAlign.start,
                       ),
                     ),
                   ),

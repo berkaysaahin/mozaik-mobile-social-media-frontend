@@ -3,11 +3,11 @@ import 'package:mozaik/app_colors.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Icon? leftIcon;
-  final Icon? rightIcon;
+  final Widget? rightWidget;
   final Widget? customWidget;
   final String? title;
   final Function(BuildContext)? onLeftIconTap;
-  final Function(BuildContext)? onRightIconTap;
+  final Function(BuildContext)? onRightWidgetTap;
   final int? selectedIndex;
   final TabController? tabController;
   final ValueNotifier<bool>? isTabBarVisibleNotifier;
@@ -15,10 +15,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CustomAppBar({
     super.key,
     this.leftIcon,
-    this.rightIcon,
+    this.rightWidget,
     this.title,
     this.onLeftIconTap,
-    this.onRightIconTap,
+    this.onRightWidgetTap,
     this.selectedIndex,
     this.tabController,
     this.isTabBarVisibleNotifier,
@@ -70,15 +70,24 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
             centerTitle: true,
             actions: [
-              if (rightIcon != null)
-                IconButton(
-                  icon: rightIcon!,
-                  onPressed: () {
-                    if (onRightIconTap != null) {
-                      onRightIconTap!(context);
-                    }
-                  },
-                ),
+              if (rightWidget != null)
+                rightWidget is Icon
+                    ? IconButton(
+                        icon: rightWidget as Icon,
+                        onPressed: () {
+                          if (onRightWidgetTap != null) {
+                            onRightWidgetTap!(context);
+                          }
+                        },
+                      )
+                    : TextButton(
+                        onPressed: () {
+                          if (onRightWidgetTap != null) {
+                            onRightWidgetTap!(context);
+                          }
+                        },
+                        child: rightWidget!,
+                      ),
             ],
           ),
         );

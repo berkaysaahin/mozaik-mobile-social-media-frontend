@@ -19,10 +19,6 @@ class _PickUsernamePageState extends State<PickUsernamePage> {
       final name = _nameController.text;
       print('Name: $name');
 
-      // Save the name to your backend or local storage
-      // Example: Firebase, SharedPreferences, etc.
-
-      // Navigate to the home screen or next screen
       Navigator.pushReplacementNamed(context, '/home');
     }
   }
@@ -85,20 +81,19 @@ class _PickUsernamePageState extends State<PickUsernamePage> {
               ),
               const SizedBox(height: 24),
               Material(
-                color: AppColors.primary, // Background color
+                color: AppColors.primary,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8), // Rounded corners
+                  borderRadius: BorderRadius.circular(8),
                   side: const BorderSide(
-                    // Border color
-                    width: 0.5, // Border width
+                    width: 0.5,
                   ),
                 ),
                 child: InkWell(
                   onTap: _saveName,
-                  splashFactory: NoSplash.splashFactory, // Remove splash effect
+                  splashFactory: NoSplash.splashFactory,
                   child: const SizedBox(
                     width: double.infinity,
-                    height: 48, // Adjust height as needed
+                    height: 48,
                     child: Center(
                       child: Text(
                         'Step In!',
@@ -106,7 +101,6 @@ class _PickUsernamePageState extends State<PickUsernamePage> {
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
-                          // Text color
                         ),
                       ),
                     ),

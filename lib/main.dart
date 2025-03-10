@@ -13,6 +13,7 @@ import 'package:mozaik/pages/discover.dart';
 import 'package:mozaik/pages/home_with_tabs.dart';
 import 'package:mozaik/pages/login.dart';
 import 'package:mozaik/pages/messages.dart';
+import 'package:mozaik/pages/new_post.dart';
 import 'package:mozaik/pages/notifications.dart';
 import 'package:mozaik/pages/pick_username.dart';
 import 'package:mozaik/pages/profile.dart';
@@ -42,6 +43,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginPage(),
         '/register': (context) => const RegisterPage(),
         '/username': (context) => const PickUsernamePage(),
+        '/newPost': (context) => const NewPostPage(),
       },
       title: 'Motsaich',
       theme: ThemeData(
@@ -145,77 +147,146 @@ class _MyHomePageState extends State<MyHomePage>
       drawer: SafeArea(
         child: Drawer(
           backgroundColor: AppColors.background,
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: <Widget>[
+          child: Column(
+            children: [
               Container(
-                height: 100,
-                decoration: BoxDecoration(
+                height: 160,
+                decoration: const BoxDecoration(
                   color: AppColors.background,
-                  // Remove border
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Text(
-                    'Menu',
-                    style: TextStyle(
-                      color: AppColors.teupeGray,
-                      fontSize: 24,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 8,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CircleAvatar(
+                        radius: 32,
+                        backgroundColor: AppColors.ashBlue,
+                        child: ClipOval(
+                          child: Image.network(
+                            "https://static.wikia.nocookie.net/projectsekai/images/f/ff/Dramaturgy_Game_Cover.png/revision/latest?cb=20201227073615",
+                            width: 64,
+                            height: 64,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 12,
+                      ),
+                      Container(
+                        height: 32,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(6),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 0,
+                              spreadRadius: 0,
+                            ),
+                          ],
+                        ),
+                        child: const Padding(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 18, vertical: 4),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Berkay Sahin',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w300,
+                                ),
+                              ),
+                              Icon(
+                                CupertinoIcons.chevron_down,
+                                size: 20,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: Divider(),
+              ),
+              Expanded(
+                child: ListView(
+                  padding: EdgeInsets.zero,
+                  children: <Widget>[
+                    ListTile(
+                      leading: const Icon(
+                        FluentIcons.home_16_regular,
+                        size: 20,
+                      ),
+                      title: const Text(
+                        'Home',
+                        style: TextStyle(
+                          fontSize: 18,
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
                     ),
-                  ),
+                    ListTile(
+                      leading: const Icon(
+                        FluentIcons.settings_16_regular,
+                        size: 20,
+                      ),
+                      title: const Text(
+                        'Settings',
+                        style: TextStyle(
+                          fontSize: 16,
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(
+                        FluentIcons.signature_20_regular,
+                        size: 20,
+                      ),
+                      title: const Text(
+                        'Login',
+                        style: TextStyle(
+                          fontSize: 16,
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/login');
+                      },
+                    ),
+                  ],
                 ),
               ),
+              const Spacer(),
               ListTile(
-                title: const Text(
-                  'Home',
-                  style: TextStyle(
-                    color: AppColors.teupeGray,
-                    fontSize: 20,
-                  ),
+                leading: const Icon(
+                  FluentIcons.sign_out_20_regular,
+                  size: 20,
                 ),
-                onTap: () {
-                  // Navigate to the home screen
-                  Navigator.pop(context); // Close the drawer
-                },
-              ),
-              ListTile(
-                title: const Text(
-                  'Settings',
-                  style: TextStyle(
-                    color: AppColors.teupeGray,
-                    fontSize: 20,
-                  ),
-                ),
-                onTap: () {
-                  // Navigate to the settings screen
-                  Navigator.pop(context); // Close the drawer
-                },
-              ),
-              ListTile(
-                title: const Text(
-                  'Login',
-                  style: TextStyle(
-                    color: AppColors.teupeGray,
-                    fontSize: 20,
-                  ),
-                ),
-                onTap: () {
-                  // Handle logout
-                  Navigator.pushNamed(context, '/login');
-                  // Close the drawer
-                },
-              ),
-              ListTile(
                 title: const Text(
                   'Logout',
                   style: TextStyle(
-                    color: AppColors.teupeGray,
-                    fontSize: 20,
+                    fontSize: 16,
                   ),
                 ),
                 onTap: () {
-                  // Handle logout
-                  Navigator.pop(context); // Close the drawer
+                  Navigator.pop(context);
                 },
               ),
             ],
@@ -225,8 +296,8 @@ class _MyHomePageState extends State<MyHomePage>
       appBar: selectedIndex != 3
           ? CustomAppBar(
               title: appBarConfig['title'],
-              rightIcon: Icon(appBarConfig['rightIcon']),
-              onRightIconTap: appBarConfig['onRightIconTap'],
+              rightWidget: Icon(appBarConfig['rightIcon']),
+              onRightWidgetTap: appBarConfig['onRightIconTap'],
               selectedIndex: selectedIndex,
               tabController: _tabController,
               isTabBarVisibleNotifier: isTabBarVisible,
@@ -250,6 +321,22 @@ class _MyHomePageState extends State<MyHomePage>
         currentIndex: selectedIndex,
         onTap: onItemTapped,
       ),
+      floatingActionButton: selectedIndex == 0
+          ? FloatingActionButton(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(36),
+              ),
+              elevation: 0,
+              backgroundColor: AppColors.primary,
+              onPressed: () {
+                Navigator.pushNamed(context, '/newPost');
+              },
+              child: const Icon(
+                FluentIcons.pen_20_regular,
+                color: Colors.white,
+              ),
+            )
+          : null,
     );
   }
 

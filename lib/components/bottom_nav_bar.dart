@@ -39,7 +39,7 @@ class BottomNavBar extends StatelessWidget {
         unselectedItemColor: AppColors.primary,
         selectedFontSize: 13,
         unselectedFontSize: 13,
-        iconSize: 26,
+        iconSize: 24,
         enableFeedback: false,
         currentIndex: currentIndex,
         onTap: onTap,
@@ -58,8 +58,8 @@ class BottomNavBar extends StatelessWidget {
           ),
           BottomNavigationBarItem(
             icon: currentIndex == 2
-                ? const Icon(CupertinoIcons.bubble_right_fill)
-                : const Icon(CupertinoIcons.bubble_right),
+                ? const Icon(CupertinoIcons.chat_bubble_fill)
+                : const Icon(CupertinoIcons.chat_bubble),
             label: 'Messages',
           ),
           BottomNavigationBarItem(

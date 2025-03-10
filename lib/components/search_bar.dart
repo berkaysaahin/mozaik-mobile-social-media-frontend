@@ -22,7 +22,7 @@ class CustomSearchBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       height: height,
       child: Align(
-        alignment: Alignment.centerLeft,
+        alignment: Alignment.center,
         child: Padding(
           padding: const EdgeInsets.only(left: 16),
           child: TextField(
@@ -34,6 +34,8 @@ class CustomSearchBar extends StatelessWidget implements PreferredSizeWidget {
                 fontSize: 14,
               ),
               border: InputBorder.none,
+              contentPadding: EdgeInsets.zero,
+              isDense: true,
             ),
           ),
         ),
