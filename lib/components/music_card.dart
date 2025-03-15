@@ -13,7 +13,7 @@ class MusicCard extends StatefulWidget {
 
 class _MusicCardState extends State<MusicCard> {
   Color? _backgroundColor;
-  static final Map<String, Color> _paletteCache = {}; // Cache for palettes
+  static final Map<String, Color> _paletteCache = {};
 
   @override
   void initState() {
@@ -25,7 +25,6 @@ class _MusicCardState extends State<MusicCard> {
   void didUpdateWidget(MusicCard oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    // Regenerate the palette if the music data has changed
     if (widget.music != oldWidget.music) {
       _generatePalette();
     }
@@ -35,7 +34,6 @@ class _MusicCardState extends State<MusicCard> {
     if (widget.music != null && widget.music!['cover_art'] != null) {
       final String coverArtUrl = widget.music!['cover_art'];
 
-      // Check if the palette is already cached
       if (_paletteCache.containsKey(coverArtUrl)) {
         if (mounted) {
           setState(() {
@@ -45,14 +43,12 @@ class _MusicCardState extends State<MusicCard> {
         return;
       }
 
-      // Generate the palette asynchronously
       try {
         final PaletteGenerator paletteGenerator =
             await PaletteGenerator.fromImageProvider(
           NetworkImage(coverArtUrl),
         );
 
-        // Cache the palette
         _paletteCache[coverArtUrl] =
             paletteGenerator.dominantColor?.color ?? AppColors.darkGray;
 

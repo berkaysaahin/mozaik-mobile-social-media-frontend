@@ -10,6 +10,7 @@ import 'package:mozaik/blocs/post_bloc.dart';
 import 'package:mozaik/components/bottom_nav_bar.dart';
 import 'package:mozaik/components/custom_app_bar.dart';
 import 'package:mozaik/components/search_bar.dart';
+import 'package:mozaik/events/post_event.dart';
 import 'package:mozaik/pages/direct_message.dart';
 import 'package:mozaik/pages/discover.dart';
 import 'package:mozaik/pages/home_with_tabs.dart';
@@ -335,7 +336,9 @@ class _MyHomePageState extends State<MyHomePage>
               elevation: 0,
               backgroundColor: AppColors.primary,
               onPressed: () {
-                Navigator.pushNamed(context, '/newPost');
+                Navigator.pushNamed(context, '/newPost').then((_) {
+                  context.read<PostBloc>().add(FetchPosts());
+                });
               },
               child: const Icon(
                 FluentIcons.add_24_filled,

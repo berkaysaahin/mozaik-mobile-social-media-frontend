@@ -1,5 +1,7 @@
 abstract class PostEvent {}
 
+class FetchPosts extends PostEvent {}
+
 class CreatePostEvent extends PostEvent {
   final String userId;
   final String content;

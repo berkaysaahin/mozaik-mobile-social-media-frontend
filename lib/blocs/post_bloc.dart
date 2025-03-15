@@ -1,18 +1,27 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mozaik/events/post_event.dart';
 import 'package:mozaik/services/post_service.dart';
-import 'package:mozaik/states/post_state_dart';
+import 'package:mozaik/states/post_state.dart';
 
 class PostBloc extends Bloc<PostEvent, PostState> {
   PostBloc() : super(PostInitial()) {
-    // Register the CreatePostEvent handler
     on<CreatePostEvent>(_onCreatePostEvent);
+    on<FetchPosts>(_onFetchPosts);
   }
 
-  // Event handler for CreatePostEvent
+  Future<void> _onFetchPosts(FetchPosts event, Emitter<PostState> emit) async {
+    emit(PostLoading());
+    try {
+      final posts = await PostService.fetchPosts();
+      emit(PostsLoaded(posts));
+    } catch (e) {
+      emit(PostError('Failed to fetch posts: $e'));
+    }
+  }
+
   Future<void> _onCreatePostEvent(
       CreatePostEvent event, Emitter<PostState> emit) async {
-    emit(PostLoading()); // Emit loading state
+    emit(PostLoading());
 
     try {
       final newPost = await PostService.createPost(
@@ -23,9 +32,10 @@ class PostBloc extends Bloc<PostEvent, PostState> {
         imageUrl: event.imageUrl,
       );
 
-      emit(PostCreated(newPost)); // Emit success state
+      emit(PostCreated(newPost));
+      add(FetchPosts());
     } catch (e) {
-      emit(PostError('Failed to create post: $e')); // Emit error state
+      emit(PostError('Failed to create post: $e'));
     }
   }
 }

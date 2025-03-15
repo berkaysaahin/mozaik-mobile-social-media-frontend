@@ -18,12 +18,11 @@ class _TrackSearchState extends State<TrackSearch> {
   List<Map<String, dynamic>> searchResults = [];
   bool isLoading = false;
   bool isSearchEmpty = true;
-  Timer? _debounceTimer; // Timer for debouncing
+  Timer? _debounceTimer;
 
-  // Debounce search to avoid too many API calls
   void _debounceSearch() {
     if (_debounceTimer?.isActive ?? false) {
-      _debounceTimer?.cancel(); // Cancel the previous timer
+      _debounceTimer?.cancel();
     }
 
     _debounceTimer = Timer(const Duration(milliseconds: 500), () {
@@ -83,7 +82,7 @@ class _TrackSearchState extends State<TrackSearch> {
   void dispose() {
     _searchController.removeListener(_debounceSearch);
     _searchController.dispose();
-    _debounceTimer?.cancel(); // Cancel the timer when the widget is disposed
+    _debounceTimer?.cancel();
     super.dispose();
   }
 
@@ -99,7 +98,6 @@ class _TrackSearchState extends State<TrackSearch> {
       ),
       body: Column(
         children: [
-          // Search Bar
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Row(
@@ -135,8 +133,6 @@ class _TrackSearchState extends State<TrackSearch> {
               ],
             ),
           ),
-
-          // Loading Indicator or Results
           isLoading
               ? const Center(child: CircularProgressIndicator())
               : Expanded(
@@ -170,7 +166,6 @@ class _TrackSearchState extends State<TrackSearch> {
                               title: Text(track['name']),
                               subtitle: Text(track['artist']),
                               onTap: () {
-                                // Return the selected track to the previous page
                                 Navigator.pop(context, {
                                   'id': track['id'],
                                   'name': track['name'],

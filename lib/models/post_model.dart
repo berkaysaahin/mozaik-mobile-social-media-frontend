@@ -32,27 +32,23 @@ class Post {
   });
   factory Post.fromJson(Map<String, dynamic> json) {
     return Post(
-      id: json['id'] as int? ?? 0, // Default value if null
-      username:
-          json['username'] as String? ?? 'Unknown', // Default value if null
-      handle: json['handle'] as String? ?? 'Unknown', // Default value if null
-      content: json['content'] as String? ?? '', // Default value if null
+      id: json['id'] as int? ?? 0,
+      username: json['username'] as String? ?? 'Unknown',
+      handle: json['handle'] as String? ?? 'Unknown',
+      content: json['content'] as String? ?? '',
       comments: int.tryParse(json['comments'].toString()) ?? 0,
-      timestamp: DateTime.parse(json['timestamp'] as String? ??
-          DateTime.now().toIso8601String()), // Default value if null
-      profilePic:
-          json['profile_picture'] as String? ?? '', // Default value if null
+      timestamp: DateTime.parse(
+          json['timestamp'] as String? ?? DateTime.now().toIso8601String()),
+      profilePic: json['profile_picture'] as String? ?? '',
       likeCount: int.tryParse(json['like_count'].toString()) ?? 0,
       reblogCount: int.tryParse(json['reblog_count'].toString()) ?? 0,
-      hasLiked: json['has_liked'] as bool? ?? false, // Default value if null
-      hasReblogged:
-          json['has_reblogged'] as bool? ?? false, // Default value if null
-      visibility:
-          json['visibility'] as String? ?? 'public', // Default value if null
-      imageUrl: json['image_url'] as String?, // Nullable
+      hasLiked: json['has_liked'] as bool? ?? false,
+      hasReblogged: json['has_reblogged'] as bool? ?? false,
+      visibility: json['visibility'] as String? ?? 'public',
+      imageUrl: json['image_url'] as String?,
       music: json['music'] != null
           ? Map<String, dynamic>.from(json['music'])
-          : null, // Nullable
+          : null,
     );
   }
 }

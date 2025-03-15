@@ -33,7 +33,7 @@ class PostService {
   static Future<Post> createPost({
     required String userId,
     required String content,
-    String? spotifyTrackId, // Send only the Spotify track ID
+    String? spotifyTrackId,
     required String visibility,
     String? imageUrl,
   }) async {
@@ -45,7 +45,7 @@ class PostService {
       body: jsonEncode(<String, dynamic>{
         'user_id': userId,
         'content': content,
-        'spotify_track_id': spotifyTrackId, // Send only the track ID
+        'spotify_track_id': spotifyTrackId,
         'visibility': visibility,
         'image_url': imageUrl,
       }),

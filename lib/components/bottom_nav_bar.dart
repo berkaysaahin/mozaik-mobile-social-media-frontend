@@ -90,13 +90,12 @@ class BottomNavBar extends StatelessWidget {
       icon: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Thicker icon using a Stack
           Stack(
             alignment: Alignment.center,
             children: [
               icon,
               Transform.translate(
-                offset: const Offset(0.5, 0.5), // Adjust for thickness
+                offset: const Offset(0.5, 0.5),
                 child: icon,
               ),
             ],

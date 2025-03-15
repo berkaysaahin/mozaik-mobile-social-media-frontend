@@ -5,7 +5,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 class SpotifyService {
   static String baseUrl = dotenv.env['HOST_URL']!;
 
-  // Search for tracks
   static Future<List<Map<String, dynamic>>> searchTracks(String query) async {
     final response = await http.get(
       Uri.parse('$baseUrl/api/spotify/search?query=$query'),

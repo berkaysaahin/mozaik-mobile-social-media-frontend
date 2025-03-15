@@ -6,7 +6,7 @@ import 'package:mozaik/blocs/post_bloc.dart';
 import 'package:mozaik/components/custom_app_bar.dart';
 import 'package:mozaik/events/post_event.dart';
 import 'package:mozaik/pages/track_search.dart';
-import 'package:mozaik/states/post_state_dart';
+import 'package:mozaik/states/post_state.dart';
 
 class NewPostPage extends StatefulWidget {
   const NewPostPage({super.key});
@@ -18,7 +18,7 @@ class NewPostPage extends StatefulWidget {
 class _NewPostPageState extends State<NewPostPage> {
   String _visibility = 'Public';
   final TextEditingController _postController = TextEditingController();
-  String? _spotifyTrackId; // Store the selected Spotify track ID
+  String? _spotifyTrackId;
   String? _imageUrl;
   String? _trackName;
   String? _trackImage;
@@ -59,11 +59,9 @@ class _NewPostPageState extends State<NewPostPage> {
         title: "Post",
         rightWidget: TextButton(
           onPressed: () {
-            // Trigger the CreatePostEvent when the "Publish" button is pressed
             final postBloc = context.read<PostBloc>();
             postBloc.add(CreatePostEvent(
-              userId:
-                  'b2ecc8ae-9e16-42eb-915f-d2e1e2022f6c', // Replace with actual user ID
+              userId: 'b2ecc8ae-9e16-42eb-915f-d2e1e2022f6c',
               content: _postController.text,
               spotifyTrackId: _spotifyTrackId,
               visibility: _visibility.toLowerCase(),
@@ -82,15 +80,12 @@ class _NewPostPageState extends State<NewPostPage> {
       body: BlocListener<PostBloc, PostState>(
         listener: (context, state) {
           if (state is PostCreated) {
-            // Show success message
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Post created successfully!')),
             );
 
-            // Navigate back to the previous screen
             Navigator.pop(context);
           } else if (state is PostError) {
-            // Show error message
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.message)),
             );
@@ -99,11 +94,9 @@ class _NewPostPageState extends State<NewPostPage> {
         child: BlocBuilder<PostBloc, PostState>(
           builder: (context, state) {
             if (state is PostLoading) {
-              // Show a loading indicator while the post is being created
               return const Center(child: CircularProgressIndicator());
             }
 
-            // Main UI for creating a post
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -179,10 +172,9 @@ class _NewPostPageState extends State<NewPostPage> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: SizedBox(
-                      height: 60, // Fixed height
+                      height: 60,
                       child: Row(
                         children: [
-                          // Track Image
                           if (_trackImage != null)
                             Padding(
                               padding:
@@ -197,7 +189,6 @@ class _NewPostPageState extends State<NewPostPage> {
                                 ),
                               ),
                             ),
-                          // Track Details
                           Expanded(
                             child: Padding(
                               padding: const EdgeInsets.symmetric(vertical: 8),
@@ -227,7 +218,6 @@ class _NewPostPageState extends State<NewPostPage> {
                               ),
                             ),
                           ),
-                          // Optional: Add a close button to remove the selected track
                           IconButton(
                             icon: const Icon(FluentIcons.dismiss_24_regular),
                             onPressed: () {
