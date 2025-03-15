@@ -1,10 +1,12 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:mozaik/app_colors.dart';
+import 'package:mozaik/blocs/post_bloc.dart';
 import 'package:mozaik/components/bottom_nav_bar.dart';
 import 'package:mozaik/components/custom_app_bar.dart';
 import 'package:mozaik/components/search_bar.dart';
@@ -27,7 +29,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await dotenv.load(fileName: ".env");
-  runApp(const MyApp());
+  runApp(BlocProvider(create: (context) => PostBloc(), child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -321,8 +323,12 @@ class _MyHomePageState extends State<MyHomePage>
         currentIndex: selectedIndex,
         onTap: onItemTapped,
       ),
-      floatingActionButton: selectedIndex == 0
-          ? FloatingActionButton(
+      floatingActionButton: ValueListenableBuilder<bool>(
+        valueListenable: isTabBarVisible,
+        builder: (context, isVisible, child) {
+          return Visibility(
+            visible: isVisible && selectedIndex == 0,
+            child: FloatingActionButton(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(36),
               ),
@@ -332,11 +338,13 @@ class _MyHomePageState extends State<MyHomePage>
                 Navigator.pushNamed(context, '/newPost');
               },
               child: const Icon(
-                FluentIcons.pen_20_regular,
+                FluentIcons.add_24_filled,
                 color: Colors.white,
               ),
-            )
-          : null,
+            ),
+          );
+        },
+      ),
     );
   }
 

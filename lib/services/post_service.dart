@@ -29,4 +29,33 @@ class PostService {
       throw Exception('Failed to load posts for user: $handle');
     }
   }
+
+  static Future<Post> createPost({
+    required String userId,
+    required String content,
+    String? spotifyTrackId, // Send only the Spotify track ID
+    required String visibility,
+    String? imageUrl,
+  }) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/api/posts/create'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'user_id': userId,
+        'content': content,
+        'spotify_track_id': spotifyTrackId, // Send only the track ID
+        'visibility': visibility,
+        'image_url': imageUrl,
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      final dynamic jsonData = json.decode(response.body);
+      return Post.fromJson(jsonData);
+    } else {
+      throw Exception('Failed to create post: ${response.body}');
+    }
+  }
 }

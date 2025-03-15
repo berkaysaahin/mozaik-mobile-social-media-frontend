@@ -362,6 +362,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             comments: post.comments,
                             timestamp: post.timestamp,
                             profilePic: post.profilePic,
+                            music: post.music,
                           ),
                           const SizedBox(height: 12),
                         ],

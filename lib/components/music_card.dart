@@ -13,6 +13,7 @@ class MusicCard extends StatefulWidget {
 
 class _MusicCardState extends State<MusicCard> {
   Color? _backgroundColor;
+  static final Map<String, Color> _paletteCache = {}; // Cache for palettes
 
   @override
   void initState() {
@@ -20,16 +21,49 @@ class _MusicCardState extends State<MusicCard> {
     _generatePalette();
   }
 
+  @override
+  void didUpdateWidget(MusicCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    // Regenerate the palette if the music data has changed
+    if (widget.music != oldWidget.music) {
+      _generatePalette();
+    }
+  }
+
   Future<void> _generatePalette() async {
     if (widget.music != null && widget.music!['cover_art'] != null) {
-      final PaletteGenerator paletteGenerator =
-          await PaletteGenerator.fromImageProvider(
-        NetworkImage(widget.music!['cover_art']),
-      );
+      final String coverArtUrl = widget.music!['cover_art'];
 
-      setState(() {
-        _backgroundColor = paletteGenerator.dominantColor?.color;
-      });
+      // Check if the palette is already cached
+      if (_paletteCache.containsKey(coverArtUrl)) {
+        if (mounted) {
+          setState(() {
+            _backgroundColor = _paletteCache[coverArtUrl];
+          });
+        }
+        return;
+      }
+
+      // Generate the palette asynchronously
+      try {
+        final PaletteGenerator paletteGenerator =
+            await PaletteGenerator.fromImageProvider(
+          NetworkImage(coverArtUrl),
+        );
+
+        // Cache the palette
+        _paletteCache[coverArtUrl] =
+            paletteGenerator.dominantColor?.color ?? AppColors.darkGray;
+
+        if (mounted) {
+          setState(() {
+            _backgroundColor = _paletteCache[coverArtUrl];
+          });
+        }
+      } catch (e) {
+        print('Error generating palette: $e');
+      }
     }
   }
 
@@ -73,28 +107,34 @@ class _MusicCardState extends State<MusicCard> {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      songTitle!,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        songTitle!,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      artist!,
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.white.withOpacity(0.8),
+                      const SizedBox(height: 4),
+                      Text(
+                        artist!,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white.withOpacity(0.8),
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ],

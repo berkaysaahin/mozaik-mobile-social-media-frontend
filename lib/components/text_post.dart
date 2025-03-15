@@ -142,6 +142,7 @@ class _TextPostState extends State<TextPost> {
                 ),
                 const Spacer(),
                 PopupMenuButton<String>(
+                  color: AppColors.background,
                   icon: const Icon(
                     CupertinoIcons.ellipsis_vertical,
                     size: 20,

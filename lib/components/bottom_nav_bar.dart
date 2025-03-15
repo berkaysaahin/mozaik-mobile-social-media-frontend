@@ -30,39 +30,37 @@ class BottomNavBar extends StatelessWidget {
         type: BottomNavigationBarType.fixed,
         elevation: 0,
         selectedLabelStyle: const TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 13,
-            textBaseline: TextBaseline.alphabetic),
+          fontWeight: FontWeight.w600,
+          fontSize: 13,
+          textBaseline: TextBaseline.alphabetic,
+        ),
         showUnselectedLabels: false,
         showSelectedLabels: false,
-        selectedItemColor: AppColors.primary,
-        unselectedItemColor: AppColors.primary,
-        selectedFontSize: 13,
-        unselectedFontSize: 13,
-        iconSize: 24,
+        selectedItemColor: Colors.black38,
+        unselectedItemColor: Colors.black38,
+        selectedFontSize: 12,
+        unselectedFontSize: 12,
+        iconSize: 22,
         enableFeedback: false,
         currentIndex: currentIndex,
         onTap: onTap,
         items: [
-          BottomNavigationBarItem(
-            icon: currentIndex == 0
-                ? const Icon(FluentIcons.home_32_filled)
-                : const Icon(FluentIcons.home_32_regular),
+          _buildBottomNavBarItem(
+            icon: Icon(FluentIcons.home_24_regular),
             label: 'Home',
+            isSelected: currentIndex == 0,
           ),
-          BottomNavigationBarItem(
-            icon: currentIndex == 1
-                ? const Icon(FluentIcons.search_32_filled)
-                : const Icon(FluentIcons.search_32_regular),
+          _buildBottomNavBarItem(
+            icon: Icon(FluentIcons.search_24_regular),
             label: 'Search',
+            isSelected: currentIndex == 1,
           ),
-          BottomNavigationBarItem(
-            icon: currentIndex == 2
-                ? const Icon(CupertinoIcons.chat_bubble_fill)
-                : const Icon(CupertinoIcons.chat_bubble),
+          _buildBottomNavBarItem(
+            icon: Icon(CupertinoIcons.text_bubble),
             label: 'Messages',
+            isSelected: currentIndex == 2,
           ),
-          BottomNavigationBarItem(
+          _buildBottomNavBarItem(
             icon: CircleAvatar(
               radius: 16,
               backgroundColor: AppColors.ashBlue,
@@ -75,10 +73,47 @@ class BottomNavBar extends StatelessWidget {
                 ),
               ),
             ),
-            label: "Profile",
+            label: 'Profile',
+            isSelected: currentIndex == 3,
           ),
         ],
       ),
+    );
+  }
+
+  BottomNavigationBarItem _buildBottomNavBarItem({
+    required Widget icon,
+    required String label,
+    required bool isSelected,
+  }) {
+    return BottomNavigationBarItem(
+      icon: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Thicker icon using a Stack
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              icon,
+              Transform.translate(
+                offset: const Offset(0.5, 0.5), // Adjust for thickness
+                child: icon,
+              ),
+            ],
+          ),
+          if (isSelected && currentIndex != 3)
+            Container(
+              margin: const EdgeInsets.only(top: 4),
+              width: 4,
+              height: 4,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.black38,
+              ),
+            ),
+        ],
+      ),
+      label: label,
     );
   }
 }

@@ -19,6 +19,7 @@ dependencies:
   flutter_dotenv: ^5.2.1
   font_awesome_flutter: ^10.8.0
   palette_generator: ^0.3.3+6
+  flutter_bloc: ^9.1.0
 
 dev_dependencies:
   flutter_test:
