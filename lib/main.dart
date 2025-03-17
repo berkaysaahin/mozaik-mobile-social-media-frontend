@@ -7,10 +7,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:mozaik/app_colors.dart';
 import 'package:mozaik/blocs/post_bloc.dart';
+import 'package:mozaik/blocs/user_bloc.dart';
 import 'package:mozaik/components/bottom_nav_bar.dart';
 import 'package:mozaik/components/custom_app_bar.dart';
+import 'package:mozaik/components/floating_action_button.dart';
 import 'package:mozaik/components/search_bar.dart';
 import 'package:mozaik/events/post_event.dart';
+import 'package:mozaik/events/user_event.dart';
 import 'package:mozaik/pages/direct_message.dart';
 import 'package:mozaik/pages/discover.dart';
 import 'package:mozaik/pages/home_with_tabs.dart';
@@ -21,6 +24,7 @@ import 'package:mozaik/pages/notifications.dart';
 import 'package:mozaik/pages/pick_username.dart';
 import 'package:mozaik/pages/profile.dart';
 import 'package:mozaik/pages/register.dart';
+import 'package:mozaik/states/user_state.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -30,7 +34,18 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await dotenv.load(fileName: ".env");
-  runApp(BlocProvider(create: (context) => PostBloc(), child: const MyApp()));
+  runApp(
+    MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => PostBloc()),
+        BlocProvider(
+          create: (context) =>
+              UserBloc()..add(FetchUserByHandle('berkaysahin')),
+        ),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -166,17 +181,27 @@ class _MyHomePageState extends State<MyHomePage>
                     mainAxisAlignment: MainAxisAlignment.end,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      CircleAvatar(
-                        radius: 32,
-                        backgroundColor: AppColors.ashBlue,
-                        child: ClipOval(
-                          child: Image.network(
-                            "https://static.wikia.nocookie.net/projectsekai/images/f/ff/Dramaturgy_Game_Cover.png/revision/latest?cb=20201227073615",
-                            width: 64,
-                            height: 64,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
+                      BlocBuilder<UserBloc, UserState>(
+                        builder: (context, state) {
+                          if (state is UserLoaded) {
+                            return CircleAvatar(
+                              radius: 32,
+                              backgroundColor: AppColors.ashBlue,
+                              child: ClipOval(
+                                child: Image.network(
+                                  state.user.profilePic,
+                                  width: 64,
+                                  height: 64,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            );
+                          } else if (state is UserError) {
+                            return const Icon(Icons.error);
+                          } else {
+                            return const CircularProgressIndicator();
+                          }
+                        },
                       ),
                       const SizedBox(
                         height: 12,
@@ -194,21 +219,31 @@ class _MyHomePageState extends State<MyHomePage>
                             ),
                           ],
                         ),
-                        child: const Padding(
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 18, vertical: 4),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 18, vertical: 4),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Text(
-                                'Berkay Sahin',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w300,
-                                ),
+                              BlocBuilder<UserBloc, UserState>(
+                                builder: (context, state) {
+                                  if (state is UserLoaded) {
+                                    return Text(
+                                      state.user.username,
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w300,
+                                      ),
+                                    );
+                                  } else if (state is UserError) {
+                                    return const Icon(Icons.error);
+                                  } else {
+                                    return const CircularProgressIndicator();
+                                  }
+                                },
                               ),
-                              Icon(
+                              const Icon(
                                 CupertinoIcons.chevron_down,
                                 size: 20,
                               ),
@@ -324,29 +359,10 @@ class _MyHomePageState extends State<MyHomePage>
         currentIndex: selectedIndex,
         onTap: onItemTapped,
       ),
-      floatingActionButton: ValueListenableBuilder<bool>(
-        valueListenable: isTabBarVisible,
-        builder: (context, isVisible, child) {
-          return Visibility(
-            visible: isVisible && selectedIndex == 0,
-            child: FloatingActionButton(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(36),
-              ),
-              elevation: 0,
-              backgroundColor: AppColors.primary,
-              onPressed: () {
-                Navigator.pushNamed(context, '/newPost').then((_) {
-                  context.read<PostBloc>().add(FetchPosts());
-                });
-              },
-              child: const Icon(
-                FluentIcons.add_24_filled,
-                color: Colors.white,
-              ),
-            ),
-          );
-        },
+      floatingActionButton: MyFloatingActionButton(
+        isVisible: isTabBarVisible.value,
+        selectedIndex: selectedIndex,
+        isTabBarVisible: isTabBarVisible,
       ),
     );
   }

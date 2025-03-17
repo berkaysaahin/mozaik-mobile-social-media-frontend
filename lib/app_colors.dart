@@ -14,6 +14,8 @@ class AppColors {
   static const Color amanojaku = Color(0xFF758694);
   static const Color weeping = Color(0xFFF5F5F5);
   static const Color background = Color(0xFFFAF5FB);
-  static const Color primary = Color(0xFF143D60);
+  static const Color primary = Color(0xFF011F26);
   static const Color backgroundDarker = Color.fromARGB(255, 219, 217, 219);
+  static const Color brandNewDay = Color(0xFFA5A692);
+  static const Color itCantGetWorse = Color(0xFF025E73);
 }

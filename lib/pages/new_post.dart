@@ -94,7 +94,11 @@ class _NewPostPageState extends State<NewPostPage> {
         child: BlocBuilder<PostBloc, PostState>(
           builder: (context, state) {
             if (state is PostLoading) {
-              return const Center(child: CircularProgressIndicator());
+              return const Center(
+                  child: CircularProgressIndicator(
+                color: AppColors.primary,
+                strokeWidth: 3,
+              ));
             }
 
             return Column(

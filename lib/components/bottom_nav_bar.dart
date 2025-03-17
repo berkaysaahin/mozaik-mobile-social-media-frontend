@@ -1,7 +1,10 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mozaik/app_colors.dart';
+import 'package:mozaik/blocs/user_bloc.dart';
+import 'package:mozaik/states/user_state.dart';
 
 class BottomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -26,57 +29,70 @@ class BottomNavBar extends StatelessWidget {
       ),
       height: 64,
       alignment: Alignment.topCenter,
-      child: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        elevation: 0,
-        selectedLabelStyle: const TextStyle(
-          fontWeight: FontWeight.w600,
-          fontSize: 13,
-          textBaseline: TextBaseline.alphabetic,
-        ),
-        showUnselectedLabels: false,
-        showSelectedLabels: false,
-        selectedItemColor: Colors.black38,
-        unselectedItemColor: Colors.black38,
-        selectedFontSize: 12,
-        unselectedFontSize: 12,
-        iconSize: 22,
-        enableFeedback: false,
-        currentIndex: currentIndex,
-        onTap: onTap,
-        items: [
-          _buildBottomNavBarItem(
-            icon: Icon(FluentIcons.home_24_regular),
-            label: 'Home',
-            isSelected: currentIndex == 0,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          elevation: 0,
+          selectedLabelStyle: const TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 13,
+            textBaseline: TextBaseline.alphabetic,
           ),
-          _buildBottomNavBarItem(
-            icon: Icon(FluentIcons.search_24_regular),
-            label: 'Search',
-            isSelected: currentIndex == 1,
-          ),
-          _buildBottomNavBarItem(
-            icon: Icon(CupertinoIcons.text_bubble),
-            label: 'Messages',
-            isSelected: currentIndex == 2,
-          ),
-          _buildBottomNavBarItem(
-            icon: CircleAvatar(
-              radius: 16,
-              backgroundColor: AppColors.ashBlue,
-              child: ClipOval(
-                child: Image.network(
-                  "https://static.wikia.nocookie.net/projectsekai/images/f/ff/Dramaturgy_Game_Cover.png/revision/latest?cb=20201227073615",
-                  width: 40,
-                  height: 40,
-                  fit: BoxFit.cover,
-                ),
-              ),
+          showUnselectedLabels: false,
+          showSelectedLabels: false,
+          selectedItemColor: AppColors.primary,
+          unselectedItemColor: AppColors.primary.withOpacity(0.7),
+          selectedFontSize: 12,
+          unselectedFontSize: 12,
+          iconSize: 22,
+          enableFeedback: false,
+          currentIndex: currentIndex,
+          onTap: onTap,
+          items: [
+            _buildBottomNavBarItem(
+              icon: Icon(FluentIcons.home_24_regular),
+              label: 'Home',
+              isSelected: currentIndex == 0,
             ),
-            label: 'Profile',
-            isSelected: currentIndex == 3,
-          ),
-        ],
+            _buildBottomNavBarItem(
+              icon: Icon(FluentIcons.search_24_regular),
+              label: 'Search',
+              isSelected: currentIndex == 1,
+            ),
+            _buildBottomNavBarItem(
+              icon: Icon(CupertinoIcons.text_bubble),
+              label: 'Messages',
+              isSelected: currentIndex == 2,
+            ),
+            _buildBottomNavBarItem(
+              icon: BlocBuilder<UserBloc, UserState>(
+                builder: (context, state) {
+                  if (state is UserLoaded) {
+                    return CircleAvatar(
+                      radius: 16,
+                      backgroundColor: AppColors.ashBlue,
+                      child: ClipOval(
+                        child: Image.network(
+                          state.user.profilePic,
+                          width: 40,
+                          height: 40,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    );
+                  } else if (state is UserError) {
+                    return const Icon(Icons.error);
+                  } else {
+                    return const CircularProgressIndicator();
+                  }
+                },
+              ),
+              label: 'Profile',
+              isSelected: currentIndex == 3,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -90,16 +106,7 @@ class BottomNavBar extends StatelessWidget {
       icon: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              icon,
-              Transform.translate(
-                offset: const Offset(0.5, 0.5),
-                child: icon,
-              ),
-            ],
-          ),
+          icon,
           if (isSelected && currentIndex != 3)
             Container(
               margin: const EdgeInsets.only(top: 4),
@@ -107,7 +114,7 @@ class BottomNavBar extends StatelessWidget {
               height: 4,
               decoration: const BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.black38,
+                color: AppColors.primary,
               ),
             ),
         ],

@@ -211,7 +211,7 @@ class _TextPostState extends State<TextPost> {
                   onTap: () {},
                 ),
                 const SizedBox(
-                  width: 8,
+                  width: 16,
                 ),
                 PostButton(
                   icon: CupertinoIcons.arrow_2_squarepath,
@@ -220,7 +220,7 @@ class _TextPostState extends State<TextPost> {
                   onTap: _toggleShare,
                 ),
                 const SizedBox(
-                  width: 8,
+                  width: 16,
                 ),
                 PostButton(
                   icon: _isLiked

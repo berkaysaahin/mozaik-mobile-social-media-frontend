@@ -13,6 +13,7 @@ class MusicCard extends StatefulWidget {
 
 class _MusicCardState extends State<MusicCard> {
   Color? _backgroundColor;
+  bool _isPaletteGenerated = false;
   static final Map<String, Color> _paletteCache = {};
 
   @override
@@ -38,6 +39,7 @@ class _MusicCardState extends State<MusicCard> {
         if (mounted) {
           setState(() {
             _backgroundColor = _paletteCache[coverArtUrl];
+            _isPaletteGenerated = true;
           });
         }
         return;
@@ -55,10 +57,16 @@ class _MusicCardState extends State<MusicCard> {
         if (mounted) {
           setState(() {
             _backgroundColor = _paletteCache[coverArtUrl];
+            _isPaletteGenerated = true;
           });
         }
       } catch (e) {
         print('Error generating palette: $e');
+        if (mounted) {
+          setState(() {
+            _isPaletteGenerated = true;
+          });
+        }
       }
     }
   }
@@ -75,78 +83,88 @@ class _MusicCardState extends State<MusicCard> {
           width: double.infinity,
           height: 120,
           decoration: BoxDecoration(
-            color: _backgroundColor ?? AppColors.darkGray,
+            color: _isPaletteGenerated
+                ? _backgroundColor ?? AppColors.darkGray
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(20),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Container(
-                width: 120,
-                height: 120,
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(24),
-                    bottomLeft: Radius.circular(24),
-                  ),
-                ),
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(24),
-                    bottomLeft: Radius.circular(24),
-                  ),
-                  child: Image.network(
-                    imageUrl!,
-                    width: 120,
-                    height: 120,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        songTitle!,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+          child: _isPaletteGenerated
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 120,
+                      height: 120,
+                      decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(24),
+                          bottomLeft: Radius.circular(24),
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        artist!,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.white.withOpacity(0.8),
+                      child: ClipRRect(
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(24),
+                          bottomLeft: Radius.circular(24),
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                        child: Image.network(
+                          imageUrl!,
+                          width: 120,
+                          height: 120,
+                          fit: BoxFit.cover,
+                        ),
                       ),
-                    ],
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              songTitle!,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              artist!,
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.white.withOpacity(0.8),
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              : const Center(
+                  child: CircularProgressIndicator(
+                    color: AppColors.primary,
+                    strokeWidth: 3,
                   ),
                 ),
-              ),
-            ],
-          ),
         ),
-        const Positioned(
-          right: 0,
-          bottom: 0,
-          child: Padding(
-            padding: EdgeInsets.all(12.0),
-            child: Icon(
-              FontAwesomeIcons.spotify,
-              color: Colors.white,
+        if (_isPaletteGenerated)
+          const Positioned(
+            right: 0,
+            bottom: 0,
+            child: Padding(
+              padding: EdgeInsets.all(12.0),
+              child: Icon(
+                FontAwesomeIcons.spotify,
+                color: Colors.white,
+              ),
             ),
           ),
-        ),
       ],
     );
   }

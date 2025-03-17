@@ -24,6 +24,8 @@ class _FollowingPageState extends State<FollowingPage> {
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
+      color: AppColors.primary,
+      strokeWidth: 3,
       onRefresh: () async {
         context.read<PostBloc>().add(FetchPosts());
         await Future.delayed(const Duration(seconds: 1));
@@ -31,7 +33,11 @@ class _FollowingPageState extends State<FollowingPage> {
       child: BlocBuilder<PostBloc, PostState>(
         builder: (context, state) {
           if (state is PostLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+                child: CircularProgressIndicator(
+              color: AppColors.primary,
+              strokeWidth: 3,
+            ));
           } else if (state is PostsLoaded) {
             return CustomScrollView(
               controller: widget.scrollController,
