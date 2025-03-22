@@ -23,3 +23,5 @@ class PostError extends PostState {
 
   PostError(this.message);
 }
+
+class PostDeleted extends PostState {}

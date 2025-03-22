@@ -2,6 +2,7 @@ class Post {
   final int id;
   final String username;
   final String handle;
+  final String userId;
   final String content;
   final int comments;
   final DateTime timestamp;
@@ -15,6 +16,7 @@ class Post {
   final Map<String, dynamic>? music;
 
   Post({
+    required this.userId,
     required this.id,
     required this.username,
     required this.handle,
@@ -42,6 +44,7 @@ class Post {
       profilePic: json['profile_picture'] as String? ?? '',
       likeCount: int.tryParse(json['like_count'].toString()) ?? 0,
       reblogCount: int.tryParse(json['reblog_count'].toString()) ?? 0,
+      userId: json['user_id'] as String? ?? '',
       hasLiked: json['has_liked'] as bool? ?? false,
       hasReblogged: json['has_reblogged'] as bool? ?? false,
       visibility: json['visibility'] as String? ?? 'public',

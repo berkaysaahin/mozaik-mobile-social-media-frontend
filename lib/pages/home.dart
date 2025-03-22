@@ -16,12 +16,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   @override
-  void initState() {
-    super.initState();
-    context.read<PostBloc>().add(FetchPosts());
-  }
-
-  @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
       color: AppColors.primary,
@@ -52,9 +46,11 @@ class _HomePageState extends State<HomePage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             TextPost(
+                                id: post.id,
                                 username: post.username,
                                 handle: post.handle,
                                 content: post.content,
+                                userId: post.userId,
                                 likeCount: post.likeCount,
                                 reblogCount: post.reblogCount,
                                 hasLiked: post.hasLiked,

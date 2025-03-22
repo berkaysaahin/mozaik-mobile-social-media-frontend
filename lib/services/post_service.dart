@@ -58,4 +58,18 @@ class PostService {
       throw Exception('Failed to create post: ${response.body}');
     }
   }
+
+  static Future<void> deletePost(int postId) async {
+    final response = await http.delete(
+      Uri.parse('$baseUrl/api/posts/$postId'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to delete post: ${response.body}');
+    }
+  }
 }
+//post id mismatch düzelt

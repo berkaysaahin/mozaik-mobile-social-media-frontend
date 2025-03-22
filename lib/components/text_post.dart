@@ -1,16 +1,23 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mozaik/app_colors.dart';
+import 'package:mozaik/blocs/post_bloc.dart';
 import 'package:mozaik/components/music_card.dart';
 import 'package:mozaik/components/post_button.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:mozaik/events/post_event.dart';
+import 'package:mozaik/pages/profile.dart';
 
 class TextPost extends StatefulWidget {
   final String username;
+  final String userId;
   final String handle;
   final String content;
   final int likeCount;
   final int reblogCount;
+  final int id;
   final int comments;
   final DateTime timestamp;
   final String profilePic;
@@ -30,7 +37,9 @@ class TextPost extends StatefulWidget {
       required this.profilePic,
       required this.hasLiked,
       required this.hasReblogged,
-      this.music});
+      this.music,
+      required this.id,
+      required this.userId});
 
   @override
   State<TextPost> createState() => _TextPostState();
@@ -87,22 +96,33 @@ class _TextPostState extends State<TextPost> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CircleAvatar(
-                  radius: 24,
-                  backgroundColor: AppColors.ashBlue,
-                  child: ClipOval(
-                    child: Image.network(
-                      widget.profilePic,
-                      fit: BoxFit.cover,
-                      width: 48,
-                      height: 48,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const Icon(
-                          FluentIcons.person_16_regular,
-                          size: 24,
-                          color: Colors.white,
-                        );
-                      },
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            ProfilePage(userId: widget.userId),
+                      ),
+                    );
+                  },
+                  child: CircleAvatar(
+                    radius: 24,
+                    backgroundColor: AppColors.ashBlue,
+                    child: ClipOval(
+                      child: Image.network(
+                        widget.profilePic,
+                        fit: BoxFit.cover,
+                        width: 48,
+                        height: 48,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Icon(
+                            FluentIcons.person_16_regular,
+                            size: 24,
+                            color: Colors.white,
+                          );
+                        },
+                      ),
                     ),
                   ),
                 ),
@@ -149,8 +169,10 @@ class _TextPostState extends State<TextPost> {
                     color: Colors.grey,
                   ),
                   onSelected: (value) {
+                    final postId = widget.id;
                     if (value == 'edit') {
                     } else if (value == 'delete') {
+                      context.read<PostBloc>().add(DeletePost(postId));
                     } else if (value == 'share') {}
                   },
                   itemBuilder: (BuildContext context) {
@@ -232,9 +254,13 @@ class _TextPostState extends State<TextPost> {
                 ),
                 const Spacer(),
                 IconButton(
-                  color: Colors.grey,
                   iconSize: 20,
-                  icon: const Icon(CupertinoIcons.paperplane),
+                  icon: SvgPicture.asset(
+                    'assets/svg/send.svg',
+                    height: 20,
+                    width: 20,
+                    color: Colors.grey,
+                  ),
                   onPressed: () {},
                 ),
               ],

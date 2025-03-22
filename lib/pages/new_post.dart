@@ -3,10 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:mozaik/app_colors.dart';
 import 'package:mozaik/blocs/post_bloc.dart';
+import 'package:mozaik/blocs/user_bloc.dart';
 import 'package:mozaik/components/custom_app_bar.dart';
 import 'package:mozaik/events/post_event.dart';
 import 'package:mozaik/pages/track_search.dart';
 import 'package:mozaik/states/post_state.dart';
+import 'package:mozaik/states/user_state.dart';
 
 class NewPostPage extends StatefulWidget {
   const NewPostPage({super.key});
@@ -104,52 +106,59 @@ class _NewPostPageState extends State<NewPostPage> {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const CircleAvatar(
-                        radius: 20,
-                        backgroundImage: NetworkImage(
-                          'https://static.wikia.nocookie.net/projectsekai/images/f/ff/Dramaturgy_Game_Cover.png/revision/latest?cb=20201227073615',
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Berkay Sahin',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                BlocBuilder<UserBloc, UserState>(
+                  builder: (context, userState) {
+                    if (userState is UserLoaded) {
+                      return Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            CircleAvatar(
+                              radius: 24,
+                              backgroundImage:
+                                  NetworkImage(userState.user.profilePic),
                             ),
-                          ),
-                          GestureDetector(
-                            onTap: _changeVisibility,
-                            child: Row(
+                            const SizedBox(width: 16),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  _visibility,
+                                  userState.user.username,
                                   style: const TextStyle(
-                                    fontSize: 14,
-                                    color: AppColors.teupeGray,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                const SizedBox(width: 4),
-                                const Icon(
-                                  FluentIcons.chevron_down_12_regular,
-                                  size: 16,
-                                  color: AppColors.teupeGray,
+                                GestureDetector(
+                                  onTap: _changeVisibility,
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        _visibility,
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          color: AppColors.teupeGray,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 4),
+                                      const Icon(
+                                        FluentIcons.chevron_down_12_regular,
+                                        size: 16,
+                                        color: AppColors.teupeGray,
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                          ],
+                        ),
+                      );
+                    } else {
+                      return const SizedBox();
+                    }
+                  },
                 ),
                 Expanded(
                   child: Padding(

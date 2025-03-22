@@ -6,9 +6,9 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 class UserService {
   static String baseUrl = dotenv.env['HOST_URL']!;
 
-  static Future<User> fetchUserByHandle(String handle) async {
+  static Future<User> fetchUserById(String id) async {
     final response =
-        await http.get(Uri.parse('$baseUrl/api/users/user?handle=$handle'));
+        await http.get(Uri.parse('$baseUrl/api/users/user?id=$id'));
 
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);

@@ -16,12 +16,6 @@ class FollowingPage extends StatefulWidget {
 
 class _FollowingPageState extends State<FollowingPage> {
   @override
-  void initState() {
-    super.initState();
-    context.read<PostBloc>().add(FetchPosts());
-  }
-
-  @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
       color: AppColors.primary,
@@ -52,6 +46,8 @@ class _FollowingPageState extends State<FollowingPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             TextPost(
+                                userId: post.userId,
+                                id: post.id,
                                 username: post.username,
                                 handle: post.handle,
                                 content: post.content,

@@ -11,6 +11,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     on<CreatePostEvent>(_onCreatePostEvent);
     on<FetchPosts>(_onFetchPosts);
     on<FetchPostsByUser>(_onFetchPostsByUser);
+    on<DeletePost>(_onDeletePost);
   }
 
   Future<void> _onFetchPosts(FetchPosts event, Emitter<PostState> emit) async {
@@ -59,6 +60,22 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       add(FetchPosts());
     } catch (e) {
       emit(PostError('Failed to create post: $e'));
+    }
+  }
+
+  Future<void> _onDeletePost(DeletePost event, Emitter<PostState> emit) async {
+    emit(PostLoading());
+    try {
+      await PostService.deletePost(event.postId);
+      final posts = await PostService.fetchPosts();
+
+      _postsCache = posts;
+      if (_postsCache.isNotEmpty) {
+        emit(PostsLoaded(_postsCache));
+        return;
+      }
+    } catch (e) {
+      emit(PostError('Failed to delete post: $e'));
     }
   }
 }

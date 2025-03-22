@@ -1,19 +1,17 @@
-import 'package:fluentui_system_icons/fluentui_system_icons.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mozaik/app_colors.dart';
-import 'package:mozaik/blocs/user_bloc.dart';
-import 'package:mozaik/states/user_state.dart';
 
 class BottomNavBar extends StatelessWidget {
   final int currentIndex;
   final Function(int) onTap;
+  final Widget profileIcon;
 
   const BottomNavBar({
     super.key,
     required this.currentIndex,
     required this.onTap,
+    required this.profileIcon,
   });
 
   @override
@@ -27,7 +25,7 @@ class BottomNavBar extends StatelessWidget {
           ),
         ),
       ),
-      height: 64,
+      height: 68,
       alignment: Alignment.topCenter,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -45,49 +43,31 @@ class BottomNavBar extends StatelessWidget {
           unselectedItemColor: AppColors.primary.withOpacity(0.7),
           selectedFontSize: 12,
           unselectedFontSize: 12,
-          iconSize: 22,
+          iconSize: 24,
           enableFeedback: false,
           currentIndex: currentIndex,
           onTap: onTap,
           items: [
             _buildBottomNavBarItem(
-              icon: Icon(FluentIcons.home_24_regular),
+              iconPath: 'assets/svg/home.svg',
+              filledIconPath: 'assets/svg/home_fill.svg',
               label: 'Home',
               isSelected: currentIndex == 0,
             ),
             _buildBottomNavBarItem(
-              icon: Icon(FluentIcons.search_24_regular),
+              iconPath: 'assets/svg/search.svg',
+              filledIconPath: 'assets/svg/search_fill.svg',
               label: 'Search',
               isSelected: currentIndex == 1,
             ),
             _buildBottomNavBarItem(
-              icon: Icon(CupertinoIcons.text_bubble),
+              iconPath: 'assets/svg/message.svg',
+              filledIconPath: 'assets/svg/message_fill.svg',
               label: 'Messages',
               isSelected: currentIndex == 2,
             ),
             _buildBottomNavBarItem(
-              icon: BlocBuilder<UserBloc, UserState>(
-                builder: (context, state) {
-                  if (state is UserLoaded) {
-                    return CircleAvatar(
-                      radius: 16,
-                      backgroundColor: AppColors.ashBlue,
-                      child: ClipOval(
-                        child: Image.network(
-                          state.user.profilePic,
-                          width: 40,
-                          height: 40,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    );
-                  } else if (state is UserError) {
-                    return const Icon(Icons.error);
-                  } else {
-                    return const CircularProgressIndicator();
-                  }
-                },
-              ),
+              icon: profileIcon, // Use the pre-built profile icon
               label: 'Profile',
               isSelected: currentIndex == 3,
             ),
@@ -98,7 +78,9 @@ class BottomNavBar extends StatelessWidget {
   }
 
   BottomNavigationBarItem _buildBottomNavBarItem({
-    required Widget icon,
+    String? iconPath,
+    String? filledIconPath,
+    Widget? icon,
     required String label,
     required bool isSelected,
   }) {
@@ -106,17 +88,16 @@ class BottomNavBar extends StatelessWidget {
       icon: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          icon,
-          if (isSelected && currentIndex != 3)
-            Container(
-              margin: const EdgeInsets.only(top: 4),
-              width: 4,
-              height: 4,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.primary,
-              ),
+          if (iconPath != null && filledIconPath != null)
+            SvgPicture.asset(
+              isSelected ? filledIconPath : iconPath,
+              height: 26,
+              width: 26,
+              color: isSelected
+                  ? AppColors.primary
+                  : AppColors.primary.withOpacity(0.7),
             ),
+          if (icon != null) icon,
         ],
       ),
       label: label,

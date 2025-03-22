@@ -11,6 +11,7 @@ import 'package:mozaik/blocs/user_bloc.dart';
 import 'package:mozaik/components/bottom_nav_bar.dart';
 import 'package:mozaik/components/custom_app_bar.dart';
 import 'package:mozaik/components/floating_action_button.dart';
+import 'package:mozaik/components/profile_icon.dart';
 import 'package:mozaik/components/search_bar.dart';
 import 'package:mozaik/events/post_event.dart';
 import 'package:mozaik/events/user_event.dart';
@@ -37,10 +38,14 @@ void main() async {
   runApp(
     MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => PostBloc()),
         BlocProvider(
-          create: (context) =>
-              UserBloc()..add(FetchUserByHandle('berkaysahin')),
+          create: (context) => PostBloc()
+            ..add(FetchPosts())
+            ..add(const FetchPostsByUser('berkaysahin')),
+        ),
+        BlocProvider(
+          create: (context) => UserBloc()
+            ..add(FetchUserById('b2ecc8ae-9e16-42eb-915f-d2e1e2022f6c')),
         ),
       ],
       child: const MyApp(),
@@ -139,7 +144,7 @@ class _MyHomePageState extends State<MyHomePage>
     },
     {
       'leftIcon': Icons.search,
-      'rightIcon': Icons.filter_alt,
+      'rightIcon': Icons.filter_alt_outlined,
       'customWidget': const CustomSearchBar(),
     },
     {
@@ -175,7 +180,7 @@ class _MyHomePageState extends State<MyHomePage>
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 20,
-                    vertical: 8,
+                    vertical: 12,
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -199,7 +204,10 @@ class _MyHomePageState extends State<MyHomePage>
                           } else if (state is UserError) {
                             return const Icon(Icons.error);
                           } else {
-                            return const CircularProgressIndicator();
+                            return const CircularProgressIndicator(
+                              color: AppColors.primary,
+                              strokeWidth: 3,
+                            );
                           }
                         },
                       ),
@@ -210,10 +218,10 @@ class _MyHomePageState extends State<MyHomePage>
                         height: 32,
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(6),
+                          borderRadius: BorderRadius.circular(8),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
+                              color: AppColors.primary.withOpacity(0.05),
                               blurRadius: 0,
                               spreadRadius: 0,
                             ),
@@ -239,7 +247,10 @@ class _MyHomePageState extends State<MyHomePage>
                                   } else if (state is UserError) {
                                     return const Icon(Icons.error);
                                   } else {
-                                    return const CircularProgressIndicator();
+                                    return const CircularProgressIndicator(
+                                      color: AppColors.primary,
+                                      strokeWidth: 3,
+                                    );
                                   }
                                 },
                               ),
@@ -352,12 +363,27 @@ class _MyHomePageState extends State<MyHomePage>
           ),
           const DiscoverPage(),
           const MessagesPage(),
-          const ProfilePage(),
+          BlocBuilder<UserBloc, UserState>(
+            builder: (context, state) {
+              if (state is UserLoaded) {
+                return ProfilePage(
+                  userId: state.user.userId,
+                  shouldFetchUser: false,
+                ); // Pass the userId here
+              } else if (state is UserError) {
+                return Center(child: Text(state.message)); // Handle error state
+              } else {
+                return const Center(
+                    child: CircularProgressIndicator()); // Show loading
+              }
+            },
+          ),
         ],
       ),
       bottomNavigationBar: BottomNavBar(
         currentIndex: selectedIndex,
         onTap: onItemTapped,
+        profileIcon: const ProfileIcon(),
       ),
       floatingActionButton: MyFloatingActionButton(
         isVisible: isTabBarVisible.value,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:mozaik/app_colors.dart';
 
 class MessageComponent extends StatelessWidget {
@@ -26,10 +27,25 @@ class MessageComponent extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const CircleAvatar(
-                  radius: 30.0,
-                  backgroundImage: NetworkImage(
-                      "https://static.wikia.nocookie.net/projectsekai/images/f/ff/Dramaturgy_Game_Cover.png/revision/latest?cb=20201227073615"),
+                CircleAvatar(
+                  radius: 30,
+                  child: ClipOval(
+                    child: CachedNetworkImage(
+                      imageUrl:
+                          "https://static.wikia.nocookie.net/projectsekai/images/f/ff/Dramaturgy_Game_Cover.png/revision/latest?cb=20201227073615",
+                      fit: BoxFit.cover,
+                      width: 60,
+                      height: 60,
+                      placeholder: (context, url) => const Center(
+                        child: CircularProgressIndicator(
+                          color: AppColors.primary,
+                          strokeWidth: 3,
+                        ),
+                      ),
+                      errorWidget: (context, url, error) =>
+                          const Icon(Icons.error),
+                    ),
+                  ),
                 ),
                 const SizedBox(
                   width: 4,

@@ -71,11 +71,23 @@ class _MusicCardState extends State<MusicCard> {
     }
   }
 
+  // Helper function to determine text color based on background brightness
+  Color _getTextColor(Color backgroundColor) {
+    final Brightness brightness =
+        ThemeData.estimateBrightnessForColor(backgroundColor);
+    return brightness == Brightness.light ? AppColors.primary : Colors.white;
+  }
+
   @override
   Widget build(BuildContext context) {
     final String? songTitle = widget.music?['track_name'];
     final String? artist = widget.music?['artist'];
     final String? imageUrl = widget.music?['cover_art'];
+
+    // Determine text color based on background color
+    final textColor = _backgroundColor != null
+        ? _getTextColor(_backgroundColor!)
+        : Colors.white; // Default color if background is not set
 
     return Stack(
       children: [
@@ -122,9 +134,9 @@ class _MusicCardState extends State<MusicCard> {
                           children: [
                             Text(
                               songTitle!,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 18,
-                                color: Colors.white,
+                                color: textColor, // Dynamic text color
                                 fontWeight: FontWeight.bold,
                               ),
                               maxLines: 1,
@@ -135,7 +147,8 @@ class _MusicCardState extends State<MusicCard> {
                               artist!,
                               style: TextStyle(
                                 fontSize: 16,
-                                color: Colors.white.withOpacity(0.8),
+                                color: textColor
+                                    .withOpacity(0.8), // Dynamic text color
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -154,14 +167,14 @@ class _MusicCardState extends State<MusicCard> {
                 ),
         ),
         if (_isPaletteGenerated)
-          const Positioned(
+          Positioned(
             right: 0,
             bottom: 0,
             child: Padding(
-              padding: EdgeInsets.all(12.0),
+              padding: const EdgeInsets.all(12.0),
               child: Icon(
                 FontAwesomeIcons.spotify,
-                color: Colors.white,
+                color: textColor, // Dynamic icon color
               ),
             ),
           ),
