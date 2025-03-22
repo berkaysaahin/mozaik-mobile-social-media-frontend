@@ -40,7 +40,7 @@ class BottomNavBar extends StatelessWidget {
           showUnselectedLabels: false,
           showSelectedLabels: false,
           selectedItemColor: AppColors.primary,
-          unselectedItemColor: AppColors.primary.withOpacity(0.7),
+          unselectedItemColor: AppColors.primary.withValues(alpha: 0.7),
           selectedFontSize: 12,
           unselectedFontSize: 12,
           iconSize: 24,
@@ -67,7 +67,7 @@ class BottomNavBar extends StatelessWidget {
               isSelected: currentIndex == 2,
             ),
             _buildBottomNavBarItem(
-              icon: profileIcon, // Use the pre-built profile icon
+              icon: profileIcon,
               label: 'Profile',
               isSelected: currentIndex == 3,
             ),
@@ -95,7 +95,7 @@ class BottomNavBar extends StatelessWidget {
               width: 26,
               color: isSelected
                   ? AppColors.primary
-                  : AppColors.primary.withOpacity(0.7),
+                  : AppColors.primary.withValues(alpha: 0.7),
             ),
           if (icon != null) icon,
         ],

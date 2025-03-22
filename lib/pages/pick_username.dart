@@ -16,9 +16,6 @@ class _PickUsernamePageState extends State<PickUsernamePage> {
 
   void _saveName() {
     if (_formKey.currentState!.validate()) {
-      final name = _nameController.text;
-      print('Name: $name');
-
       Navigator.pushReplacementNamed(context, '/home');
     }
   }

@@ -18,11 +18,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final _passwordController = TextEditingController();
 
   void _register() {
-    if (_formKey.currentState!.validate()) {
-      final email = _emailController.text;
-      final password = _passwordController.text;
-      print('Email: $email, Password: $password');
-    }
+    if (_formKey.currentState!.validate()) {}
     Navigator.pushNamed(context, '/username');
   }
 

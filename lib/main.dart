@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:mozaik/app_colors.dart';
 import 'package:mozaik/blocs/post_bloc.dart';
+import 'package:mozaik/blocs/profile_bloc.dart';
 import 'package:mozaik/blocs/user_bloc.dart';
 import 'package:mozaik/components/bottom_nav_bar.dart';
 import 'package:mozaik/components/custom_app_bar.dart';
@@ -14,7 +15,7 @@ import 'package:mozaik/components/floating_action_button.dart';
 import 'package:mozaik/components/profile_icon.dart';
 import 'package:mozaik/components/search_bar.dart';
 import 'package:mozaik/events/post_event.dart';
-import 'package:mozaik/events/user_event.dart';
+import 'package:mozaik/events/profile_event.dart';
 import 'package:mozaik/pages/direct_message.dart';
 import 'package:mozaik/pages/discover.dart';
 import 'package:mozaik/pages/home_with_tabs.dart';
@@ -25,7 +26,7 @@ import 'package:mozaik/pages/notifications.dart';
 import 'package:mozaik/pages/pick_username.dart';
 import 'package:mozaik/pages/profile.dart';
 import 'package:mozaik/pages/register.dart';
-import 'package:mozaik/states/user_state.dart';
+import 'package:mozaik/states/profile_state.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -44,8 +45,11 @@ void main() async {
             ..add(const FetchPostsByUser('berkaysahin')),
         ),
         BlocProvider(
-          create: (context) => UserBloc()
-            ..add(FetchUserById('b2ecc8ae-9e16-42eb-915f-d2e1e2022f6c')),
+          create: (context) => ProfileBloc()
+            ..add(FetchProfileById('b2ecc8ae-9e16-42eb-915f-d2e1e2022f6c')),
+        ),
+        BlocProvider(
+          create: (context) => UserBloc(),
         ),
       ],
       child: const MyApp(),
@@ -67,6 +71,9 @@ class MyApp extends StatelessWidget {
         '/register': (context) => const RegisterPage(),
         '/username': (context) => const PickUsernamePage(),
         '/newPost': (context) => const NewPostPage(),
+        '/discover': (context) => const DiscoverPage(),
+        '/profile': (context) => const ProfilePage(),
+        '/messages': (context) => const MessagesPage(),
       },
       title: 'Motsaich',
       theme: ThemeData(
@@ -186,9 +193,9 @@ class _MyHomePageState extends State<MyHomePage>
                     mainAxisAlignment: MainAxisAlignment.end,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      BlocBuilder<UserBloc, UserState>(
+                      BlocBuilder<ProfileBloc, ProfileState>(
                         builder: (context, state) {
-                          if (state is UserLoaded) {
+                          if (state is ProfileLoaded) {
                             return CircleAvatar(
                               radius: 32,
                               backgroundColor: AppColors.ashBlue,
@@ -201,7 +208,7 @@ class _MyHomePageState extends State<MyHomePage>
                                 ),
                               ),
                             );
-                          } else if (state is UserError) {
+                          } else if (state is ProfileError) {
                             return const Icon(Icons.error);
                           } else {
                             return const CircularProgressIndicator(
@@ -221,7 +228,7 @@ class _MyHomePageState extends State<MyHomePage>
                           borderRadius: BorderRadius.circular(8),
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.primary.withOpacity(0.05),
+                              color: AppColors.primary.withValues(alpha: 0.05),
                               blurRadius: 0,
                               spreadRadius: 0,
                             ),
@@ -234,9 +241,9 @@ class _MyHomePageState extends State<MyHomePage>
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              BlocBuilder<UserBloc, UserState>(
+                              BlocBuilder<ProfileBloc, ProfileState>(
                                 builder: (context, state) {
-                                  if (state is UserLoaded) {
+                                  if (state is ProfileLoaded) {
                                     return Text(
                                       state.user.username,
                                       style: const TextStyle(
@@ -244,7 +251,7 @@ class _MyHomePageState extends State<MyHomePage>
                                         fontWeight: FontWeight.w300,
                                       ),
                                     );
-                                  } else if (state is UserError) {
+                                  } else if (state is ProfileError) {
                                     return const Icon(Icons.error);
                                   } else {
                                     return const CircularProgressIndicator(
@@ -363,18 +370,14 @@ class _MyHomePageState extends State<MyHomePage>
           ),
           const DiscoverPage(),
           const MessagesPage(),
-          BlocBuilder<UserBloc, UserState>(
+          BlocBuilder<ProfileBloc, ProfileState>(
             builder: (context, state) {
-              if (state is UserLoaded) {
-                return ProfilePage(
-                  userId: state.user.userId,
-                  shouldFetchUser: false,
-                ); // Pass the userId here
-              } else if (state is UserError) {
-                return Center(child: Text(state.message)); // Handle error state
+              if (state is ProfileLoaded) {
+                return const ProfilePage();
+              } else if (state is ProfileError) {
+                return Center(child: Text(state.message));
               } else {
-                return const Center(
-                    child: CircularProgressIndicator()); // Show loading
+                return const Center(child: CircularProgressIndicator());
               }
             },
           ),

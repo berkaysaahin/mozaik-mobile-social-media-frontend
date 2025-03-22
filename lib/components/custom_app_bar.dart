@@ -35,6 +35,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         return Container(
           decoration: !isTabBarVisible
               ? const BoxDecoration(
+                  color: AppColors.background,
                   border: Border(
                     bottom: BorderSide(
                       color: AppColors.platinum,
@@ -44,6 +45,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 )
               : null,
           child: AppBar(
+            backgroundColor: AppColors.background,
             leading: leftIcon != null
                 ? IconButton(
                     icon: leftIcon!,

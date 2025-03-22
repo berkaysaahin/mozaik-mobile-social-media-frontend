@@ -3,12 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:mozaik/app_colors.dart';
 import 'package:mozaik/blocs/post_bloc.dart';
-import 'package:mozaik/blocs/user_bloc.dart';
+import 'package:mozaik/blocs/profile_bloc.dart';
 import 'package:mozaik/components/custom_app_bar.dart';
 import 'package:mozaik/events/post_event.dart';
 import 'package:mozaik/pages/track_search.dart';
 import 'package:mozaik/states/post_state.dart';
-import 'package:mozaik/states/user_state.dart';
+import 'package:mozaik/states/profile_state.dart';
 
 class NewPostPage extends StatefulWidget {
   const NewPostPage({super.key});
@@ -106,9 +106,9 @@ class _NewPostPageState extends State<NewPostPage> {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                BlocBuilder<UserBloc, UserState>(
-                  builder: (context, userState) {
-                    if (userState is UserLoaded) {
+                BlocBuilder<ProfileBloc, ProfileState>(
+                  builder: (context, profileState) {
+                    if (profileState is ProfileLoaded) {
                       return Padding(
                         padding: const EdgeInsets.all(24.0),
                         child: Row(
@@ -117,14 +117,14 @@ class _NewPostPageState extends State<NewPostPage> {
                             CircleAvatar(
                               radius: 24,
                               backgroundImage:
-                                  NetworkImage(userState.user.profilePic),
+                                  NetworkImage(profileState.user.profilePic),
                             ),
                             const SizedBox(width: 16),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  userState.user.username,
+                                  profileState.user.username,
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
@@ -170,7 +170,7 @@ class _NewPostPageState extends State<NewPostPage> {
                         hintText: 'What\'s on your mind?',
                         border: InputBorder.none,
                         hintStyle: TextStyle(
-                          color: AppColors.teupeGray.withOpacity(0.6),
+                          color: AppColors.teupeGray.withValues(alpha: 0.6),
                         ),
                       ),
                       style: const TextStyle(

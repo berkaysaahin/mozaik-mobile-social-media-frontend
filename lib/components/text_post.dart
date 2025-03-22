@@ -8,7 +8,7 @@ import 'package:mozaik/components/music_card.dart';
 import 'package:mozaik/components/post_button.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mozaik/events/post_event.dart';
-import 'package:mozaik/pages/profile.dart';
+import 'package:mozaik/pages/user_profile.dart';
 
 class TextPost extends StatefulWidget {
   final String username;
@@ -102,7 +102,7 @@ class _TextPostState extends State<TextPost> {
                       context,
                       MaterialPageRoute(
                         builder: (context) =>
-                            ProfilePage(userId: widget.userId),
+                            UserProfilePage(userId: widget.userId),
                       ),
                     );
                   },

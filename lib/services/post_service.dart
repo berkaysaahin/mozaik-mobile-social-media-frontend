@@ -72,4 +72,3 @@ class PostService {
     }
   }
 }
-//post id mismatch düzelt

@@ -61,7 +61,6 @@ class _MusicCardState extends State<MusicCard> {
           });
         }
       } catch (e) {
-        print('Error generating palette: $e');
         if (mounted) {
           setState(() {
             _isPaletteGenerated = true;
@@ -71,7 +70,6 @@ class _MusicCardState extends State<MusicCard> {
     }
   }
 
-  // Helper function to determine text color based on background brightness
   Color _getTextColor(Color backgroundColor) {
     final Brightness brightness =
         ThemeData.estimateBrightnessForColor(backgroundColor);
@@ -84,10 +82,9 @@ class _MusicCardState extends State<MusicCard> {
     final String? artist = widget.music?['artist'];
     final String? imageUrl = widget.music?['cover_art'];
 
-    // Determine text color based on background color
     final textColor = _backgroundColor != null
         ? _getTextColor(_backgroundColor!)
-        : Colors.white; // Default color if background is not set
+        : Colors.white;
 
     return Stack(
       children: [
@@ -136,7 +133,7 @@ class _MusicCardState extends State<MusicCard> {
                               songTitle!,
                               style: TextStyle(
                                 fontSize: 18,
-                                color: textColor, // Dynamic text color
+                                color: textColor,
                                 fontWeight: FontWeight.bold,
                               ),
                               maxLines: 1,
@@ -147,8 +144,7 @@ class _MusicCardState extends State<MusicCard> {
                               artist!,
                               style: TextStyle(
                                 fontSize: 16,
-                                color: textColor
-                                    .withOpacity(0.8), // Dynamic text color
+                                color: textColor.withValues(alpha: 0.8),
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -174,7 +170,7 @@ class _MusicCardState extends State<MusicCard> {
               padding: const EdgeInsets.all(12.0),
               child: Icon(
                 FontAwesomeIcons.spotify,
-                color: textColor, // Dynamic icon color
+                color: textColor,
               ),
             ),
           ),

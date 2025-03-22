@@ -2,21 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mozaik/app_colors.dart';
 import 'package:mozaik/blocs/post_bloc.dart';
-import 'package:mozaik/blocs/user_bloc.dart';
-import 'package:mozaik/components/rounded_rectangle_button.dart';
+import 'package:mozaik/blocs/profile_bloc.dart';
 import 'package:mozaik/components/text_post.dart';
-import 'package:mozaik/events/user_event.dart';
 import 'package:mozaik/states/post_state.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:mozaik/states/user_state.dart';
+import 'package:mozaik/states/profile_state.dart';
 
 class ProfilePage extends StatefulWidget {
-  final bool shouldFetchUser;
-  final String userId;
-  const ProfilePage(
-      {super.key, required this.userId, this.shouldFetchUser = true});
+  const ProfilePage({
+    super.key,
+  });
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -24,24 +19,14 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   @override
-  void initState() {
-    super.initState();
-    if (widget.shouldFetchUser) {
-      // Fetch the user data if the flag is true
-      context.read<UserBloc>().add(FetchUserById(widget.userId));
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         body: CustomScrollView(
           slivers: [
-            // Single BlocBuilder for UserBloc
-            BlocBuilder<UserBloc, UserState>(
-              builder: (context, userState) {
-                if (userState is UserLoading) {
+            BlocBuilder<ProfileBloc, ProfileState>(
+              builder: (context, profileState) {
+                if (profileState is ProfileLoading) {
                   return const SliverAppBar(
                     expandedHeight: 200,
                     flexibleSpace: Center(
@@ -51,8 +36,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ),
                   );
-                } else if (userState is UserLoaded) {
-                  final user = userState.user;
+                } else if (profileState is ProfileLoaded) {
+                  final user = profileState.user;
                   return SliverAppBar(
                     expandedHeight: 200,
                     collapsedHeight: 0,
@@ -114,61 +99,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                     ),
                                   ),
                                 ),
-                                Align(
-                                  alignment: Alignment.bottomRight,
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                            color: AppColors.backgroundDarker,
-                                            width: 2,
-                                          ),
-                                        ),
-                                        child: CircleAvatar(
-                                          backgroundColor: AppColors.background,
-                                          radius: 18,
-                                          child: SvgPicture.asset(
-                                            'assets/svg/edit_fill.svg',
-                                            height: 20,
-                                            width: 20,
-                                            color: AppColors.primary
-                                                .withOpacity(0.8),
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                            color: AppColors.backgroundDarker,
-                                            width: 2,
-                                          ),
-                                        ),
-                                        child: CircleAvatar(
-                                          backgroundColor: AppColors.background,
-                                          radius: 18,
-                                          child: SvgPicture.asset(
-                                            'assets/svg/message_2_fill.svg',
-                                            height: 20,
-                                            width: 20,
-                                            color: AppColors.primary
-                                                .withOpacity(0.8),
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      RoundedRectangleButton(
-                                        elevation: 0,
-                                        text: 'Follow',
-                                        onPressed: () {},
-                                        backgroundColor: AppColors.primary,
-                                      ),
-                                    ],
-                                  ),
-                                )
                               ],
                             ),
                           ),
@@ -176,11 +106,11 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ),
                   );
-                } else if (userState is UserError) {
+                } else if (profileState is ProfileError) {
                   return SliverAppBar(
                     expandedHeight: 200,
                     flexibleSpace: Center(
-                      child: Text(userState.message),
+                      child: Text(profileState.message),
                     ),
                   );
                 } else {
@@ -193,11 +123,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 }
               },
             ),
-            // Single BlocBuilder for UserBloc and PostBloc
-            BlocBuilder<UserBloc, UserState>(
-              builder: (context, userState) {
-                if (userState is UserLoaded) {
-                  final user = userState.user;
+            BlocBuilder<ProfileBloc, ProfileState>(
+              builder: (context, profileState) {
+                if (profileState is ProfileLoaded) {
+                  final user = profileState.user;
                   return BlocBuilder<PostBloc, PostState>(
                     builder: (context, postState) {
                       if (postState is PostLoading) {
@@ -212,7 +141,6 @@ class _ProfilePageState extends State<ProfilePage> {
                       } else if (postState is PostsLoaded) {
                         return SliverList(
                           delegate: SliverChildListDelegate([
-                            // User Info Section
                             Container(
                               decoration: const BoxDecoration(
                                 color: AppColors.background,
@@ -352,7 +280,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ],
                               ),
                             ),
-                            // Posts Section
                             ...postState.posts.map((post) {
                               return Container(
                                 color: AppColors.background,
