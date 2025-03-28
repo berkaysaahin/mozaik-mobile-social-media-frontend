@@ -39,18 +39,11 @@ void main() async {
   runApp(
     MultiBlocProvider(
       providers: [
+        BlocProvider(create: (context) => PostBloc()..add(FetchPosts())),
         BlocProvider(
-          create: (context) => PostBloc()
-            ..add(FetchPosts())
-            ..add(const FetchPostsByUser('berkaysahin')),
-        ),
-        BlocProvider(
-          create: (context) => ProfileBloc()
-            ..add(FetchProfileById('b2ecc8ae-9e16-42eb-915f-d2e1e2022f6c')),
-        ),
-        BlocProvider(
-          create: (context) => UserBloc(),
-        ),
+            create: (context) => ProfileBloc()
+              ..add(FetchProfileById('b2ecc8ae-9e16-42eb-915f-d2e1e2022f6c'))),
+        BlocProvider(create: (context) => UserBloc()),
       ],
       child: const MyApp(),
     ),

@@ -5,41 +5,125 @@ import 'package:mozaik/services/post_service.dart';
 import 'package:mozaik/states/post_state.dart';
 
 class PostBloc extends Bloc<PostEvent, PostState> {
-  List<Post> _postsCache = [];
+  List<Post> _generalPostsCache = [];
+  final List<Post> _userPostsCache = [];
+  final Set<int> _loadedPostIds = {};
+  final Set<int> _loadingPostIds = {};
 
   PostBloc() : super(PostInitial()) {
     on<CreatePostEvent>(_onCreatePostEvent);
     on<FetchPosts>(_onFetchPosts);
     on<FetchPostsByUser>(_onFetchPostsByUser);
     on<DeletePost>(_onDeletePost);
+    on<ClearUserPosts>(_onClearUserPosts);
+    on<StartPostLoading>(_onStartPostLoading);
+    on<StopPostLoading>(_onStopPostLoading);
   }
-
-  Future<void> _onFetchPosts(FetchPosts event, Emitter<PostState> emit) async {
-    emit(PostLoading());
-    try {
-      final posts = await PostService.fetchPosts();
-
-      _postsCache = posts;
-      if (_postsCache.isNotEmpty) {
-        emit(PostsLoaded(_postsCache));
-        return;
-      }
-    } catch (e) {
-      emit(PostError('Failed to fetch posts: $e'));
+  void _onClearUserPosts(ClearUserPosts event, Emitter<PostState> emit) {
+    _userPostsCache.clear();
+    if (state is PostsCombinedState) {
+      emit((state as PostsCombinedState).copyWith(
+        userPosts: [],
+        showingUserPosts: true,
+        loadingPostIds: _loadingPostIds,
+        loadedPostIds: _loadedPostIds,
+      ));
+    } else {
+      emit(PostsCombinedState(
+        generalPosts: _generalPostsCache,
+        userPosts: [],
+        showingUserPosts: true,
+        loadingPostIds: _loadingPostIds,
+        loadedPostIds: _loadedPostIds,
+      ));
     }
   }
 
   Future<void> _onFetchPostsByUser(
       FetchPostsByUser event, Emitter<PostState> emit) async {
-    emit(PostLoading());
+    if (_userPostsCache.isNotEmpty && _userPostsCache[0].userId == event.id) {
+      emit(PostsCombinedState(
+        generalPosts: _generalPostsCache,
+        userPosts: _userPostsCache,
+        showingUserPosts: true,
+        loadingPostIds: _loadingPostIds,
+        loadedPostIds: _loadedPostIds,
+      ));
+    } else {
+      emit(PostLoading());
+    }
+
     try {
-      final posts = await PostService.fetchPostsByUser(event.handle);
+      final posts = await PostService.fetchPostsByUser(event.id);
+      _userPostsCache
+        ..clear()
+        ..addAll(posts);
 
-      _postsCache = posts;
+      _loadedPostIds.addAll(posts.map((post) => post.id));
 
-      emit(PostsLoaded(posts));
+      emit(PostsCombinedState(
+        generalPosts: _generalPostsCache,
+        userPosts: _userPostsCache,
+        showingUserPosts: true,
+        loadingPostIds: _loadingPostIds,
+        loadedPostIds: _loadedPostIds,
+      ));
     } catch (e) {
-      emit(PostError('Failed to load posts for user: ${event.handle} - $e'));
+      emit(PostError('Failed to load posts: $e'));
+    }
+  }
+
+  void _onStartPostLoading(StartPostLoading event, Emitter<PostState> emit) {
+    _loadingPostIds.add(event.postId);
+    _loadedPostIds.remove(event.postId);
+
+    if (state is PostsCombinedState) {
+      emit((state as PostsCombinedState).copyWith(
+        loadingPostIds: _loadingPostIds,
+        loadedPostIds: _loadedPostIds,
+      ));
+    }
+  }
+
+  void _onStopPostLoading(StopPostLoading event, Emitter<PostState> emit) {
+    _loadingPostIds.remove(event.postId);
+    _loadedPostIds.add(event.postId);
+
+    if (state is PostsCombinedState) {
+      emit((state as PostsCombinedState).copyWith(
+        loadingPostIds: _loadingPostIds,
+        loadedPostIds: _loadedPostIds,
+      ));
+    }
+  }
+
+  Future<void> _onFetchPosts(FetchPosts event, Emitter<PostState> emit) async {
+    if (_generalPostsCache.isNotEmpty) {
+      emit(PostsCombinedState(
+        generalPosts: _generalPostsCache,
+        userPosts: _userPostsCache,
+        showingUserPosts: false,
+        loadingPostIds: _loadingPostIds,
+        loadedPostIds: _loadedPostIds,
+      ));
+    } else {
+      emit(PostLoading());
+    }
+
+    try {
+      final posts = await PostService.fetchPosts();
+      _generalPostsCache = posts;
+      _loadedPostIds.addAll(posts.map((post) => post.id));
+
+      emit(PostsCombinedState(
+        generalPosts: _generalPostsCache,
+        userPosts: _userPostsCache,
+        showingUserPosts: false,
+        loadingPostIds: _loadingPostIds,
+        loadedPostIds: _loadedPostIds,
+      ));
+    } catch (e) {
+      emit(PostError('Failed to fetch posts: $e'));
     }
   }
 
@@ -55,7 +139,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
         visibility: event.visibility,
         imageUrl: event.imageUrl,
       );
-      _postsCache.insert(0, newPost);
+      _generalPostsCache.insert(0, newPost);
       emit(PostCreated(newPost));
       add(FetchPosts());
     } catch (e) {
@@ -69,9 +153,13 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       await PostService.deletePost(event.postId);
       final posts = await PostService.fetchPosts();
 
-      _postsCache = posts;
-      if (_postsCache.isNotEmpty) {
-        emit(PostsLoaded(_postsCache));
+      _generalPostsCache = posts;
+      if (_generalPostsCache.isNotEmpty) {
+        emit(PostsCombinedState(
+          generalPosts: _generalPostsCache,
+          userPosts: _userPostsCache,
+          showingUserPosts: false,
+        ));
         return;
       }
     } catch (e) {

@@ -10,12 +10,24 @@ abstract class PostEvent extends Equatable {
 class FetchPosts extends PostEvent {}
 
 class FetchPostsByUser extends PostEvent {
-  final String handle;
+  final String id;
 
-  const FetchPostsByUser(this.handle);
+  const FetchPostsByUser(this.id);
 
   @override
-  List<Object?> get props => [handle];
+  List<Object?> get props => [id];
+}
+
+class ClearUserPosts extends PostEvent {}
+
+class StartPostLoading extends PostEvent {
+  final int postId;
+  const StartPostLoading(this.postId);
+}
+
+class StopPostLoading extends PostEvent {
+  final int postId;
+  const StopPostLoading(this.postId);
 }
 
 class CreatePostEvent extends PostEvent {

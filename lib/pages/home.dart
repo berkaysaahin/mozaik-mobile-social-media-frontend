@@ -16,6 +16,12 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   @override
+  void initState() {
+    context.read<PostBloc>().add(FetchPosts());
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
       color: AppColors.primary,
@@ -27,19 +33,18 @@ class _HomePageState extends State<HomePage> {
       child: BlocBuilder<PostBloc, PostState>(
         builder: (context, state) {
           if (state is PostLoading) {
-            return const Center(
-                child: CircularProgressIndicator(
-              color: AppColors.primary,
-              strokeWidth: 3,
-            ));
-          } else if (state is PostsLoaded) {
+            return const SizedBox.shrink();
+          } else if (state is PostsCombinedState) {
+            final posts =
+                state.showingUserPosts ? state.userPosts : state.generalPosts;
+
             return CustomScrollView(
               controller: widget.scrollController,
               slivers: [
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
-                      final post = state.posts[index];
+                      final post = posts[index];
                       return Container(
                         color: AppColors.background,
                         child: Column(
@@ -64,7 +69,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                       );
                     },
-                    childCount: state.posts.length,
+                    childCount: posts.length,
                   ),
                 ),
               ],

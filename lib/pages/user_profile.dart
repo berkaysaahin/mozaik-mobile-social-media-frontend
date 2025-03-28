@@ -4,9 +4,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mozaik/app_colors.dart';
 import 'package:mozaik/blocs/post_bloc.dart';
 import 'package:mozaik/blocs/user_bloc.dart';
-import 'package:mozaik/components/custom_app_bar.dart';
+import 'package:mozaik/components/rounded_button.dart';
 import 'package:mozaik/components/rounded_rectangle_button.dart';
 import 'package:mozaik/components/text_post.dart';
+import 'package:mozaik/events/post_event.dart';
 import 'package:mozaik/events/user_event.dart';
 import 'package:mozaik/states/post_state.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -29,19 +30,12 @@ class _UserProfilePageState extends State<UserProfilePage> {
   void initState() {
     super.initState();
     context.read<UserBloc>().add(FetchUserById(widget.userId));
+    context.read<PostBloc>().add(FetchPostsByUser(widget.userId));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(
-        leftIcon: const Icon(FluentIcons.arrow_left_24_regular),
-        rightWidget: const Icon(FluentIcons.more_vertical_24_regular),
-        onLeftIconTap: (BuildContext context) {
-          Navigator.pop(context);
-        },
-        onRightWidgetTap: (BuildContext context) {},
-      ),
       body: SafeArea(
         child: NestedScrollView(
           headerSliverBuilder: (context, innerBoxIsScrolled) {
@@ -84,16 +78,51 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               errorWidget: (context, url, error) =>
                                   const Icon(Icons.error),
                             ),
-                            Container(
-                              height: 170,
-                              decoration: BoxDecoration(
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.1),
-                                    offset: const Offset(0, -140),
-                                    blurRadius: 6,
-                                  ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                children: [
+                                  AppRoundedButton(
+                                      onTap: () {
+                                        context
+                                            .read<PostBloc>()
+                                            .add(ClearUserPosts());
+
+                                        context
+                                            .read<PostBloc>()
+                                            .add(FetchPosts());
+
+                                        Navigator.pop(context);
+                                      },
+                                      iconData:
+                                          FluentIcons.arrow_left_24_regular,
+                                      backgroundColor: AppColors
+                                          .backgroundDarker
+                                          .withValues(alpha: 0.6)),
+                                  const Spacer(),
+                                  AppRoundedButton(
+                                      onTap: () {},
+                                      iconData:
+                                          FluentIcons.more_vertical_24_regular,
+                                      backgroundColor: AppColors
+                                          .backgroundDarker
+                                          .withValues(alpha: 0.6)),
                                 ],
+                              ),
+                            ),
+                            IgnorePointer(
+                              child: Container(
+                                height: 170,
+                                decoration: BoxDecoration(
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color:
+                                          Colors.black.withValues(alpha: 0.1),
+                                      offset: const Offset(0, -140),
+                                      blurRadius: 6,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                             Padding(
@@ -217,7 +246,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           strokeWidth: 3,
                         ),
                       );
-                    } else if (postState is PostsLoaded) {
+                    } else if (postState is PostsCombinedState) {
+                      final posts = postState.userPosts.isNotEmpty
+                          ? postState.userPosts
+                          : postState.generalPosts;
                       return ListView(
                         children: [
                           Container(
@@ -358,7 +390,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               ],
                             ),
                           ),
-                          ...postState.posts.map((post) {
+                          ...posts.map((post) {
                             return Container(
                               color: AppColors.background,
                               child: Column(

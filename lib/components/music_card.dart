@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mozaik/app_colors.dart';
@@ -13,60 +14,66 @@ class MusicCard extends StatefulWidget {
 
 class _MusicCardState extends State<MusicCard> {
   Color? _backgroundColor;
-  bool _isPaletteGenerated = false;
   static final Map<String, Color> _paletteCache = {};
+  ImageStream? _imageStream;
+  bool _isGeneratingPalette = false;
 
   @override
   void initState() {
     super.initState();
-    _generatePalette();
   }
 
   @override
-  void didUpdateWidget(MusicCard oldWidget) {
-    super.didUpdateWidget(oldWidget);
+  void dispose() {
+    _imageStream?.removeListener(ImageStreamListener((_, __) {}));
+    super.dispose();
+  }
 
-    if (widget.music != oldWidget.music) {
-      _generatePalette();
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (widget.music != null && widget.music!['cover_art'] != null) {
+      precacheImage(
+        CachedNetworkImageProvider(widget.music!['cover_art']),
+        context,
+      );
+      getMainColorFromUrl();
     }
   }
 
-  Future<void> _generatePalette() async {
-    if (widget.music != null && widget.music!['cover_art'] != null) {
-      final String coverArtUrl = widget.music!['cover_art'];
+  Future<void> getMainColorFromUrl([int timeout = 1000]) async {
+    if (_isGeneratingPalette) return;
+    if (widget.music == null || widget.music!['cover_art'] == null) return;
+    _isGeneratingPalette = true;
 
-      if (_paletteCache.containsKey(coverArtUrl)) {
-        if (mounted) {
-          setState(() {
-            _backgroundColor = _paletteCache[coverArtUrl];
-            _isPaletteGenerated = true;
-          });
-        }
-        return;
+    final String coverArtUrl = widget.music!['cover_art'];
+
+    if (_paletteCache.containsKey(coverArtUrl)) {
+      if (mounted &&
+          _backgroundColor !=
+              (_paletteCache[coverArtUrl] ?? AppColors.darkGray)) {
+        setState(() => _backgroundColor = _paletteCache[coverArtUrl]);
       }
+      return;
+    }
 
-      try {
-        final PaletteGenerator paletteGenerator =
-            await PaletteGenerator.fromImageProvider(
-          NetworkImage(coverArtUrl),
-        );
+    try {
+      await Future.delayed(const Duration(milliseconds: 50));
+      if (!mounted) return;
 
-        _paletteCache[coverArtUrl] =
-            paletteGenerator.dominantColor?.color ?? AppColors.darkGray;
+      final paletteGenerator = await PaletteGenerator.fromImageProvider(
+        CachedNetworkImageProvider(coverArtUrl),
+        size: const Size(200, 200),
+        maximumColorCount: 5,
+      ).timeout(Duration(milliseconds: timeout));
 
-        if (mounted) {
-          setState(() {
-            _backgroundColor = _paletteCache[coverArtUrl];
-            _isPaletteGenerated = true;
-          });
-        }
-      } catch (e) {
-        if (mounted) {
-          setState(() {
-            _isPaletteGenerated = true;
-          });
-        }
-      }
+      final color = paletteGenerator.dominantColor?.color ?? AppColors.darkGray;
+      _paletteCache[coverArtUrl] = color;
+      if (mounted) setState(() => _backgroundColor = color);
+    } catch (e) {
+      if (mounted) setState(() => _backgroundColor = AppColors.darkGray);
+    } finally {
+      _isGeneratingPalette = false;
     }
   }
 
@@ -81,6 +88,7 @@ class _MusicCardState extends State<MusicCard> {
     final String? songTitle = widget.music?['track_name'];
     final String? artist = widget.music?['artist'];
     final String? imageUrl = widget.music?['cover_art'];
+    final cardHeight = MediaQuery.of(context).size.height * 0.15;
 
     final textColor = _backgroundColor != null
         ? _getTextColor(_backgroundColor!)
@@ -90,20 +98,20 @@ class _MusicCardState extends State<MusicCard> {
       children: [
         Container(
           width: double.infinity,
-          height: 120,
+          height: cardHeight,
           decoration: BoxDecoration(
-            color: _isPaletteGenerated
+            color: _backgroundColor != null
                 ? _backgroundColor ?? AppColors.darkGray
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(20),
           ),
-          child: _isPaletteGenerated
+          child: _backgroundColor != null
               ? Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Container(
-                      width: 120,
-                      height: 120,
+                      width: cardHeight,
+                      height: cardHeight,
                       decoration: const BoxDecoration(
                         borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(24),
@@ -112,15 +120,21 @@ class _MusicCardState extends State<MusicCard> {
                       ),
                       child: ClipRRect(
                         borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(24),
-                          bottomLeft: Radius.circular(24),
+                          topLeft: Radius.circular(20),
+                          bottomLeft: Radius.circular(20),
                         ),
-                        child: Image.network(
-                          imageUrl!,
-                          width: 120,
-                          height: 120,
-                          fit: BoxFit.cover,
-                        ),
+                        child: imageUrl != null
+                            ? CachedNetworkImage(
+                                imageUrl: imageUrl,
+                                width: 120,
+                                height: 120,
+                                fit: BoxFit.cover,
+                                memCacheWidth: 200,
+                                memCacheHeight: 200,
+                                errorWidget: (context, url, error) =>
+                                    const Icon(Icons.music_note),
+                              )
+                            : const Icon(Icons.music_note),
                       ),
                     ),
                     Expanded(
@@ -162,7 +176,7 @@ class _MusicCardState extends State<MusicCard> {
                   ),
                 ),
         ),
-        if (_isPaletteGenerated)
+        if (_backgroundColor != null)
           Positioned(
             right: 0,
             bottom: 0,

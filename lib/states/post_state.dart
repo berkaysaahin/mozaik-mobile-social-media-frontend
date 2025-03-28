@@ -12,10 +12,36 @@ class PostCreated extends PostState {
   PostCreated(this.post);
 }
 
-class PostsLoaded extends PostState {
-  final List<Post> posts;
+class PostsCombinedState extends PostState {
+  final List<Post> generalPosts;
+  final List<Post> userPosts;
+  final bool showingUserPosts;
+  final Set<int> loadingPostIds;
+  final Set<int> loadedPostIds;
 
-  PostsLoaded(this.posts);
+  PostsCombinedState({
+    required this.generalPosts,
+    required this.userPosts,
+    required this.showingUserPosts,
+    this.loadingPostIds = const {},
+    this.loadedPostIds = const {},
+  });
+
+  PostsCombinedState copyWith({
+    List<Post>? generalPosts,
+    List<Post>? userPosts,
+    bool? showingUserPosts,
+    Set<int>? loadingPostIds,
+    Set<int>? loadedPostIds,
+  }) {
+    return PostsCombinedState(
+      generalPosts: generalPosts ?? this.generalPosts,
+      userPosts: userPosts ?? this.userPosts,
+      showingUserPosts: showingUserPosts ?? this.showingUserPosts,
+      loadingPostIds: loadingPostIds ?? this.loadingPostIds,
+      loadedPostIds: loadedPostIds ?? this.loadedPostIds,
+    );
+  }
 }
 
 class PostError extends PostState {

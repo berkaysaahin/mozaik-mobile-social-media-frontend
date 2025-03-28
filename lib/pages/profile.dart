@@ -4,6 +4,7 @@ import 'package:mozaik/app_colors.dart';
 import 'package:mozaik/blocs/post_bloc.dart';
 import 'package:mozaik/blocs/profile_bloc.dart';
 import 'package:mozaik/components/text_post.dart';
+import 'package:mozaik/events/post_event.dart';
 import 'package:mozaik/states/post_state.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:mozaik/states/profile_state.dart';
@@ -18,6 +19,14 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  @override
+  void initState() {
+    context
+        .read<PostBloc>()
+        .add(const FetchPostsByUser('b2ecc8ae-9e16-42eb-915f-d2e1e2022f6c'));
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -138,7 +147,8 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                           ),
                         );
-                      } else if (postState is PostsLoaded) {
+                      } else if (postState is PostsCombinedState) {
+                        final posts = postState.userPosts;
                         return SliverList(
                           delegate: SliverChildListDelegate([
                             Container(
@@ -193,7 +203,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                 ),
                                                 const SizedBox(height: 8),
                                                 const Text(
-                                                  "well this time I break, I will never live, another day",
+                                                  "I can't ever talk about this DNA!",
                                                   style: TextStyle(
                                                       fontSize: 16,
                                                       fontWeight:
@@ -280,7 +290,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ],
                               ),
                             ),
-                            ...postState.posts.map((post) {
+                            ...posts.map((post) {
                               return Container(
                                 color: AppColors.background,
                                 child: Column(
