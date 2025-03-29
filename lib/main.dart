@@ -18,7 +18,7 @@ import 'package:mozaik/events/post_event.dart';
 import 'package:mozaik/events/profile_event.dart';
 import 'package:mozaik/pages/direct_message.dart';
 import 'package:mozaik/pages/discover.dart';
-import 'package:mozaik/pages/home_with_tabs.dart';
+import 'package:mozaik/pages/home.dart';
 import 'package:mozaik/pages/login.dart';
 import 'package:mozaik/pages/messages.dart';
 import 'package:mozaik/pages/new_post.dart';
@@ -145,7 +145,9 @@ class _MyHomePageState extends State<MyHomePage>
     {
       'leftIcon': Icons.search,
       'rightIcon': Icons.filter_alt_outlined,
-      'customWidget': const CustomSearchBar(),
+      'customWidget': const CustomSearchBar(
+        borderRadius: 12,
+      ),
     },
     {
       'title': 'Messages',
@@ -167,179 +169,199 @@ class _MyHomePageState extends State<MyHomePage>
     final appBarConfig = appBarConfigs[selectedIndex];
 
     return Scaffold(
-      drawer: SafeArea(
-        child: Drawer(
-          backgroundColor: AppColors.background,
-          child: Column(
-            children: [
-              Container(
-                height: 160,
-                decoration: const BoxDecoration(
-                  color: AppColors.background,
+      drawer: Drawer(
+        backgroundColor: AppColors.background,
+        shape: ShapeBorder.lerp(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(0),
+          ),
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(0),
+          ),
+          0.5,
+        ),
+        child: Column(
+          children: [
+            Container(
+              height: 160,
+              decoration: const BoxDecoration(
+                color: AppColors.background,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 4,
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 12,
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      BlocBuilder<ProfileBloc, ProfileState>(
-                        builder: (context, state) {
-                          if (state is ProfileLoaded) {
-                            return CircleAvatar(
-                              radius: 32,
-                              backgroundColor: AppColors.ashBlue,
-                              child: ClipOval(
-                                child: Image.network(
-                                  state.user.profilePic,
-                                  width: 64,
-                                  height: 64,
-                                  fit: BoxFit.cover,
-                                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    BlocBuilder<ProfileBloc, ProfileState>(
+                      builder: (context, state) {
+                        if (state is ProfileLoaded) {
+                          return CircleAvatar(
+                            radius: 30,
+                            backgroundColor: AppColors.ashBlue,
+                            child: ClipOval(
+                              child: Image.network(
+                                state.user.profilePic,
+                                width: 60,
+                                height: 60,
+                                fit: BoxFit.cover,
                               ),
-                            );
-                          } else if (state is ProfileError) {
-                            return const Icon(Icons.error);
-                          } else {
-                            return const CircularProgressIndicator(
-                              color: AppColors.primary,
-                              strokeWidth: 3,
-                            );
-                          }
-                        },
-                      ),
-                      const SizedBox(
-                        height: 12,
-                      ),
-                      Container(
-                        height: 32,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.primary.withValues(alpha: 0.05),
-                              blurRadius: 0,
-                              spreadRadius: 0,
                             ),
-                          ],
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 18, vertical: 4),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              BlocBuilder<ProfileBloc, ProfileState>(
-                                builder: (context, state) {
-                                  if (state is ProfileLoaded) {
-                                    return Text(
-                                      state.user.username,
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w300,
+                          );
+                        } else if (state is ProfileError) {
+                          return const Icon(Icons.error);
+                        } else {
+                          return const CircularProgressIndicator(
+                            color: AppColors.primary,
+                            strokeWidth: 3,
+                          );
+                        }
+                      },
+                    ),
+                    const SizedBox(
+                      height: 4,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        BlocBuilder<ProfileBloc, ProfileState>(
+                          builder: (context, state) {
+                            if (state is ProfileLoaded) {
+                              return Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    state.user.username,
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  Text(
+                                    state.user.handle,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w200,
+                                      color: AppColors.primary.withValues(
+                                        alpha: 0.6,
                                       ),
-                                    );
-                                  } else if (state is ProfileError) {
-                                    return const Icon(Icons.error);
-                                  } else {
-                                    return const CircularProgressIndicator(
-                                      color: AppColors.primary,
-                                      strokeWidth: 3,
-                                    );
-                                  }
-                                },
-                              ),
-                              const Icon(
-                                CupertinoIcons.chevron_down,
-                                size: 20,
-                              ),
-                            ],
-                          ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            } else if (state is ProfileError) {
+                              return const Icon(Icons.error);
+                            } else {
+                              return const CircularProgressIndicator(
+                                color: AppColors.primary,
+                                strokeWidth: 3,
+                              );
+                            }
+                          },
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                child: Divider(),
-              ),
-              Expanded(
-                child: ListView(
-                  padding: EdgeInsets.zero,
-                  children: <Widget>[
-                    ListTile(
-                      leading: const Icon(
-                        FluentIcons.home_16_regular,
-                        size: 20,
-                      ),
-                      title: const Text(
-                        'Home',
-                        style: TextStyle(
-                          fontSize: 18,
-                        ),
-                      ),
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                    ListTile(
-                      leading: const Icon(
-                        FluentIcons.settings_16_regular,
-                        size: 20,
-                      ),
-                      title: const Text(
-                        'Settings',
-                        style: TextStyle(
-                          fontSize: 16,
-                        ),
-                      ),
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                    ListTile(
-                      leading: const Icon(
-                        FluentIcons.signature_20_regular,
-                        size: 20,
-                      ),
-                      title: const Text(
-                        'Login',
-                        style: TextStyle(
-                          fontSize: 16,
-                        ),
-                      ),
-                      onTap: () {
-                        Navigator.pushNamed(context, '/login');
-                      },
+                      ],
                     ),
                   ],
                 ),
               ),
-              const Spacer(),
-              ListTile(
-                leading: const Icon(
-                  FluentIcons.sign_out_20_regular,
-                  size: 20,
-                ),
-                title: const Text(
-                  'Logout',
-                  style: TextStyle(
-                    fontSize: 16,
-                  ),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                },
+            ),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Divider(
+                thickness: 0.5,
+                color: AppColors.primary,
               ),
-            ],
-          ),
+            ),
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: <Widget>[
+                  ListTile(
+                    visualDensity: const VisualDensity(
+                      horizontal: -4,
+                    ),
+                    leading: const Icon(
+                      FluentIcons.home_32_regular,
+                      size: 22,
+                    ),
+                    title: const Text(
+                      'Home',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  ListTile(
+                    visualDensity: const VisualDensity(
+                      horizontal: -4,
+                    ),
+                    leading: const Icon(
+                      FluentIcons.settings_32_regular,
+                      size: 22,
+                    ),
+                    title: const Text(
+                      'Settings',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  ListTile(
+                    visualDensity: const VisualDensity(
+                      horizontal: -4,
+                    ),
+                    leading: const Icon(
+                      CupertinoIcons.goforward,
+                      size: 22,
+                    ),
+                    title: const Text(
+                      'Login',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.pushNamed(context, '/login');
+                    },
+                  ),
+                ],
+              ),
+            ),
+            const Spacer(),
+            ListTile(
+              visualDensity: const VisualDensity(
+                horizontal: -4,
+              ),
+              leading: const Icon(
+                CupertinoIcons.gobackward,
+                size: 22,
+              ),
+              title: const Text(
+                'Logout',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
         ),
       ),
       appBar: selectedIndex != 3
@@ -357,10 +379,7 @@ class _MyHomePageState extends State<MyHomePage>
         controller: _pageController,
         physics: const NeverScrollableScrollPhysics(),
         children: [
-          HomeWithTabs(
-            tabController: _tabController,
-            isTabBarVisibleNotifier: isTabBarVisible,
-          ),
+          const HomePage(),
           const DiscoverPage(),
           const MessagesPage(),
           BlocBuilder<ProfileBloc, ProfileState>(

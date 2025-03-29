@@ -6,8 +6,8 @@ import 'package:mozaik/app_colors.dart';
 import 'package:mozaik/blocs/post_bloc.dart';
 import 'package:mozaik/components/music_card.dart';
 import 'package:mozaik/components/post_button.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mozaik/events/post_event.dart';
+import 'package:mozaik/pages/single_post_page.dart';
 import 'package:mozaik/pages/user_profile.dart';
 import 'package:mozaik/states/post_state.dart';
 import 'package:shimmer/shimmer.dart';
@@ -283,41 +283,53 @@ class _TextPostState extends State<TextPost>
                     MusicCard(music: widget.music),
                     const SizedBox(height: 8),
                   ],
-                  Row(
-                    children: [
-                      IconButton(
-                        iconSize: 20,
-                        icon: SvgPicture.asset(
-                          'assets/svg/send.svg',
-                          height: 20,
-                          width: 20,
-                          color: Colors.grey,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        PostButton(
+                          icon: CupertinoIcons.bubble_left,
+                          count: widget.comments,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => SinglePostPage(
+                                  coverArt: widget.music?['cover_art'] ?? '',
+                                  trackName: widget.music?['track_name'] ?? '',
+                                  artist: widget.music?['artist'] ?? '',
+                                  description: widget.content,
+                                  likes: _likes,
+                                  commentsCount: widget.comments,
+                                  username: widget.username,
+                                  userHandle: widget.handle,
+                                  userAvatar: widget.profilePic,
+                                  postId: widget.id,
+                                  timestamp: widget.timestamp,
+                                ),
+                              ),
+                            );
+                          },
                         ),
-                        onPressed: () {},
-                      ),
-                      const Spacer(),
-                      PostButton(
-                        icon: CupertinoIcons.bubble_left,
-                        count: widget.comments,
-                        onTap: () {},
-                      ),
-                      const SizedBox(width: 16),
-                      PostButton(
-                        icon: CupertinoIcons.arrow_2_squarepath,
-                        color: _isShared ? AppColors.primary : Colors.grey,
-                        count: _shares,
-                        onTap: _toggleShare,
-                      ),
-                      const SizedBox(width: 16),
-                      PostButton(
-                        icon: _isLiked
-                            ? CupertinoIcons.heart_fill
-                            : CupertinoIcons.heart,
-                        color: _isLiked ? Colors.red : Colors.grey,
-                        count: _likes,
-                        onTap: _toggleLike,
-                      ),
-                    ],
+                        const SizedBox(width: 16),
+                        PostButton(
+                          icon: CupertinoIcons.arrow_2_squarepath,
+                          color: _isShared ? AppColors.primary : Colors.grey,
+                          count: _shares,
+                          onTap: _toggleShare,
+                        ),
+                        const SizedBox(width: 16),
+                        PostButton(
+                          icon: _isLiked
+                              ? CupertinoIcons.heart_fill
+                              : CupertinoIcons.heart,
+                          color: _isLiked ? Colors.red : Colors.grey,
+                          count: _likes,
+                          onTap: _toggleLike,
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

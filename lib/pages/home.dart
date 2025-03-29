@@ -7,8 +7,7 @@ import 'package:mozaik/events/post_event.dart';
 import 'package:mozaik/states/post_state.dart';
 
 class HomePage extends StatefulWidget {
-  final ScrollController scrollController;
-  const HomePage({super.key, required this.scrollController});
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -39,7 +38,6 @@ class _HomePageState extends State<HomePage> {
                 state.showingUserPosts ? state.userPosts : state.generalPosts;
 
             return CustomScrollView(
-              controller: widget.scrollController,
               slivers: [
                 SliverList(
                   delegate: SliverChildBuilderDelegate(

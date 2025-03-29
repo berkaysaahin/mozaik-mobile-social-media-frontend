@@ -126,11 +126,20 @@ class _MusicCardState extends State<MusicCard> {
                         child: imageUrl != null
                             ? CachedNetworkImage(
                                 imageUrl: imageUrl,
-                                width: 120,
-                                height: 120,
+                                width: cardHeight,
+                                height: cardHeight,
                                 fit: BoxFit.cover,
                                 memCacheWidth: 200,
                                 memCacheHeight: 200,
+                                imageBuilder: (context, imageProvider) =>
+                                    Container(
+                                  decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                      image: imageProvider,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
                                 errorWidget: (context, url, error) =>
                                     const Icon(Icons.music_note),
                               )
