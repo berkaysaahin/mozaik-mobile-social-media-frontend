@@ -1,8 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:mozaik/app_colors.dart';
 import 'package:palette_generator/palette_generator.dart';
+import 'package:mozaik/app_colors.dart';
 
 class MusicCard extends StatefulWidget {
   final Map<String, dynamic>? music;
@@ -14,190 +14,143 @@ class MusicCard extends StatefulWidget {
 
 class _MusicCardState extends State<MusicCard> {
   Color? _backgroundColor;
-  static final Map<String, Color> _paletteCache = {};
-  ImageStream? _imageStream;
-  bool _isGeneratingPalette = false;
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _imageStream?.removeListener(ImageStreamListener((_, __) {}));
-    super.dispose();
-  }
+  static final Map<String, Color> _colorCache = {};
+  bool _isGeneratingColor = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (widget.music != null && widget.music!['cover_art'] != null) {
-      precacheImage(
-        CachedNetworkImageProvider(widget.music!['cover_art']),
-        context,
-      );
-      getMainColorFromUrl();
+      _extractDominantColor();
     }
   }
 
-  Future<void> getMainColorFromUrl([int timeout = 1000]) async {
-    if (_isGeneratingPalette) return;
-    if (widget.music == null || widget.music!['cover_art'] == null) return;
-    _isGeneratingPalette = true;
+  Future<void> _extractDominantColor() async {
+    if (_isGeneratingColor) return;
+    final String? coverArtUrl = widget.music?['cover_art'];
+    if (coverArtUrl == null) return;
 
-    final String coverArtUrl = widget.music!['cover_art'];
-
-    if (_paletteCache.containsKey(coverArtUrl)) {
-      if (mounted &&
-          _backgroundColor !=
-              (_paletteCache[coverArtUrl] ?? AppColors.darkGray)) {
-        setState(() => _backgroundColor = _paletteCache[coverArtUrl]);
-      }
+    if (_colorCache.containsKey(coverArtUrl)) {
+      if (mounted) setState(() => _backgroundColor = _colorCache[coverArtUrl]);
       return;
     }
 
+    _isGeneratingColor = true;
+
     try {
-      await Future.delayed(const Duration(milliseconds: 50));
-      if (!mounted) return;
+      final palette = await PaletteGenerator.fromImageProvider(
+        ResizeImage(
+          CachedNetworkImageProvider(coverArtUrl),
+          width: 100,
+        ),
+        size: Size(100, 100),
+        maximumColorCount: 2,
+        timeout: Duration(seconds: 2),
+      );
 
-      final paletteGenerator = await PaletteGenerator.fromImageProvider(
-        CachedNetworkImageProvider(coverArtUrl),
-        size: const Size(200, 200),
-        maximumColorCount: 5,
-      ).timeout(Duration(milliseconds: timeout));
+      final color = palette.dominantColor?.color ?? AppColors.darkGray;
 
-      final color = paletteGenerator.dominantColor?.color ?? AppColors.darkGray;
-      _paletteCache[coverArtUrl] = color;
-      if (mounted) setState(() => _backgroundColor = color);
+      if (mounted) {
+        setState(() {
+          _colorCache[coverArtUrl] = color;
+          _backgroundColor = color;
+        });
+      }
     } catch (e) {
       if (mounted) setState(() => _backgroundColor = AppColors.darkGray);
     } finally {
-      _isGeneratingPalette = false;
+      _isGeneratingColor = false;
     }
   }
 
   Color _getTextColor(Color backgroundColor) {
-    final Brightness brightness =
-        ThemeData.estimateBrightnessForColor(backgroundColor);
+    final brightness = ThemeData.estimateBrightnessForColor(backgroundColor);
     return brightness == Brightness.light ? AppColors.primary : Colors.white;
   }
 
   @override
   Widget build(BuildContext context) {
-    final String? songTitle = widget.music?['track_name'];
-    final String? artist = widget.music?['artist'];
-    final String? imageUrl = widget.music?['cover_art'];
     final cardHeight = MediaQuery.of(context).size.height * 0.15;
-
     final textColor = _backgroundColor != null
         ? _getTextColor(_backgroundColor!)
         : Colors.white;
 
-    return Stack(
-      children: [
-        Container(
-          width: double.infinity,
-          height: cardHeight,
-          decoration: BoxDecoration(
-            color: _backgroundColor != null
-                ? _backgroundColor ?? AppColors.darkGray
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: _backgroundColor != null
-              ? Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: cardHeight,
-                      height: cardHeight,
-                      decoration: const BoxDecoration(
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(24),
-                          bottomLeft: Radius.circular(24),
+    return Container(
+      height: cardHeight,
+      decoration: BoxDecoration(
+        color: _backgroundColor ?? Colors.transparent,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Stack(
+        children: [
+          Row(
+            children: [
+              Container(
+                width: cardHeight,
+                height: cardHeight,
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(12),
+                    bottomLeft: Radius.circular(12),
+                  ),
+                  image: widget.music?['cover_art'] != null
+                      ? DecorationImage(
+                          image: CachedNetworkImageProvider(
+                              widget.music!['cover_art']),
+                          fit: BoxFit.cover,
+                        )
+                      : null,
+                ),
+                child: widget.music?['cover_art'] == null
+                    ? const Icon(Icons.music_note,
+                        size: 40, color: Colors.white70)
+                    : null,
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        widget.music?['track_name'] ?? 'Unknown Track',
+                        style: TextStyle(
+                          color: textColor,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      child: ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(20),
-                          bottomLeft: Radius.circular(20),
+                      const SizedBox(height: 4),
+                      Text(
+                        widget.music?['artist'] ?? 'Unknown Artist',
+                        style: TextStyle(
+                          color: textColor.withOpacity(0.8),
+                          fontSize: 14,
                         ),
-                        child: imageUrl != null
-                            ? CachedNetworkImage(
-                                imageUrl: imageUrl,
-                                width: cardHeight,
-                                height: cardHeight,
-                                fit: BoxFit.cover,
-                                memCacheWidth: 200,
-                                memCacheHeight: 200,
-                                imageBuilder: (context, imageProvider) =>
-                                    Container(
-                                  decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                      image: imageProvider,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                ),
-                                errorWidget: (context, url, error) =>
-                                    const Icon(Icons.music_note),
-                              )
-                            : const Icon(Icons.music_note),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              songTitle!,
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: textColor,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              artist!,
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: textColor.withValues(alpha: 0.8),
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                )
-              : const Center(
-                  child: CircularProgressIndicator(
-                    color: AppColors.primary,
-                    strokeWidth: 3,
+                    ],
                   ),
                 ),
-        ),
-        if (_backgroundColor != null)
-          Positioned(
-            right: 0,
-            bottom: 0,
-            child: Padding(
-              padding: const EdgeInsets.all(12.0),
+              ),
+            ],
+          ),
+          if (_backgroundColor != null)
+            Positioned(
+              right: 12,
+              bottom: 12,
               child: Icon(
                 FontAwesomeIcons.spotify,
                 color: textColor,
+                size: 20,
               ),
             ),
-          ),
-      ],
+        ],
+      ),
     );
   }
 }

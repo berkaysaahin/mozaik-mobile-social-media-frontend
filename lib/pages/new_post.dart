@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
@@ -11,6 +12,7 @@ import 'package:mozaik/events/post_event.dart';
 import 'package:mozaik/pages/track_search.dart';
 import 'package:mozaik/states/post_state.dart';
 import 'package:mozaik/states/profile_state.dart';
+import 'package:shimmer/shimmer.dart';
 
 class NewPostPage extends StatefulWidget {
   const NewPostPage({super.key});
@@ -28,6 +30,7 @@ class _NewPostPageState extends State<NewPostPage> {
   String? _trackImage;
   String? _trackArtist;
   File? _selectedImage;
+  bool _isUploading = false;
 
   void _changeVisibility() {
     setState(() {
@@ -47,7 +50,8 @@ class _NewPostPageState extends State<NewPostPage> {
     if (pickedFile != null) {
       setState(() {
         _selectedImage = File(pickedFile.path);
-        _imageUrl = pickedFile.path;
+
+        _isUploading = false;
       });
     }
   }
@@ -55,6 +59,7 @@ class _NewPostPageState extends State<NewPostPage> {
   void _removeImage() {
     setState(() {
       _selectedImage = null;
+      _imageUrl = null;
     });
   }
 
@@ -76,6 +81,38 @@ class _NewPostPageState extends State<NewPostPage> {
     }
   }
 
+  Future<void> _publishPost() async {
+    if (_isUploading) return;
+
+    setState(() => _isUploading = true);
+
+    try {
+      if (_selectedImage != null) {
+        final storageRef = FirebaseStorage.instance.ref();
+        final imageRef = storageRef.child(
+          'post_images/${DateTime.now().millisecondsSinceEpoch}.jpg',
+        );
+
+        await imageRef.putFile(_selectedImage!);
+        _imageUrl = await imageRef.getDownloadURL();
+      }
+
+      final postBloc = context.read<PostBloc>();
+      postBloc.add(CreatePostEvent(
+        userId: 'b2ecc8ae-9e16-42eb-915f-d2e1e2022f6c',
+        content: _postController.text,
+        spotifyTrackId: _spotifyTrackId,
+        visibility: _visibility.toLowerCase(),
+        imageUrl: _imageUrl,
+      ));
+    } catch (e) {
+      setState(() => _isUploading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to publish: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -86,23 +123,27 @@ class _NewPostPageState extends State<NewPostPage> {
         },
         title: "Post",
         rightWidget: TextButton(
-          onPressed: () {
-            final postBloc = context.read<PostBloc>();
-            postBloc.add(CreatePostEvent(
-              userId: 'b2ecc8ae-9e16-42eb-915f-d2e1e2022f6c',
-              content: _postController.text,
-              spotifyTrackId: _spotifyTrackId,
-              visibility: _visibility.toLowerCase(),
-              imageUrl: _imageUrl,
-            ));
-          },
-          child: const Text(
-            "Publish",
-            style: TextStyle(
-              fontSize: 16,
-              color: AppColors.primary,
-            ),
-          ),
+          onPressed: _isUploading ? null : _publishPost,
+          child: _isUploading
+              ? Shimmer.fromColors(
+                  baseColor: Colors.grey[300]!,
+                  highlightColor: Colors.grey[100]!,
+                  child: Container(
+                    width: 64,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                )
+              : const Text(
+                  "Publish",
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: AppColors.primary,
+                  ),
+                ),
         ),
       ),
       body: BlocListener<PostBloc, PostState>(

@@ -52,8 +52,9 @@ class CreatePostEvent extends PostEvent {
 
 class DeletePost extends PostEvent {
   final int postId;
+  final String? imageUrl;
 
-  const DeletePost(this.postId);
+  const DeletePost(this.postId, {this.imageUrl});
 
   @override
   List<Object?> get props => [postId];

@@ -1,3 +1,4 @@
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mozaik/events/post_event.dart';
 import 'package:mozaik/models/post_model.dart';
@@ -150,6 +151,14 @@ class PostBloc extends Bloc<PostEvent, PostState> {
   Future<void> _onDeletePost(DeletePost event, Emitter<PostState> emit) async {
     emit(PostLoading());
     try {
+      if (event.imageUrl != null && event.imageUrl!.isNotEmpty) {
+        try {
+          final ref = FirebaseStorage.instance.refFromURL(event.imageUrl!);
+          await ref.delete();
+        } catch (e) {
+          emit(PostError('Failed to delete image: $e'));
+        }
+      }
       await PostService.deletePost(event.postId);
       final posts = await PostService.fetchPosts();
 

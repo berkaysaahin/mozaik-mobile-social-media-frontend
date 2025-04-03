@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mozaik/app_colors.dart';
@@ -36,6 +37,26 @@ class _HomePageState extends State<HomePage> {
           } else if (state is PostsCombinedState) {
             final posts =
                 state.showingUserPosts ? state.userPosts : state.generalPosts;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              final postsToPrecache = posts.take(3);
+              for (final post in postsToPrecache) {
+                if (post.imageUrl != null) {
+                  precacheImage(
+                          CachedNetworkImageProvider(post.imageUrl!), context)
+                      .catchError((e) {
+                    debugPrint('Failed to precache image: $e');
+                  });
+                }
+                if (post.music?['cover_art'] != null) {
+                  precacheImage(
+                          CachedNetworkImageProvider(post.music!['cover_art']),
+                          context)
+                      .catchError((e) {
+                    debugPrint('Failed to precache music cover: $e');
+                  });
+                }
+              }
+            });
 
             return CustomScrollView(
               slivers: [
@@ -49,25 +70,29 @@ class _HomePageState extends State<HomePage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             TextPost(
-                                id: post.id,
-                                username: post.username,
-                                handle: post.handle,
-                                content: post.content,
-                                userId: post.userId,
-                                likeCount: post.likeCount,
-                                reblogCount: post.reblogCount,
-                                hasLiked: post.hasLiked,
-                                hasReblogged: post.hasReblogged,
-                                comments: post.comments,
-                                timestamp: post.timestamp,
-                                profilePic: post.profilePic,
-                                music: post.music),
+                              id: post.id,
+                              username: post.username,
+                              handle: post.handle,
+                              content: post.content,
+                              userId: post.userId,
+                              likeCount: post.likeCount,
+                              reblogCount: post.reblogCount,
+                              hasLiked: post.hasLiked,
+                              hasReblogged: post.hasReblogged,
+                              comments: post.comments,
+                              timestamp: post.timestamp,
+                              profilePic: post.profilePic,
+                              music: post.music,
+                              imageUrl: post.imageUrl,
+                            ),
                             const SizedBox(height: 12),
                           ],
                         ),
                       );
                     },
                     childCount: posts.length,
+                    addAutomaticKeepAlives: true,
+                    addRepaintBoundaries: true,
                   ),
                 ),
               ],

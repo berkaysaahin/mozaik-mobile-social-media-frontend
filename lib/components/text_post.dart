@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +26,7 @@ class TextPost extends StatefulWidget {
   final String profilePic;
   final bool hasLiked;
   final bool hasReblogged;
+  final String? imageUrl;
   final Map<String, dynamic>? music;
 
   const TextPost(
@@ -41,7 +43,8 @@ class TextPost extends StatefulWidget {
       required this.hasReblogged,
       this.music,
       required this.id,
-      required this.userId});
+      required this.userId,
+      this.imageUrl});
 
   @override
   State<TextPost> createState() => _TextPostState();
@@ -144,225 +147,74 @@ class _TextPostState extends State<TextPost>
   }
 
   Widget _buildPostContent() {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(6),
-        border: const Border(
-          bottom: BorderSide(
-            color: AppColors.platinum,
-            width: 0.6,
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SinglePostPage(
+              coverArt: widget.music?['cover_art'] ?? '',
+              trackName: widget.music?['track_name'] ?? '',
+              artist: widget.music?['artist'] ?? '',
+              description: widget.content,
+              likes: _likes,
+              commentsCount: widget.comments,
+              username: widget.username,
+              userHandle: widget.handle,
+              userAvatar: widget.profilePic,
+              postId: widget.id,
+              timestamp: widget.timestamp,
+              imageUrl: widget.imageUrl,
+            ),
           ),
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            GestureDetector(
-              onTap: () {
-                context.read<PostBloc>().add(ClearUserPosts());
-                context.read<PostBloc>().add(FetchPostsByUser(widget.userId));
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        UserProfilePage(userId: widget.userId),
-                  ),
-                );
-              },
-              child: CircleAvatar(
-                radius: 24,
-                backgroundColor: AppColors.ashBlue,
-                child: ClipOval(
-                  child: Image.network(
-                    widget.profilePic,
-                    fit: BoxFit.cover,
-                    width: 48,
-                    height: 48,
-                    errorBuilder: (context, error, stackTrace) {
-                      return const Icon(
-                        FluentIcons.person_16_regular,
-                        size: 24,
-                        color: Colors.white,
-                      );
-                    },
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              widget.username,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Row(
-                              children: [
-                                Text(
-                                  '@${widget.handle}',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey[600],
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  formatTimestamp(widget.timestamp),
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey[600],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      PopupMenuButton<String>(
-                        color: AppColors.background,
-                        icon: const Icon(
-                          CupertinoIcons.ellipsis_vertical,
-                          size: 20,
-                          color: Colors.grey,
-                        ),
-                        onSelected: (value) {
-                          final postId = widget.id;
-                          if (value == 'edit') {
-                          } else if (value == 'delete') {
-                            context.read<PostBloc>().add(DeletePost(postId));
-                          } else if (value == 'share') {}
-                        },
-                        itemBuilder: (BuildContext context) {
-                          return [
-                            const PopupMenuItem<String>(
-                              value: 'edit',
-                              child: Text('Edit'),
-                            ),
-                            const PopupMenuItem<String>(
-                              value: 'delete',
-                              child: Text('Delete'),
-                            ),
-                            const PopupMenuItem<String>(
-                              value: 'share',
-                              child: Text('Share'),
-                            ),
-                          ];
-                        },
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    widget.content,
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          height: 1.5,
-                          letterSpacing: 0.4,
-                        ),
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.start,
-                    maxLines: 6,
-                  ),
-                  const SizedBox(height: 12),
-                  if (widget.music != null) ...[
-                    MusicCard(music: widget.music),
-                    const SizedBox(height: 8),
-                  ],
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        PostButton(
-                          icon: CupertinoIcons.bubble_left,
-                          count: widget.comments,
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => SinglePostPage(
-                                  coverArt: widget.music?['cover_art'] ?? '',
-                                  trackName: widget.music?['track_name'] ?? '',
-                                  artist: widget.music?['artist'] ?? '',
-                                  description: widget.content,
-                                  likes: _likes,
-                                  commentsCount: widget.comments,
-                                  username: widget.username,
-                                  userHandle: widget.handle,
-                                  userAvatar: widget.profilePic,
-                                  postId: widget.id,
-                                  timestamp: widget.timestamp,
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                        const SizedBox(width: 16),
-                        PostButton(
-                          icon: CupertinoIcons.arrow_2_squarepath,
-                          color: _isShared ? AppColors.primary : Colors.grey,
-                          count: _shares,
-                          onTap: _toggleShare,
-                        ),
-                        const SizedBox(width: 16),
-                        PostButton(
-                          icon: _isLiked
-                              ? CupertinoIcons.heart_fill
-                              : CupertinoIcons.heart,
-                          color: _isLiked ? Colors.red : Colors.grey,
-                          count: _likes,
-                          onTap: _toggleLike,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPostPlaceholder() {
-    return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
+        );
+      },
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(6),
           border: const Border(
-            bottom: BorderSide(color: AppColors.platinum, width: 0.6),
+            bottom: BorderSide(
+              color: AppColors.platinum,
+              width: 0.6,
+            ),
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  shape: BoxShape.circle,
+              GestureDetector(
+                onTap: () {
+                  context.read<PostBloc>().add(ClearUserPosts());
+                  context.read<PostBloc>().add(FetchPostsByUser(widget.userId));
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          UserProfilePage(userId: widget.userId),
+                    ),
+                  );
+                },
+                child: CircleAvatar(
+                  radius: 24,
+                  backgroundColor: AppColors.ashBlue,
+                  child: ClipOval(
+                    child: Image.network(
+                      widget.profilePic,
+                      fit: BoxFit.cover,
+                      width: 48,
+                      height: 48,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Icon(
+                          FluentIcons.person_16_regular,
+                          size: 24,
+                          color: Colors.white,
+                        );
+                      },
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(width: 12),
@@ -376,65 +228,154 @@ class _TextPostState extends State<TextPost>
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Container(
-                                width: 120,
-                                height: 18,
-                                color: Colors.grey[300],
+                              Text(
+                                widget.username,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                              const SizedBox(height: 4),
-                              Container(
-                                width: 180,
-                                height: 14,
-                                color: Colors.grey[300],
+                              Row(
+                                children: [
+                                  Text(
+                                    '@${widget.handle}',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    formatTimestamp(widget.timestamp),
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
                         ),
-                        Container(
-                          width: 20,
-                          height: 20,
-                          color: Colors.grey[300],
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Column(
-                      children: List.generate(
-                        3,
-                        (index) => Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
-                          child: Container(
-                            width: double.infinity,
-                            height: 16,
-                            color: Colors.grey[300],
+                        PopupMenuButton<String>(
+                          color: AppColors.background,
+                          icon: const Icon(
+                            CupertinoIcons.ellipsis_vertical,
+                            size: 20,
+                            color: Colors.grey,
                           ),
+                          onSelected: (value) {
+                            final postId = widget.id;
+                            if (value == 'edit') {
+                            } else if (value == 'delete') {
+                              context.read<PostBloc>().add(DeletePost(
+                                    postId,
+                                    imageUrl: widget.imageUrl,
+                                  ));
+                            } else if (value == 'share') {}
+                          },
+                          itemBuilder: (BuildContext context) {
+                            return [
+                              const PopupMenuItem<String>(
+                                value: 'edit',
+                                child: Text('Edit'),
+                              ),
+                              const PopupMenuItem<String>(
+                                value: 'delete',
+                                child: Text('Delete'),
+                              ),
+                              const PopupMenuItem<String>(
+                                value: 'share',
+                                child: Text('Share'),
+                              ),
+                            ];
+                          },
                         ),
-                      ),
+                      ],
                     ),
                     const SizedBox(height: 12),
-                    if (widget.music != null)
-                      Container(
-                        height: 80,
-                        decoration: BoxDecoration(
-                          color: Colors.grey[300],
-                          borderRadius: BorderRadius.circular(20),
+                    Text(
+                      widget.content,
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            height: 1.5,
+                            letterSpacing: 0.4,
+                          ),
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.start,
+                      maxLines: 6,
+                    ),
+                    const SizedBox(height: 12),
+                    if (widget.imageUrl != null)
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: CachedNetworkImage(
+                          imageUrl: widget.imageUrl!,
+                          fit: BoxFit.contain,
+                          width: double.infinity,
+                          placeholder: (context, url) => Container(
+                            color: Colors.grey[200],
+                            child: Center(child: CircularProgressIndicator()),
+                          ),
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error),
                         ),
                       ),
                     const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Container(
-                            width: 24, height: 24, color: Colors.grey[300]),
-                        const SizedBox(width: 16),
-                        Container(
-                            width: 24, height: 24, color: Colors.grey[300]),
-                        const SizedBox(width: 16),
-                        Container(
-                            width: 24, height: 24, color: Colors.grey[300]),
-                        const Spacer(),
-                        Container(
-                            width: 24, height: 24, color: Colors.grey[300]),
-                      ],
+                    if (widget.music != null) ...[
+                      MusicCard(music: widget.music),
+                      const SizedBox(height: 8),
+                    ],
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          PostButton(
+                            icon: CupertinoIcons.bubble_left,
+                            count: widget.comments,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => SinglePostPage(
+                                    coverArt: widget.music?['cover_art'] ?? '',
+                                    trackName:
+                                        widget.music?['track_name'] ?? '',
+                                    artist: widget.music?['artist'] ?? '',
+                                    description: widget.content,
+                                    likes: _likes,
+                                    commentsCount: widget.comments,
+                                    username: widget.username,
+                                    userHandle: widget.handle,
+                                    userAvatar: widget.profilePic,
+                                    postId: widget.id,
+                                    timestamp: widget.timestamp,
+                                    imageUrl: widget.imageUrl,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                          const SizedBox(width: 16),
+                          PostButton(
+                            icon: CupertinoIcons.arrow_2_squarepath,
+                            color: _isShared ? AppColors.primary : Colors.grey,
+                            count: _shares,
+                            onTap: _toggleShare,
+                          ),
+                          const SizedBox(width: 16),
+                          PostButton(
+                            icon: _isLiked
+                                ? CupertinoIcons.heart_fill
+                                : CupertinoIcons.heart,
+                            color: _isLiked ? Colors.red : Colors.grey,
+                            count: _likes,
+                            onTap: _toggleLike,
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -443,6 +384,14 @@ class _TextPostState extends State<TextPost>
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildPostPlaceholder() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: const _ShimmerPostItem(),
     );
   }
 
@@ -465,5 +414,118 @@ class _TextPostState extends State<TextPost>
     } else {
       return 'Just now';
     }
+  }
+}
+
+class _ShimmerPostItem extends StatelessWidget {
+  const _ShimmerPostItem();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(6),
+        border: const Border(
+          bottom: BorderSide(color: AppColors.platinum, width: 0.6),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 120,
+                              height: 18,
+                              color: Colors.white,
+                            ),
+                            const SizedBox(height: 4),
+                            Container(
+                              width: 180,
+                              height: 14,
+                              color: Colors.white,
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        width: 20,
+                        height: 20,
+                        color: Colors.white,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Column(
+                    children: List.generate(
+                      3,
+                      (index) => Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Container(
+                          width: double.infinity,
+                          height: 16,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    height: 200,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    height: 80,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: List.generate(
+                        3,
+                        (index) => Container(
+                          width: 24,
+                          height: 24,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

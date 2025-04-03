@@ -18,6 +18,7 @@ class SinglePostPage extends StatefulWidget {
   final String userAvatar;
   final int postId;
   final DateTime timestamp;
+  final String? imageUrl;
 
   const SinglePostPage({
     super.key,
@@ -32,6 +33,7 @@ class SinglePostPage extends StatefulWidget {
     required this.userAvatar,
     required this.postId,
     required this.timestamp,
+    this.imageUrl,
   });
 
   @override
@@ -164,6 +166,37 @@ class _SinglePostPageState extends State<SinglePostPage> {
                         style: const TextStyle(fontSize: 16),
                       ),
                       const SizedBox(height: 16),
+                      if (widget.imageUrl != null &&
+                          widget.imageUrl!.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: CachedNetworkImage(
+                              imageUrl: widget.imageUrl!,
+                              width: double.infinity,
+                              fit: BoxFit.contain,
+                              placeholder: (context, url) => Container(
+                                height: 300,
+                                color: Colors.grey[200],
+                                child: const Center(
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 3,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                              ),
+                              errorWidget: (context, url, error) => Container(
+                                height: 300,
+                                color: Colors.grey[200],
+                                child: const Icon(Icons.error),
+                              ),
+                            ),
+                          ),
+                        ),
+                      const SizedBox(
+                        height: 16,
+                      ),
                       if (widget.coverArt.isNotEmpty)
                         MusicCard(
                           music: {
