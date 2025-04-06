@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
 class AppRoundedButton extends StatelessWidget {
-  final Color backgroundColor;
+  final Color? backgroundColor;
   final Function() onTap;
   final IconData iconData;
   final double size;
+  final Color? iconColor;
 
   const AppRoundedButton({
     super.key,
@@ -12,6 +13,7 @@ class AppRoundedButton extends StatelessWidget {
     required this.iconData,
     required this.backgroundColor,
     this.size = 48,
+    this.iconColor,
   });
 
   @override
@@ -28,19 +30,12 @@ class AppRoundedButton extends StatelessWidget {
           decoration: BoxDecoration(
             color: backgroundColor,
             shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
-                blurRadius: 4,
-                offset: const Offset(0, 2),
-              ),
-            ],
           ),
           child: Center(
             child: Icon(
               iconData,
-              color: Colors.white,
-              size: size * 0.5,
+              color: iconColor,
+              size: size * 0.6,
             ),
           ),
         ),

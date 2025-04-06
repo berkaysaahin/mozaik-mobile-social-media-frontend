@@ -134,9 +134,9 @@ class _TrackSearchState extends State<TrackSearch> {
             ),
           ),
           isLoading
-              ? const Center(
+              ? Center(
                   child: CircularProgressIndicator(
-                  color: AppColors.primary,
+                  color: Theme.of(context).primaryColor,
                   strokeWidth: 3,
                 ))
               : Expanded(

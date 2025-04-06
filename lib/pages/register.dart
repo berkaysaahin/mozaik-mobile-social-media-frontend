@@ -115,11 +115,11 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     const SizedBox(height: 24),
                     Material(
-                      color: AppColors.primary,
+                      color: Theme.of(context).primaryColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                         side: const BorderSide(
-                          width: 1,
+                          width: 0.1,
                         ),
                       ),
                       child: InkWell(
@@ -175,11 +175,13 @@ class _RegisterPageState extends State<RegisterPage> {
                       height: 24,
                     ),
                     Material(
-                      color: AppColors.background,
+                      color: Theme.of(context).brightness == Brightness.light
+                          ? AppColors.background
+                          : AppColors.backgroundDark,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                         side: const BorderSide(
-                          width: 0.5,
+                          width: 0.1,
                         ),
                       ),
                       child: InkWell(
@@ -216,11 +218,13 @@ class _RegisterPageState extends State<RegisterPage> {
                       height: 24,
                     ),
                     Material(
-                      color: AppColors.background,
+                      color: Theme.of(context).brightness == Brightness.light
+                          ? AppColors.background
+                          : AppColors.backgroundDark,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                         side: const BorderSide(
-                          width: 0.5,
+                          width: 0.1,
                         ),
                       ),
                       child: InkWell(
@@ -275,14 +279,14 @@ class _RegisterPageState extends State<RegisterPage> {
                       Navigator.pushNamed(context, '/login');
                     },
                     splashFactory: NoSplash.splashFactory,
-                    child: const Padding(
+                    child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: 2, vertical: 8),
                       child: Text(
                         "Sign In",
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.primary,
+                          color: Theme.of(context).primaryColor,
                         ),
                         textAlign: TextAlign.start,
                       ),

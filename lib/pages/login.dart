@@ -118,7 +118,7 @@ class _LoginPageState extends State<LoginPage> {
                     InkWell(
                       onTap: () {},
                       splashFactory: NoSplash.splashFactory,
-                      child: const Padding(
+                      child: Padding(
                         padding:
                             EdgeInsets.symmetric(horizontal: 2, vertical: 8),
                         child: Text(
@@ -126,7 +126,7 @@ class _LoginPageState extends State<LoginPage> {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.primary,
+                            color: Theme.of(context).primaryColor,
                           ),
                           textAlign: TextAlign.start,
                         ),
@@ -134,7 +134,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     const SizedBox(height: 12),
                     Material(
-                      color: AppColors.primary,
+                      color: Theme.of(context).primaryColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                         side: const BorderSide(
@@ -194,7 +194,9 @@ class _LoginPageState extends State<LoginPage> {
                       height: 24,
                     ),
                     Material(
-                      color: AppColors.background,
+                      color: Theme.of(context).brightness == Brightness.light
+                          ? AppColors.background
+                          : AppColors.backgroundDark,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                         side: const BorderSide(
@@ -235,7 +237,9 @@ class _LoginPageState extends State<LoginPage> {
                       height: 24,
                     ),
                     Material(
-                      color: AppColors.background,
+                      color: Theme.of(context).brightness == Brightness.light
+                          ? AppColors.background
+                          : AppColors.backgroundDark,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                         side: const BorderSide(
@@ -294,14 +298,14 @@ class _LoginPageState extends State<LoginPage> {
                       Navigator.pushNamed(context, '/register');
                     },
                     splashFactory: NoSplash.splashFactory,
-                    child: const Padding(
+                    child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: 2, vertical: 8),
                       child: Text(
                         "Sign Up",
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.primary,
+                          color: Theme.of(context).primaryColor,
                         ),
                         textAlign: TextAlign.start,
                       ),

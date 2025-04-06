@@ -27,73 +27,55 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ValueNotifier<bool> effectiveNotifier =
-        isTabBarVisibleNotifier ?? ValueNotifier(false);
-    return ValueListenableBuilder<bool>(
-      valueListenable: effectiveNotifier,
-      builder: (context, isTabBarVisible, child) {
-        return Container(
-          decoration: !isTabBarVisible
-              ? const BoxDecoration(
-                  color: AppColors.background,
-                  border: Border(
-                    bottom: BorderSide(
-                      color: AppColors.platinum,
-                      width: 1,
-                    ),
-                  ),
-                )
-              : null,
-          child: AppBar(
-            backgroundColor: AppColors.background,
-            leading: leftIcon != null
-                ? IconButton(
-                    icon: leftIcon!,
-                    onPressed: () {
-                      if (onLeftIconTap != null) {
-                        onLeftIconTap!(context);
-                      }
-                    },
-                  )
-                : null,
-            title: Stack(
-              alignment: Alignment.centerLeft,
-              children: [
-                if (title != null)
-                  Text(
-                    title!,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                if (customWidget != null) customWidget!,
-              ],
+    return AppBar(
+      backgroundColor: Theme.of(context).brightness == Brightness.light
+          ? AppColors.background
+          : AppColors.backgroundDark,
+      leading: leftIcon != null
+          ? IconButton(
+              icon: leftIcon!,
+              onPressed: () {
+                if (onLeftIconTap != null) {
+                  onLeftIconTap!(context);
+                }
+              },
+            )
+          : null,
+      title: Stack(
+        alignment: Alignment.centerLeft,
+        children: [
+          if (title != null)
+            Text(
+              title!,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            centerTitle: true,
-            actions: [
-              if (rightWidget != null)
-                rightWidget is Icon
-                    ? IconButton(
-                        icon: rightWidget as Icon,
-                        onPressed: () {
-                          if (onRightWidgetTap != null) {
-                            onRightWidgetTap!(context);
-                          }
-                        },
-                      )
-                    : TextButton(
-                        onPressed: () {
-                          if (onRightWidgetTap != null) {
-                            onRightWidgetTap!(context);
-                          }
-                        },
-                        child: rightWidget!,
-                      ),
-            ],
-          ),
-        );
-      },
+          if (customWidget != null) customWidget!,
+        ],
+      ),
+      centerTitle: true,
+      actions: [
+        if (rightWidget != null)
+          rightWidget is Icon
+              ? IconButton(
+                  icon: rightWidget as Icon,
+                  onPressed: () {
+                    if (onRightWidgetTap != null) {
+                      onRightWidgetTap!(context);
+                    }
+                  },
+                )
+              : TextButton(
+                  onPressed: () {
+                    if (onRightWidgetTap != null) {
+                      onRightWidgetTap!(context);
+                    }
+                  },
+                  child: rightWidget!,
+                ),
+      ],
     );
   }
 

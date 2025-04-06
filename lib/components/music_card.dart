@@ -14,33 +14,27 @@ class MusicCard extends StatefulWidget {
 
 class _MusicCardState extends State<MusicCard> {
   Color? _backgroundColor;
-  static final Map<String, Color> _colorCache = {};
   bool _isGeneratingColor = false;
+  String? _currentCoverArtUrl;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (widget.music != null && widget.music!['cover_art'] != null) {
+      _currentCoverArtUrl = widget.music!['cover_art'];
       _extractDominantColor();
     }
   }
 
   Future<void> _extractDominantColor() async {
-    if (_isGeneratingColor) return;
-    final String? coverArtUrl = widget.music?['cover_art'];
-    if (coverArtUrl == null) return;
-
-    if (_colorCache.containsKey(coverArtUrl)) {
-      if (mounted) setState(() => _backgroundColor = _colorCache[coverArtUrl]);
-      return;
-    }
+    if (_isGeneratingColor || _currentCoverArtUrl == null) return;
 
     _isGeneratingColor = true;
 
     try {
       final palette = await PaletteGenerator.fromImageProvider(
         ResizeImage(
-          CachedNetworkImageProvider(coverArtUrl),
+          CachedNetworkImageProvider(_currentCoverArtUrl!),
           width: 100,
         ),
         size: Size(100, 100),
@@ -50,22 +44,30 @@ class _MusicCardState extends State<MusicCard> {
 
       final color = palette.dominantColor?.color ?? AppColors.darkGray;
 
-      if (mounted) {
-        setState(() {
-          _colorCache[coverArtUrl] = color;
-          _backgroundColor = color;
-        });
+      if (mounted && _currentCoverArtUrl == widget.music?['cover_art']) {
+        setState(() => _backgroundColor = color);
       }
     } catch (e) {
-      if (mounted) setState(() => _backgroundColor = AppColors.darkGray);
+      if (mounted && _currentCoverArtUrl == widget.music?['cover_art']) {
+        setState(() => _backgroundColor = AppColors.darkGray);
+      }
     } finally {
       _isGeneratingColor = false;
     }
   }
 
+  @override
+  void didUpdateWidget(MusicCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.music?['cover_art'] != oldWidget.music?['cover_art']) {
+      _currentCoverArtUrl = widget.music?['cover_art'];
+      _extractDominantColor();
+    }
+  }
+
   Color _getTextColor(Color backgroundColor) {
-    final brightness = ThemeData.estimateBrightnessForColor(backgroundColor);
-    return brightness == Brightness.light ? AppColors.primary : Colors.white;
+    final hsl = HSLColor.fromColor(backgroundColor);
+    return hsl.lightness > 0.6 ? Colors.black : Colors.white;
   }
 
   @override
@@ -127,7 +129,7 @@ class _MusicCardState extends State<MusicCard> {
                       Text(
                         widget.music?['artist'] ?? 'Unknown Artist',
                         style: TextStyle(
-                          color: textColor.withOpacity(0.8),
+                          color: textColor.withValues(alpha: 0.8),
                           fontSize: 14,
                         ),
                         maxLines: 1,

@@ -132,16 +132,16 @@ class _NewPostPageState extends State<NewPostPage> {
                     width: 64,
                     height: 24,
                     decoration: BoxDecoration(
-                      color: AppColors.primary,
+                      color: Theme.of(context).primaryColor,
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
                 )
-              : const Text(
+              : Text(
                   "Publish",
                   style: TextStyle(
                     fontSize: 16,
-                    color: AppColors.primary,
+                    color: Theme.of(context).primaryColor,
                   ),
                 ),
         ),
@@ -162,9 +162,9 @@ class _NewPostPageState extends State<NewPostPage> {
         child: BlocBuilder<PostBloc, PostState>(
           builder: (context, state) {
             if (state is PostLoading) {
-              return const Center(
+              return Center(
                   child: CircularProgressIndicator(
-                color: AppColors.primary,
+                color: Theme.of(context).primaryColor,
                 strokeWidth: 3,
               ));
             }
@@ -371,11 +371,14 @@ class _NewPostPageState extends State<NewPostPage> {
                           Container(
                             height: 70,
                             width: double.infinity,
-                            decoration: const BoxDecoration(
+                            decoration: BoxDecoration(
                               border: Border(
                                 top: BorderSide(
-                                  width: 1,
-                                  color: AppColors.platinum,
+                                  width: 0.1,
+                                  color: Theme.of(context).brightness ==
+                                          Brightness.light
+                                      ? AppColors.backgroundDark
+                                      : AppColors.background,
                                 ),
                               ),
                             ),

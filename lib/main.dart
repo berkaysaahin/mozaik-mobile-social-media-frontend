@@ -3,19 +3,19 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:mozaik/app_colors.dart';
 import 'package:mozaik/blocs/post_bloc.dart';
 import 'package:mozaik/blocs/profile_bloc.dart';
+import 'package:mozaik/blocs/theme_bloc.dart';
 import 'package:mozaik/blocs/user_bloc.dart';
 import 'package:mozaik/components/bottom_nav_bar.dart';
 import 'package:mozaik/components/custom_app_bar.dart';
 import 'package:mozaik/components/floating_action_button.dart';
 import 'package:mozaik/components/profile_icon.dart';
-import 'package:mozaik/components/search_bar.dart';
 import 'package:mozaik/events/post_event.dart';
 import 'package:mozaik/events/profile_event.dart';
+import 'package:mozaik/events/theme_event.dart';
 import 'package:mozaik/pages/direct_message.dart';
 import 'package:mozaik/pages/discover.dart';
 import 'package:mozaik/pages/home.dart';
@@ -27,6 +27,8 @@ import 'package:mozaik/pages/pick_username.dart';
 import 'package:mozaik/pages/profile.dart';
 import 'package:mozaik/pages/register.dart';
 import 'package:mozaik/states/profile_state.dart';
+import 'package:mozaik/states/theme_state.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -36,6 +38,10 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await dotenv.load(fileName: ".env");
+  final prefs = await SharedPreferences.getInstance();
+  final savedTheme = prefs.getString('app_theme');
+  final initialTheme =
+      savedTheme?.contains('dark') ?? false ? ThemeMode.dark : ThemeMode.light;
   runApp(
     MultiBlocProvider(
       providers: [
@@ -44,64 +50,43 @@ void main() async {
             create: (context) => ProfileBloc()
               ..add(FetchProfileById('b2ecc8ae-9e16-42eb-915f-d2e1e2022f6c'))),
         BlocProvider(create: (context) => UserBloc()),
+        BlocProvider(create: (context) => ThemeBloc()),
       ],
-      child: const MyApp(),
+      child: MyApp(
+        initialTheme: initialTheme,
+      ),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final ThemeMode initialTheme;
+  const MyApp({super.key, required this.initialTheme});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      routes: {
-        '/home': (context) => const MyHomePage(),
-        '/directMessage': (context) => const DirectMessagePage(),
-        '/login': (context) => const LoginPage(),
-        '/register': (context) => const RegisterPage(),
-        '/username': (context) => const PickUsernamePage(),
-        '/newPost': (context) => const NewPostPage(),
-        '/discover': (context) => const DiscoverPage(),
-        '/profile': (context) => const ProfilePage(),
-        '/messages': (context) => const MessagesPage(),
+    return BlocBuilder<ThemeBloc, ThemeState>(
+      builder: (context, state) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          routes: {
+            '/home': (context) => const MyHomePage(),
+            '/directMessage': (context) => const DirectMessagePage(),
+            '/login': (context) => const LoginPage(),
+            '/register': (context) => const RegisterPage(),
+            '/username': (context) => const PickUsernamePage(),
+            '/newPost': (context) => const NewPostPage(),
+            '/discover': (context) => const DiscoverPage(),
+            '/profile': (context) => const ProfilePage(),
+            '/messages': (context) => const MessagesPage(),
+          },
+          title: 'Motsaich',
+          theme: state.lightTheme,
+          darkTheme: state.darkTheme,
+          themeMode: state.themeMode,
+          home: const MyHomePage(),
+        );
       },
-      title: 'Motsaich',
-      theme: ThemeData(
-        textTheme: GoogleFonts.montserratTextTheme(
-          Theme.of(context).textTheme,
-        ).copyWith(
-          bodyLarge: GoogleFonts.montserrat(
-            fontSize: 16,
-            fontWeight: FontWeight.w400,
-            height: 1.5,
-            letterSpacing: 0.5,
-          ),
-          titleMedium: GoogleFonts.montserrat(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-          labelMedium: GoogleFonts.montserrat(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: Colors.grey,
-          ),
-        ),
-        primaryColor: AppColors.primary,
-        focusColor: AppColors.platinum,
-        splashColor: Colors.transparent,
-        splashFactory: NoSplash.splashFactory,
-        highlightColor: Colors.transparent,
-        useMaterial3: true,
-        textSelectionTheme: const TextSelectionThemeData(
-          cursorColor: AppColors.platinum,
-          selectionColor: AppColors.platinum,
-          selectionHandleColor: AppColors.platinum,
-        ),
-      ),
-      home: const MyHomePage(),
     );
   }
 }
@@ -145,9 +130,7 @@ class _MyHomePageState extends State<MyHomePage>
     {
       'leftIcon': Icons.search,
       'rightIcon': Icons.filter_alt_outlined,
-      'customWidget': const CustomSearchBar(
-        borderRadius: 12,
-      ),
+      'title': 'Search'
     },
     {
       'title': 'Messages',
@@ -170,7 +153,9 @@ class _MyHomePageState extends State<MyHomePage>
 
     return Scaffold(
       drawer: Drawer(
-        backgroundColor: AppColors.background,
+        backgroundColor: Theme.of(context).brightness == Brightness.light
+            ? AppColors.background
+            : AppColors.backgroundDark,
         shape: ShapeBorder.lerp(
           RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(0),
@@ -184,8 +169,10 @@ class _MyHomePageState extends State<MyHomePage>
           children: [
             Container(
               height: 160,
-              decoration: const BoxDecoration(
-                color: AppColors.background,
+              decoration: BoxDecoration(
+                color: Theme.of(context).brightness == Brightness.light
+                    ? AppColors.background
+                    : AppColors.backgroundDark,
               ),
               child: Padding(
                 padding: const EdgeInsets.symmetric(
@@ -214,15 +201,15 @@ class _MyHomePageState extends State<MyHomePage>
                         } else if (state is ProfileError) {
                           return const Icon(Icons.error);
                         } else {
-                          return const CircularProgressIndicator(
-                            color: AppColors.primary,
+                          return CircularProgressIndicator(
+                            color: Theme.of(context).primaryColor,
                             strokeWidth: 3,
                           );
                         }
                       },
                     ),
                     const SizedBox(
-                      height: 4,
+                      height: 5,
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -242,14 +229,19 @@ class _MyHomePageState extends State<MyHomePage>
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
+                                  SizedBox(
+                                    height: 1,
+                                  ),
                                   Text(
                                     state.user.handle,
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w200,
-                                      color: AppColors.primary.withValues(
-                                        alpha: 0.6,
-                                      ),
+                                      color: Theme.of(context)
+                                          .primaryColor
+                                          .withValues(
+                                            alpha: 0.6,
+                                          ),
                                     ),
                                   ),
                                 ],
@@ -257,11 +249,17 @@ class _MyHomePageState extends State<MyHomePage>
                             } else if (state is ProfileError) {
                               return const Icon(Icons.error);
                             } else {
-                              return const CircularProgressIndicator(
-                                color: AppColors.primary,
+                              return CircularProgressIndicator(
+                                color: Theme.of(context).primaryColor,
                                 strokeWidth: 3,
                               );
                             }
+                          },
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.brightness_6),
+                          onPressed: () {
+                            context.read<ThemeBloc>().add(ToggleThemeEvent());
                           },
                         ),
                       ],
@@ -270,11 +268,11 @@ class _MyHomePageState extends State<MyHomePage>
                 ),
               ),
             ),
-            const Padding(
+            Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: Divider(
-                thickness: 0.5,
-                color: AppColors.primary,
+                thickness: 0.1,
+                color: Theme.of(context).primaryColor,
               ),
             ),
             Expanded(
@@ -433,14 +431,20 @@ class _MyHomePageState extends State<MyHomePage>
                 borderRadius: BorderRadius.circular(16),
                 child: Material(
                   elevation: 1,
-                  color: AppColors.background,
+                  color: Theme.of(context).brightness == Brightness.light
+                      ? AppColors.background
+                      : AppColors.backgroundDark,
                   child: Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16),
-                      color: AppColors.background,
+                      color: Theme.of(context).brightness == Brightness.light
+                          ? AppColors.background
+                          : AppColors.backgroundDark,
                       border: Border.all(
-                        color: AppColors.platinum,
-                        width: 0.6,
+                        color: Theme.of(context).brightness == Brightness.light
+                            ? AppColors.backgroundDark
+                            : AppColors.background,
+                        width: 0.1,
                       ),
                     ),
                     child: Column(
@@ -462,9 +466,12 @@ class _MyHomePageState extends State<MyHomePage>
                             ],
                           ),
                         ),
-                        const Divider(
-                          height: 0.6,
-                          color: AppColors.platinum,
+                        Divider(
+                          thickness: 0.1,
+                          color:
+                              Theme.of(context).brightness == Brightness.light
+                                  ? AppColors.backgroundDark
+                                  : AppColors.background,
                         ),
                         Flexible(
                           child: ConstrainedBox(
@@ -484,25 +491,28 @@ class _MyHomePageState extends State<MyHomePage>
                             ),
                           ),
                         ),
-                        const Divider(
-                          height: 0.6,
-                          color: AppColors.platinum,
+                        Divider(
+                          thickness: 0.1,
+                          color:
+                              Theme.of(context).brightness == Brightness.light
+                                  ? AppColors.backgroundDark
+                                  : AppColors.background,
                         ),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Row(
                             children: [
-                              const Icon(
+                              Icon(
                                 FluentIcons.checkmark_24_regular,
                                 size: 26,
-                                color: AppColors.primary,
+                                color: Theme.of(context).primaryColor,
                               ),
                               TextButton(
                                 onPressed: () {},
-                                child: const Text(
+                                child: Text(
                                   " Mark all as read",
                                   style: TextStyle(
-                                    color: AppColors.primary,
+                                    color: Theme.of(context).primaryColor,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -518,10 +528,10 @@ class _MyHomePageState extends State<MyHomePage>
                                     ),
                                   );
                                 },
-                                child: const Text(
+                                child: Text(
                                   "View all",
                                   style: TextStyle(
-                                    color: AppColors.primary,
+                                    color: Theme.of(context).primaryColor,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),

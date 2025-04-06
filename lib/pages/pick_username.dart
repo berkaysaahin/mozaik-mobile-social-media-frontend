@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mozaik/app_colors.dart';
 import 'package:mozaik/components/custom_app_bar.dart';
 import "package:flutter/cupertino.dart";
 
@@ -78,11 +77,11 @@ class _PickUsernamePageState extends State<PickUsernamePage> {
               ),
               const SizedBox(height: 24),
               Material(
-                color: AppColors.primary,
+                color: Theme.of(context).primaryColor,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                   side: const BorderSide(
-                    width: 0.5,
+                    width: 0.1,
                   ),
                 ),
                 child: InkWell(

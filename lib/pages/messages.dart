@@ -19,12 +19,12 @@ class MessagesPage extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 16.0),
                 child: CustomSearchBar(
                   hintText: "Search in messages",
-                  height: 52,
-                  borderRadius: 12,
                 ),
               ),
               Container(
-                color: AppColors.background,
+                color: Theme.of(context).brightness == Brightness.light
+                    ? AppColors.background
+                    : AppColors.backgroundDark,
                 child: const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -46,7 +46,9 @@ class MessagesPage extends StatelessWidget {
         SliverFillRemaining(
           hasScrollBody: false,
           child: Container(
-            color: AppColors.platinum,
+            color: Theme.of(context).brightness == Brightness.light
+                ? AppColors.backgroundDark
+                : AppColors.background,
             alignment: Alignment.center,
           ),
         ),

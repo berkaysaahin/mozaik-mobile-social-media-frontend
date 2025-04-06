@@ -109,7 +109,9 @@ class _SinglePostPageState extends State<SinglePostPage> {
         centerTitle: true,
         elevation: 0,
         scrolledUnderElevation: 0.0,
-        backgroundColor: AppColors.background,
+        backgroundColor: Theme.of(context).brightness == Brightness.light
+            ? AppColors.background
+            : AppColors.backgroundDark,
       ),
       body: CustomScrollView(
         slivers: [
@@ -179,10 +181,10 @@ class _SinglePostPageState extends State<SinglePostPage> {
                               placeholder: (context, url) => Container(
                                 height: 300,
                                 color: Colors.grey[200],
-                                child: const Center(
+                                child: Center(
                                   child: CircularProgressIndicator(
                                     strokeWidth: 3,
-                                    color: AppColors.primary,
+                                    color: Theme.of(context).primaryColor,
                                   ),
                                 ),
                               ),
@@ -257,11 +259,11 @@ class _SinglePostPageState extends State<SinglePostPage> {
             ),
           ),
           _isLoadingComments
-              ? const SliverFillRemaining(
+              ? SliverFillRemaining(
                   child: Center(
                       child: CircularProgressIndicator(
                     strokeWidth: 3,
-                    color: AppColors.primary,
+                    color: Theme.of(context).primaryColor,
                   )),
                 )
               : SliverList(
@@ -277,8 +279,10 @@ class _SinglePostPageState extends State<SinglePostPage> {
       ),
       bottomSheet: Container(
         padding: const EdgeInsets.all(8),
-        decoration: const BoxDecoration(
-          color: AppColors.background,
+        decoration: BoxDecoration(
+          color: Theme.of(context).brightness == Brightness.light
+              ? AppColors.background
+              : AppColors.backgroundDark,
         ),
         child: Row(
           children: [
@@ -288,25 +292,35 @@ class _SinglePostPageState extends State<SinglePostPage> {
                 child: TextField(
                   controller: _commentController,
                   decoration: InputDecoration(
-                    hintText: 'Add a comment...',
+                    filled: true,
+                    fillColor: Theme.of(context).brightness == Brightness.light
+                        ? Color.lerp(
+                            Colors.white, Colors.grey, 0.2) // Light mode
+                        : Color.lerp(Colors.black, Colors.white, 0.2),
+                    hintText: "Type a message...",
                     hintStyle: TextStyle(
-                      color: AppColors.primary.withValues(alpha: 0.5),
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Color.lerp(
+                              Colors.white, Colors.grey, 0.2) // Light mode
+                          : Color.lerp(Colors.black, Colors.white, 0.2),
                       fontSize: 16,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 12,
+                      horizontal: 16,
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
                     ),
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 12),
                   ),
                 ),
               ),
             ),
             IconButton(
-              icon: const Icon(
+              icon: Icon(
                 FluentIcons.send_32_filled,
-                color: AppColors.primary,
+                color: Theme.of(context).primaryColor,
               ),
               onPressed: _addComment,
             ),

@@ -172,11 +172,12 @@ class _TextPostState extends State<TextPost>
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(6),
-          border: const Border(
+          border: Border(
             bottom: BorderSide(
-              color: AppColors.platinum,
-              width: 0.6,
+              color: Theme.of(context).brightness == Brightness.light
+                  ? AppColors.backgroundDark
+                  : AppColors.background,
+              width: 0.1,
             ),
           ),
         ),
@@ -231,7 +232,7 @@ class _TextPostState extends State<TextPost>
                               Text(
                                 widget.username,
                                 style: const TextStyle(
-                                  fontSize: 18,
+                                  fontSize: 17,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -258,7 +259,10 @@ class _TextPostState extends State<TextPost>
                           ),
                         ),
                         PopupMenuButton<String>(
-                          color: AppColors.background,
+                          color:
+                              Theme.of(context).brightness == Brightness.light
+                                  ? AppColors.background
+                                  : AppColors.backgroundDark,
                           icon: const Icon(
                             CupertinoIcons.ellipsis_vertical,
                             size: 20,
@@ -361,7 +365,9 @@ class _TextPostState extends State<TextPost>
                           const SizedBox(width: 16),
                           PostButton(
                             icon: CupertinoIcons.arrow_2_squarepath,
-                            color: _isShared ? AppColors.primary : Colors.grey,
+                            color: _isShared
+                                ? Theme.of(context).primaryColor
+                                : Colors.grey,
                             count: _shares,
                             onTap: _toggleShare,
                           ),
@@ -426,8 +432,12 @@ class _ShimmerPostItem extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(6),
-        border: const Border(
-          bottom: BorderSide(color: AppColors.platinum, width: 0.6),
+        border: Border(
+          bottom: BorderSide(
+              color: Theme.of(context).brightness == Brightness.light
+                  ? AppColors.backgroundDark
+                  : AppColors.background,
+              width: 0.1),
         ),
       ),
       child: Padding(

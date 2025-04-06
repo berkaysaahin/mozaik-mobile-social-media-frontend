@@ -1,3 +1,4 @@
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mozaik/app_colors.dart';
@@ -36,11 +37,11 @@ class _ProfilePageState extends State<ProfilePage> {
             BlocBuilder<ProfileBloc, ProfileState>(
               builder: (context, profileState) {
                 if (profileState is ProfileLoading) {
-                  return const SliverAppBar(
+                  return SliverAppBar(
                     expandedHeight: 200,
                     flexibleSpace: Center(
                       child: CircularProgressIndicator(
-                        color: AppColors.primary,
+                        color: Theme.of(context).primaryColor,
                         strokeWidth: 3,
                       ),
                     ),
@@ -52,7 +53,10 @@ class _ProfilePageState extends State<ProfilePage> {
                     collapsedHeight: 0,
                     toolbarHeight: 0,
                     pinned: true,
-                    backgroundColor: AppColors.background,
+                    backgroundColor:
+                        Theme.of(context).brightness == Brightness.light
+                            ? AppColors.background
+                            : AppColors.backgroundDark,
                     automaticallyImplyLeading: false,
                     flexibleSpace: FlexibleSpaceBar(
                       background: Stack(
@@ -62,9 +66,9 @@ class _ProfilePageState extends State<ProfilePage> {
                             fit: BoxFit.cover,
                             width: double.infinity,
                             height: 150,
-                            placeholder: (context, url) => const Center(
+                            placeholder: (context, url) => Center(
                               child: CircularProgressIndicator(
-                                color: AppColors.primary,
+                                color: Theme.of(context).primaryColor,
                                 strokeWidth: 3,
                               ),
                             ),
@@ -84,7 +88,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 24),
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -96,15 +100,39 @@ class _ProfilePageState extends State<ProfilePage> {
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(64),
                                       border: Border.all(
-                                        color: AppColors.background,
+                                        color: Theme.of(context).brightness ==
+                                                Brightness.light
+                                            ? AppColors.background
+                                            : AppColors.backgroundDark,
                                         width: 4,
                                       ),
                                     ),
                                     child: CircleAvatar(
-                                      backgroundColor: AppColors.background,
+                                      backgroundColor:
+                                          Theme.of(context).brightness ==
+                                                  Brightness.light
+                                              ? AppColors.background
+                                              : AppColors.backgroundDark,
                                       backgroundImage:
                                           CachedNetworkImageProvider(
                                               user.profilePic),
+                                    ),
+                                  ),
+                                ),
+                                Align(
+                                  alignment: Alignment.bottomRight,
+                                  child: CircleAvatar(
+                                    backgroundColor: Theme.of(context)
+                                                .brightness ==
+                                            Brightness.light
+                                        ? Color.lerp(Colors.white, Colors.grey,
+                                            0.2) // Light mode
+                                        : Color.lerp(
+                                            Colors.black, Colors.white, 0.2),
+                                    radius: 18,
+                                    child: Icon(
+                                      FluentIcons.more_horizontal_32_regular,
+                                      color: Theme.of(context).primaryColor,
                                     ),
                                   ),
                                 ),
@@ -139,10 +167,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   return BlocBuilder<PostBloc, PostState>(
                     builder: (context, postState) {
                       if (postState is PostLoading) {
-                        return const SliverFillRemaining(
+                        return SliverFillRemaining(
                           child: Center(
                             child: CircularProgressIndicator(
-                              color: AppColors.primary,
+                              color: Theme.of(context).primaryColor,
                               strokeWidth: 3,
                             ),
                           ),
@@ -152,17 +180,23 @@ class _ProfilePageState extends State<ProfilePage> {
                         return SliverList(
                           delegate: SliverChildListDelegate([
                             Container(
-                              decoration: const BoxDecoration(
-                                color: AppColors.background,
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).brightness ==
+                                        Brightness.light
+                                    ? AppColors.background
+                                    : AppColors.backgroundDark,
                               ),
                               child: Column(
                                 children: [
                                   Container(
-                                    decoration: const BoxDecoration(
+                                    decoration: BoxDecoration(
                                       border: Border(
                                         bottom: BorderSide(
-                                          color: AppColors.platinum,
-                                          width: 0.7,
+                                          color: Theme.of(context).brightness ==
+                                                  Brightness.light
+                                              ? AppColors.backgroundDark
+                                              : AppColors.background,
+                                          width: 0.1,
                                         ),
                                       ),
                                     ),
@@ -170,7 +204,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       constraints: BoxConstraints(
                                         minHeight:
                                             MediaQuery.sizeOf(context).height /
-                                                5,
+                                                6,
                                       ),
                                       child: Column(
                                         mainAxisAlignment:
@@ -180,7 +214,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                         children: [
                                           Padding(
                                             padding: const EdgeInsets.symmetric(
-                                                horizontal: 32, vertical: 8),
+                                                horizontal: 16, vertical: 8),
                                             child: Column(
                                               mainAxisAlignment:
                                                   MainAxisAlignment.start,
@@ -196,10 +230,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                                 ),
                                                 Text(
                                                   '@${user.handle}',
-                                                  style: const TextStyle(
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.w300),
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                    color: Colors.grey[600],
+                                                  ),
                                                 ),
                                                 const SizedBox(height: 8),
                                                 const Text(
@@ -210,73 +244,67 @@ class _ProfilePageState extends State<ProfilePage> {
                                                           FontWeight.w100),
                                                   maxLines: 2,
                                                 ),
-                                                const SizedBox(height: 16),
+                                                const SizedBox(height: 8),
                                                 const Row(
                                                   mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceAround,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
+                                                      MainAxisAlignment.start,
                                                   children: [
-                                                    Column(
-                                                      children: [
-                                                        Text(
-                                                          '136',
-                                                          style: TextStyle(
-                                                              fontSize: 24,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold),
-                                                        ),
-                                                        Text(
-                                                          'Followers',
-                                                          style: TextStyle(
-                                                              fontSize: 14,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w300),
-                                                        ),
-                                                      ],
+                                                    Text(
+                                                      '8',
+                                                      style: TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.bold),
                                                     ),
-                                                    Column(
-                                                      children: [
-                                                        Text(
-                                                          '231',
-                                                          style: TextStyle(
-                                                              fontSize: 24,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold),
-                                                        ),
-                                                        Text(
-                                                          'Following',
-                                                          style: TextStyle(
-                                                              fontSize: 14,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w300),
-                                                        ),
-                                                      ],
+                                                    SizedBox(
+                                                      width: 4,
                                                     ),
-                                                    Column(
-                                                      children: [
-                                                        Text(
-                                                          '24',
-                                                          style: TextStyle(
-                                                              fontSize: 24,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold),
-                                                        ),
-                                                        Text(
-                                                          'Posts',
-                                                          style: TextStyle(
-                                                              fontSize: 14,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w300),
-                                                        ),
-                                                      ],
+                                                    Text(
+                                                      'Followers',
+                                                      style: TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.w500),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 8,
+                                                    ),
+                                                    Text(
+                                                      '12',
+                                                      style: TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 4,
+                                                    ),
+                                                    Text(
+                                                      'Following',
+                                                      style: TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.w500),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 8,
+                                                    ),
+                                                    Text(
+                                                      '3',
+                                                      style: TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 4,
+                                                    ),
+                                                    Text(
+                                                      'Posts',
+                                                      style: TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.w500),
                                                     ),
                                                   ],
                                                 ),
@@ -292,7 +320,10 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                             ...posts.map((post) {
                               return Container(
-                                color: AppColors.background,
+                                color: Theme.of(context).brightness ==
+                                        Brightness.light
+                                    ? AppColors.background
+                                    : AppColors.backgroundDark,
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -309,6 +340,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       comments: post.comments,
                                       timestamp: post.timestamp,
                                       profilePic: post.profilePic,
+                                      imageUrl: post.imageUrl,
                                       music: post.music,
                                     ),
                                     const SizedBox(height: 12),

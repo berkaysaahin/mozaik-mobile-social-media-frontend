@@ -11,11 +11,13 @@ class MessageComponent extends StatelessWidget {
       onTap: () => Navigator.pushNamed(context, '/directMessage'),
       child: Container(
         width: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           border: Border(
             bottom: BorderSide(
-              color: AppColors.platinum,
-              width: 0.3,
+              color: Theme.of(context).brightness == Brightness.light
+                  ? AppColors.backgroundDark
+                  : AppColors.background,
+              width: 0.1,
             ),
           ),
         ),
@@ -28,17 +30,18 @@ class MessageComponent extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 CircleAvatar(
-                  radius: 30,
+                  radius: 24,
+                  backgroundColor: Colors.transparent,
                   child: ClipOval(
                     child: CachedNetworkImage(
                       imageUrl:
                           "https://static.wikia.nocookie.net/projectsekai/images/f/ff/Dramaturgy_Game_Cover.png/revision/latest?cb=20201227073615",
                       fit: BoxFit.cover,
-                      width: 60,
-                      height: 60,
-                      placeholder: (context, url) => const Center(
+                      width: 64,
+                      height: 64,
+                      placeholder: (context, url) => Center(
                         child: CircularProgressIndicator(
-                          color: AppColors.primary,
+                          color: Theme.of(context).primaryColor,
                           strokeWidth: 3,
                         ),
                       ),

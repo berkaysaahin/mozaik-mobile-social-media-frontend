@@ -16,12 +16,21 @@ class BottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final borderColor = Theme.of(context).brightness == Brightness.light
+        ? AppColors.backgroundDark
+        : AppColors.background;
+    final primaryColor = Theme.of(context).primaryColor;
+    final unselectedColor = primaryColor.withValues(alpha: 0.7);
+
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
+        color: Theme.of(context).brightness == Brightness.light
+            ? AppColors.background
+            : AppColors.backgroundDark,
         border: Border(
           top: BorderSide(
-            color: AppColors.platinum,
-            width: 0.5,
+            color: borderColor,
+            width: 0.1,
           ),
         ),
       ),
@@ -39,8 +48,11 @@ class BottomNavBar extends StatelessWidget {
           ),
           showUnselectedLabels: false,
           showSelectedLabels: false,
-          selectedItemColor: AppColors.primary,
-          unselectedItemColor: AppColors.primary.withValues(alpha: 0.7),
+          selectedItemColor: primaryColor,
+          unselectedItemColor: unselectedColor,
+          backgroundColor: Theme.of(context).brightness == Brightness.light
+              ? AppColors.background
+              : AppColors.backgroundDark,
           selectedFontSize: 12,
           unselectedFontSize: 12,
           iconSize: 24,
@@ -53,23 +65,31 @@ class BottomNavBar extends StatelessWidget {
               filledIconPath: 'assets/svg/home_fill.svg',
               label: 'Home',
               isSelected: currentIndex == 0,
+              selectedColor: primaryColor,
+              unselectedColor: unselectedColor,
             ),
             _buildBottomNavBarItem(
               iconPath: 'assets/svg/search.svg',
               filledIconPath: 'assets/svg/search_fill.svg',
               label: 'Search',
               isSelected: currentIndex == 1,
+              selectedColor: primaryColor,
+              unselectedColor: unselectedColor,
             ),
             _buildBottomNavBarItem(
               iconPath: 'assets/svg/message.svg',
               filledIconPath: 'assets/svg/message_fill.svg',
               label: 'Messages',
               isSelected: currentIndex == 2,
+              selectedColor: primaryColor,
+              unselectedColor: unselectedColor,
             ),
             _buildBottomNavBarItem(
               icon: profileIcon,
               label: 'Profile',
               isSelected: currentIndex == 3,
+              selectedColor: primaryColor,
+              unselectedColor: unselectedColor,
             ),
           ],
         ),
@@ -83,6 +103,8 @@ class BottomNavBar extends StatelessWidget {
     Widget? icon,
     required String label,
     required bool isSelected,
+    required Color selectedColor,
+    required Color unselectedColor,
   }) {
     return BottomNavigationBarItem(
       icon: Column(
@@ -93,9 +115,7 @@ class BottomNavBar extends StatelessWidget {
               isSelected ? filledIconPath : iconPath,
               height: 26,
               width: 26,
-              color: isSelected
-                  ? AppColors.primary
-                  : AppColors.primary.withValues(alpha: 0.7),
+              color: isSelected ? selectedColor : unselectedColor,
             ),
           if (icon != null) icon,
         ],

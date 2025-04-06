@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mozaik/app_colors.dart';
 import 'package:mozaik/blocs/post_bloc.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:mozaik/events/post_event.dart';
@@ -34,16 +33,16 @@ class _MyFloatingActionButtonState extends State<MyFloatingActionButton> {
               borderRadius: BorderRadius.circular(36),
             ),
             elevation: 0,
-            backgroundColor: AppColors.primary,
+            backgroundColor: Theme.of(context).primaryColor,
             onPressed: () async {
               final result = await Navigator.pushNamed(context, '/newPost');
               if (context.mounted && result == true) {
                 context.read<PostBloc>().add(FetchPosts());
               }
             },
-            child: const Icon(
+            child: Icon(
               FluentIcons.add_24_filled,
-              color: Colors.white,
+              color: Theme.of(context).dialogBackgroundColor,
             ),
           ),
         );

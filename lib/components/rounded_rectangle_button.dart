@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class RoundedRectangleButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
-  final Color backgroundColor;
+  final Color? backgroundColor;
   final Color textColor;
   final double borderRadius;
   final double elevation;
@@ -32,7 +32,7 @@ class RoundedRectangleButton extends StatelessWidget {
         elevation: elevation,
         padding: const EdgeInsets.symmetric(
           horizontal: 24.0,
-          vertical: 8.0,
+          vertical: 2.0,
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(borderRadius),

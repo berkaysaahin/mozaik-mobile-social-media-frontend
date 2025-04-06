@@ -24,7 +24,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
-      color: AppColors.primary,
+      color: Theme.of(context).primaryColor,
       strokeWidth: 3,
       onRefresh: () async {
         context.read<PostBloc>().add(FetchPosts());
@@ -65,7 +65,9 @@ class _HomePageState extends State<HomePage> {
                     (context, index) {
                       final post = posts[index];
                       return Container(
-                        color: AppColors.background,
+                        color: Theme.of(context).brightness == Brightness.light
+                            ? AppColors.background
+                            : AppColors.backgroundDark,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [

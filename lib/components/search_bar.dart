@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mozaik/app_colors.dart';
 
 class CustomSearchBar extends StatelessWidget implements PreferredSizeWidget {
   final String hintText;
@@ -17,8 +16,10 @@ class CustomSearchBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(borderRadius),
-        border: Border.all(color: AppColors.platinum, width: 1),
+        borderRadius: BorderRadius.circular(12),
+        color: Theme.of(context).brightness == Brightness.light
+            ? Color.lerp(Colors.white, Colors.grey, 0.2)
+            : Color.lerp(Colors.black, Colors.white, 0.2),
       ),
       height: height,
       child: Align(
@@ -30,7 +31,6 @@ class CustomSearchBar extends StatelessWidget implements PreferredSizeWidget {
               hintText: hintText,
               hintStyle: const TextStyle(
                 fontWeight: FontWeight.w100,
-                fontStyle: FontStyle.italic,
                 fontSize: 14,
               ),
               border: InputBorder.none,

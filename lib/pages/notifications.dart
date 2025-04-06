@@ -21,11 +21,13 @@ class NotificationsPage extends StatelessWidget {
         children: [
           Container(
             height: 56,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(
-                  color: AppColors.platinum,
-                  width: 0.6,
+                  color: Theme.of(context).brightness == Brightness.light
+                      ? AppColors.backgroundDark
+                      : AppColors.background,
+                  width: 0.1,
                 ),
               ),
             ),
@@ -35,10 +37,10 @@ class NotificationsPage extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      const Text(
+                      Text(
                         'Inbox ',
                         style: TextStyle(
-                          color: AppColors.primary,
+                          color: Theme.of(context).primaryColor,
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
                         ),

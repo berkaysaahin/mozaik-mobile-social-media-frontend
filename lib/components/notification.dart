@@ -18,11 +18,13 @@ class CustomNotification extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(12),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
-            color: AppColors.platinum,
-            width: 1,
+            color: Theme.of(context).brightness == Brightness.light
+                ? AppColors.backgroundDark
+                : AppColors.background,
+            width: 0.1,
           ),
         ),
       ),

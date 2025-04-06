@@ -29,8 +29,8 @@ class ProfileIcon extends StatelessWidget {
         } else {
           return Transform.scale(
             scale: 0.5,
-            child: const CircularProgressIndicator(
-              color: AppColors.primary,
+            child: CircularProgressIndicator(
+              color: Theme.of(context).primaryColor,
               strokeWidth: 2,
             ),
           );
