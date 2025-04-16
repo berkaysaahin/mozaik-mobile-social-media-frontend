@@ -126,23 +126,21 @@ class _NewPostPageState extends State<NewPostPage> {
           onPressed: _isUploading ? null : _publishPost,
           child: _isUploading
               ? Shimmer.fromColors(
-                  baseColor: Colors.grey[300]!,
-                  highlightColor: Colors.grey[100]!,
+                  baseColor: Theme.of(context).primaryColor.withValues(alpha: 0.4),
+                  highlightColor: Theme.of(context).primaryColor.withValues(alpha: 0.2),
                   child: Container(
                     width: 64,
                     height: 24,
                     decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor,
+                      color: Theme.of(context).scaffoldBackgroundColor,
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
                 )
               : Text(
                   "Publish",
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Theme.of(context).primaryColor,
-                  ),
+                  style: Theme.of(context).textTheme.labelLarge,
+
                 ),
         ),
       ),
@@ -201,10 +199,7 @@ class _NewPostPageState extends State<NewPostPage> {
                                         children: [
                                           Text(
                                             profileState.user.username,
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                            ),
+                                            style: Theme.of(context).textTheme.titleMedium,
                                           ),
                                           GestureDetector(
                                             onTap: _changeVisibility,
@@ -212,17 +207,14 @@ class _NewPostPageState extends State<NewPostPage> {
                                               children: [
                                                 Text(
                                                   _visibility,
-                                                  style: const TextStyle(
-                                                    fontSize: 14,
-                                                    color: AppColors.teupeGray,
-                                                  ),
+                                                  style: Theme.of(context).textTheme.labelMedium
                                                 ),
                                                 const SizedBox(width: 4),
-                                                const Icon(
+                                                 Icon(
                                                   FluentIcons
                                                       .chevron_down_12_regular,
                                                   size: 16,
-                                                  color: AppColors.teupeGray,
+                                                  color: Theme.of(context).primaryColor
                                                 ),
                                               ],
                                             ),
@@ -245,15 +237,9 @@ class _NewPostPageState extends State<NewPostPage> {
                               decoration: InputDecoration(
                                 hintText: 'What\'s on your mind?',
                                 border: InputBorder.none,
-                                hintStyle: TextStyle(
-                                  color: AppColors.teupeGray
-                                      .withValues(alpha: 0.6),
-                                ),
+                                hintStyle: Theme.of(context).textTheme.labelMedium
                               ),
-                              style: const TextStyle(
-                                fontSize: 16,
-                                color: AppColors.teupeGray,
-                              ),
+                              style: Theme.of(context).textTheme.bodyMedium
                             ),
                           ),
                           const Spacer(),
@@ -292,19 +278,13 @@ class _NewPostPageState extends State<NewPostPage> {
                                           children: [
                                             Text(
                                               _trackName ?? 'Unknown Track',
-                                              style: const TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold,
-                                              ),
+                                              style: Theme.of(context).textTheme.labelLarge,
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
                                             ),
                                             Text(
                                               _trackArtist ?? 'Unknown Artist',
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                color: AppColors.teupeGray,
-                                              ),
+                                              style: Theme.of(context).textTheme.labelMedium,
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
                                             ),
@@ -355,9 +335,9 @@ class _NewPostPageState extends State<NewPostPage> {
                                               shape: BoxShape.circle,
                                               color: Colors.black54,
                                             ),
-                                            child: const Icon(
+                                            child:  Icon(
                                               Icons.close,
-                                              color: Colors.white,
+                                              color: Theme.of(context).primaryColor,
                                               size: 20,
                                             ),
                                           ),
@@ -386,12 +366,12 @@ class _NewPostPageState extends State<NewPostPage> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                const SizedBox(
+                                 SizedBox(
                                   width: 52,
                                   height: 52,
                                   child: Icon(
                                     FluentIcons.image_24_regular,
-                                    color: AppColors.teupeGray,
+                                    color: Theme.of(context).primaryColor,
                                   ),
                                 ),
                                 SizedBox(
@@ -399,10 +379,10 @@ class _NewPostPageState extends State<NewPostPage> {
                                   height: 52,
                                   child: IconButton(
                                     onPressed: _pickImage,
-                                    icon: const Icon(
+                                    icon:  Icon(
                                       FluentIcons.camera_24_regular,
                                     ),
-                                    color: AppColors.teupeGray,
+                                    color: Theme.of(context).primaryColor,
                                   ),
                                 ),
                                 SizedBox(
@@ -410,17 +390,17 @@ class _NewPostPageState extends State<NewPostPage> {
                                   height: 52,
                                   child: IconButton(
                                       onPressed: openTrackSearch,
-                                      icon: const Icon(
+                                      icon:  Icon(
                                         FluentIcons.music_note_1_20_regular,
-                                        color: AppColors.teupeGray,
+                                        color: Theme.of(context).primaryColor,
                                       )),
                                 ),
-                                const SizedBox(
+                                 SizedBox(
                                   width: 52,
                                   height: 52,
                                   child: Icon(
                                     FluentIcons.emoji_24_regular,
-                                    color: AppColors.teupeGray,
+                                    color: Theme.of(context).primaryColor,
                                   ),
                                 ),
                                 const Spacer(),
@@ -432,16 +412,13 @@ class _NewPostPageState extends State<NewPostPage> {
                                       children: [
                                         Text(
                                           _visibility,
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                            color: AppColors.teupeGray,
-                                          ),
+                                          style: Theme.of(context).textTheme.labelMedium,
                                         ),
                                         const SizedBox(width: 4),
-                                        const Icon(
+                                         Icon(
                                           FluentIcons.chevron_down_12_regular,
                                           size: 16,
-                                          color: AppColors.teupeGray,
+                                          color: Theme.of(context).primaryColor,
                                         ),
                                       ],
                                     ),

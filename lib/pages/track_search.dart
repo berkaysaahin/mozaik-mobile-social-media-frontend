@@ -106,7 +106,9 @@ class _TrackSearchState extends State<TrackSearch> {
                 Expanded(
                   child: TextField(
                     controller: _searchController,
+                    cursorColor: Theme.of(context).primaryColor,
                     decoration: InputDecoration(
+
                       hintText: 'Search for a song...',
                       border: InputBorder.none,
                       enabledBorder: InputBorder.none,
@@ -141,13 +143,10 @@ class _TrackSearchState extends State<TrackSearch> {
                 ))
               : Expanded(
                   child: isSearchEmpty
-                      ? const Center(
+                      ?  Center(
                           child: Text(
                             'No results found.',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: AppColors.teupeGray,
-                            ),
+                            style: Theme.of(context).textTheme.labelMedium,
                           ),
                         )
                       : ListView.builder(
@@ -167,8 +166,8 @@ class _TrackSearchState extends State<TrackSearch> {
                                     )
                                   : const Icon(
                                       FluentIcons.music_note_1_20_regular),
-                              title: Text(track['name']),
-                              subtitle: Text(track['artist']),
+                              title: Text(track['name'],style: Theme.of(context).textTheme.titleSmall,),
+                              subtitle: Text(track['artist'],style:Theme.of(context).textTheme.labelMedium,),
                               onTap: () {
                                 Navigator.pop(context, {
                                   'id': track['id'],

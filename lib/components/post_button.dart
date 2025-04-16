@@ -25,12 +25,12 @@ class PostButton extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 20, color: color ?? Colors.grey),
-              const SizedBox(width: 4),
+              Icon(icon, size: 18, color: color ?? Colors.grey),
+              const SizedBox(width: 6),
               if (count > 0)
                 Text(
                   count.toString(),
-                  style: const TextStyle(fontSize: 14),
+                  style: Theme.of(context).textTheme.labelLarge,
                 ),
             ],
           ),

@@ -60,6 +60,8 @@ class _TextPostState extends State<TextPost>
   late bool _isShared;
   bool _isDisposed = false;
   bool _initialLoadCompleted = false;
+  bool _isBookmarked = false;
+  int _bookmarks = 0;
 
   @override
   void initState() {
@@ -104,6 +106,15 @@ class _TextPostState extends State<TextPost>
       _shares += _isShared ? 1 : -1;
     });
   }
+
+
+  void _toggleBookmark() {
+    setState(() {
+      _isBookmarked = !_isBookmarked;
+      _bookmarks += _isBookmarked ? 1 : -1;
+    });
+  }
+
 
   Future<void> _loadPostData() async {
     if (!mounted) return;
@@ -169,225 +180,219 @@ class _TextPostState extends State<TextPost>
           ),
         );
       },
-      child: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: Theme.of(context).brightness == Brightness.light
-                  ? AppColors.backgroundDark
-                  : AppColors.background,
-              width: 0.1,
-            ),
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              GestureDetector(
-                onTap: () {
-                  context.read<PostBloc>().add(ClearUserPosts());
-                  context.read<PostBloc>().add(FetchPostsByUser(widget.userId));
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          UserProfilePage(userId: widget.userId),
-                    ),
-                  );
-                },
-                child: CircleAvatar(
-                  radius: 24,
-                  backgroundColor: AppColors.ashBlue,
-                  child: ClipOval(
-                    child: Image.network(
-                      widget.profilePic,
-                      fit: BoxFit.cover,
-                      width: 48,
-                      height: 48,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const Icon(
-                          FluentIcons.person_16_regular,
-                          size: 24,
-                          color: Colors.white,
-                        );
-                      },
-                    ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            GestureDetector(
+              onTap: () {
+                context.read<PostBloc>().add(ClearUserPosts());
+                context.read<PostBloc>().add(FetchPostsByUser(widget.userId));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        UserProfilePage(userId: widget.userId),
+                  ),
+                );
+              },
+              child: CircleAvatar(
+                radius: 20,
+                backgroundColor: AppColors.ashBlue,
+                child: ClipOval(
+                  child: Image.network(
+                    widget.profilePic,
+                    fit: BoxFit.cover,
+                    width: 48,
+                    height: 48,
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Icon(
+                        FluentIcons.person_16_regular,
+                        size: 24,
+                        color: Colors.white,
+                      );
+                    },
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              widget.username,
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                            const SizedBox(height: 2),
+                            Row(
+                              children: [
+                                Text(
+                                  '@${widget.handle}',
+                                  style: Theme.of(context).textTheme.labelMedium,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  '·',
+                                  style: Theme.of(context).textTheme.labelMedium,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  formatTimestamp(widget.timestamp),
+                                  style: Theme.of(context).textTheme.labelMedium,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      PopupMenuButton<String>(
+                        padding: EdgeInsets.zero,
+                        color:
+                            Theme.of(context).brightness == Brightness.light
+                                ? AppColors.background
+                                : AppColors.backgroundDark,
+                        icon: const Icon(
+                          CupertinoIcons.ellipsis_vertical,
+                          size: 18,
+                          color: Colors.grey,
+                        ),
+                        onSelected: (value) {
+                          final postId = widget.id;
+                          if (value == 'edit') {
+                          } else if (value == 'delete') {
+                            context.read<PostBloc>().add(DeletePost(
+                                  postId,
+                                  imageUrl: widget.imageUrl,
+                                ));
+                          } else if (value == 'share') {}
+                        },
+                        itemBuilder: (BuildContext context) {
+                          return [
+                            const PopupMenuItem<String>(
+                              value: 'edit',
+                              child: Text('Edit'),
+                            ),
+                            const PopupMenuItem<String>(
+                              value: 'delete',
+                              child: Text('Delete'),
+                            ),
+                            const PopupMenuItem<String>(
+                              value: 'share',
+                              child: Text('Share'),
+                            ),
+                          ];
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    widget.content,
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+
+                      height: 1.4,
+                      letterSpacing: 0.2,
+                        ),
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.start,
+                    maxLines: 6,
+                  ),
+                  const SizedBox(height: 12),
+                  if (widget.imageUrl != null)
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: CachedNetworkImage(
+                        imageUrl: widget.imageUrl!,
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        placeholder: (context, url) => Container(
+                          color: Colors.grey[200],
+                          child: Center(child: CircularProgressIndicator()),
+                        ),
+                        errorWidget: (context, url, error) =>
+                            Icon(Icons.error),
+                      ),
+                    ),
+                  const SizedBox(height: 12),
+                  if (widget.music != null) ...[
+                    MusicCard(music: widget.music),
+
+                  ],
+                  const SizedBox(height: 12),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                widget.username,
-                                style: const TextStyle(
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.bold,
+                        PostButton(
+                          icon: _isBookmarked
+                              ? CupertinoIcons.bookmark_fill
+                              : CupertinoIcons.bookmark,
+                          color: _isBookmarked ? Theme.of(context).primaryColor : Colors.grey,
+                          count: _bookmarks,
+                          onTap: _toggleBookmark,
+                        ),
+                        Spacer(),
+                        PostButton(
+                          icon: CupertinoIcons.bubble_left,
+                          count: widget.comments,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => SinglePostPage(
+                                  coverArt: widget.music?['cover_art'] ?? '',
+                                  trackName:
+                                      widget.music?['track_name'] ?? '',
+                                  artist: widget.music?['artist'] ?? '',
+                                  description: widget.content,
+                                  likes: _likes,
+                                  commentsCount: widget.comments,
+                                  username: widget.username,
+                                  userHandle: widget.handle,
+                                  userAvatar: widget.profilePic,
+                                  postId: widget.id,
+                                  timestamp: widget.timestamp,
+                                  imageUrl: widget.imageUrl,
                                 ),
                               ),
-                              Row(
-                                children: [
-                                  Text(
-                                    '@${widget.handle}',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    formatTimestamp(widget.timestamp),
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
+                            );
+                          },
                         ),
-                        PopupMenuButton<String>(
-                          color:
-                              Theme.of(context).brightness == Brightness.light
-                                  ? AppColors.background
-                                  : AppColors.backgroundDark,
-                          icon: const Icon(
-                            CupertinoIcons.ellipsis_vertical,
-                            size: 20,
-                            color: Colors.grey,
-                          ),
-                          onSelected: (value) {
-                            final postId = widget.id;
-                            if (value == 'edit') {
-                            } else if (value == 'delete') {
-                              context.read<PostBloc>().add(DeletePost(
-                                    postId,
-                                    imageUrl: widget.imageUrl,
-                                  ));
-                            } else if (value == 'share') {}
-                          },
-                          itemBuilder: (BuildContext context) {
-                            return [
-                              const PopupMenuItem<String>(
-                                value: 'edit',
-                                child: Text('Edit'),
-                              ),
-                              const PopupMenuItem<String>(
-                                value: 'delete',
-                                child: Text('Delete'),
-                              ),
-                              const PopupMenuItem<String>(
-                                value: 'share',
-                                child: Text('Share'),
-                              ),
-                            ];
-                          },
+                        const SizedBox(width: 24),
+                        PostButton(
+                          icon: CupertinoIcons.arrow_2_squarepath,
+                          color: _isShared
+                              ? Theme.of(context).primaryColor
+                              : Colors.grey,
+                          count: _shares,
+                          onTap: _toggleShare,
+                        ),
+                        const SizedBox(width: 24),
+                        PostButton(
+                          icon: _isLiked
+                              ? CupertinoIcons.heart_fill
+                              : CupertinoIcons.heart,
+                          color: _isLiked ? Colors.red : Colors.grey,
+                          count: _likes,
+                          onTap: _toggleLike,
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
-                    Text(
-                      widget.content,
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            height: 1.5,
-                            letterSpacing: 0.4,
-                          ),
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.start,
-                      maxLines: 6,
-                    ),
-                    const SizedBox(height: 12),
-                    if (widget.imageUrl != null)
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: CachedNetworkImage(
-                          imageUrl: widget.imageUrl!,
-                          fit: BoxFit.contain,
-                          width: double.infinity,
-                          placeholder: (context, url) => Container(
-                            color: Colors.grey[200],
-                            child: Center(child: CircularProgressIndicator()),
-                          ),
-                          errorWidget: (context, url, error) =>
-                              Icon(Icons.error),
-                        ),
-                      ),
-                    const SizedBox(height: 12),
-                    if (widget.music != null) ...[
-                      MusicCard(music: widget.music),
-                      const SizedBox(height: 8),
-                    ],
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          PostButton(
-                            icon: CupertinoIcons.bubble_left,
-                            count: widget.comments,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => SinglePostPage(
-                                    coverArt: widget.music?['cover_art'] ?? '',
-                                    trackName:
-                                        widget.music?['track_name'] ?? '',
-                                    artist: widget.music?['artist'] ?? '',
-                                    description: widget.content,
-                                    likes: _likes,
-                                    commentsCount: widget.comments,
-                                    username: widget.username,
-                                    userHandle: widget.handle,
-                                    userAvatar: widget.profilePic,
-                                    postId: widget.id,
-                                    timestamp: widget.timestamp,
-                                    imageUrl: widget.imageUrl,
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                          const SizedBox(width: 16),
-                          PostButton(
-                            icon: CupertinoIcons.arrow_2_squarepath,
-                            color: _isShared
-                                ? Theme.of(context).primaryColor
-                                : Colors.grey,
-                            count: _shares,
-                            onTap: _toggleShare,
-                          ),
-                          const SizedBox(width: 16),
-                          PostButton(
-                            icon: _isLiked
-                                ? CupertinoIcons.heart_fill
-                                : CupertinoIcons.heart,
-                            color: _isLiked ? Colors.red : Colors.grey,
-                            count: _likes,
-                            onTap: _toggleLike,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -441,7 +446,7 @@ class _ShimmerPostItem extends StatelessWidget {
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

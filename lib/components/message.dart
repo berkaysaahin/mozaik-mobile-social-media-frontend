@@ -22,7 +22,7 @@ class MessageComponent extends StatelessWidget {
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
           child: SizedBox(
             height: 52,
             child: Row(
@@ -51,21 +51,18 @@ class MessageComponent extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(
-                  width: 4,
+                  width: 12,
                 ),
                 SizedBox(
                   width: MediaQuery.of(context).size.width - 150,
-                  child: const Column(
+                  child:  Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Row(
                         children: [
                           Text(
                             'Eve',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
-                            ),
+                            style: Theme.of(context).textTheme.titleMedium,
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                             softWrap: true,
@@ -75,10 +72,7 @@ class MessageComponent extends StatelessWidget {
                           ),
                           Text(
                             '@evemusic',
-                            style: TextStyle(
-                                fontSize: 14,
-                                color: AppColors.amanojaku,
-                                fontWeight: FontWeight.w300),
+                            style: Theme.of(context).textTheme.labelMedium,
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                             softWrap: true,
@@ -87,9 +81,7 @@ class MessageComponent extends StatelessWidget {
                       ),
                       Text(
                         "You've been hoping to get something dramatic out of this storyline.",
-                        style: TextStyle(
-                          fontSize: 16,
-                        ),
+                        style: Theme.of(context).textTheme.bodyMedium,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                         softWrap: true,
@@ -97,13 +89,11 @@ class MessageComponent extends StatelessWidget {
                     ],
                   ),
                 ),
-                const Center(
+                 Spacer(),
+                 Center(
                   child: Text(
                     'feb 20',
-                    style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w300,
-                        color: AppColors.amanojaku),
+                    style: Theme.of(context).textTheme.labelSmall,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                     softWrap: true,

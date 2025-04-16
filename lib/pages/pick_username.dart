@@ -34,76 +34,111 @@ class _PickUsernamePageState extends State<PickUsernamePage> {
           Navigator.pop(context);
         },
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'One last step before you dive in,',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'One last step before you dive in,',
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium
+                      ?.copyWith(fontSize: 16),
                 ),
-              ),
-              const SizedBox(height: 6),
-              const Text(
-                'How shall we call you in Mozaik?',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+                const SizedBox(height: 8),
+                Text(
+                  'How shall we call you in Mozaik?',
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleLarge
+                      ?.copyWith(fontSize: 24),
                 ),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Your Username',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                const SizedBox(height: 36),
+                TextFormField(
+                  controller: _nameController,
+                  cursorColor: Theme.of(context).primaryColor,
+                  decoration: InputDecoration(
+                    hintText: 'Your cool new username',
+                    hintStyle: Theme.of(context).textTheme.labelMedium,
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Theme.of(context)
+                            .primaryColor, // Change this to your desired color
+                        width: 2.0,
+                      ),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    // Focused border
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Theme.of(context)
+                            .primaryColor, // Or any color you want when focused
+                        width: 2.0,
+                      ),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    // Error border
+                    errorBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.red, // Error color
+                        width: 1.0,
+                      ),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    // Focused error border
+                    focusedErrorBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.red, // Error color when focused
+                        width: 2.0,
+                      ),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a name';
+                    }
+                    if (value.length < 3) {
+                      return 'Name must be at least 3 characters long';
+                    }
+                    return null;
+                  },
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a name';
-                  }
-                  if (value.length < 3) {
-                    return 'Name must be at least 3 characters long';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 24),
-              Material(
-                color: Theme.of(context).primaryColor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  side: const BorderSide(
-                    width: 0.1,
+                const SizedBox(height: 24),
+                Material(
+                  color: Theme.of(context).primaryColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    side: const BorderSide(
+                      width: 0.1,
+                    ),
                   ),
-                ),
-                child: InkWell(
-                  onTap: _saveName,
-                  splashFactory: NoSplash.splashFactory,
-                  child: const SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: Center(
-                      child: Text(
-                        'Step In!',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
+                  child: InkWell(
+                    onTap: _saveName,
+                    splashFactory: NoSplash.splashFactory,
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: Center(
+                        child: Text(
+                          'Step In!',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium
+                              ?.copyWith(
+                                color: Theme.of(context).scaffoldBackgroundColor,
+                              ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

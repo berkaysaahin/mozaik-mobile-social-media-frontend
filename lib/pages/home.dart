@@ -5,6 +5,7 @@ import 'package:mozaik/app_colors.dart';
 import 'package:mozaik/blocs/post_bloc.dart';
 import 'package:mozaik/components/text_post.dart';
 import 'package:mozaik/events/post_event.dart';
+import 'package:mozaik/models/post_model.dart';
 import 'package:mozaik/states/post_state.dart';
 
 class HomePage extends StatefulWidget {
@@ -13,12 +14,37 @@ class HomePage extends StatefulWidget {
   @override
   State<HomePage> createState() => _HomePageState();
 }
-
 class _HomePageState extends State<HomePage> {
+  final List<String> _precachedUrls = [];
+
   @override
   void initState() {
     context.read<PostBloc>().add(FetchPosts());
     super.initState();
+  }
+
+  void _precacheImages(List<Post> posts, BuildContext context) {
+    if (!mounted) return;
+
+    final postsToPrecache = posts.take(3);
+    for (final post in postsToPrecache) {
+      try {
+        if (post.imageUrl != null && !_precachedUrls.contains(post.imageUrl)) {
+          precacheImage(CachedNetworkImageProvider(post.imageUrl!), context);
+          _precachedUrls.add(post.imageUrl!);
+        }
+        if (post.music?['cover_art'] != null &&
+            !_precachedUrls.contains(post.music!['cover_art'])) {
+          precacheImage(
+              CachedNetworkImageProvider(post.music!['cover_art']),
+              context
+          );
+          _precachedUrls.add(post.music!['cover_art']);
+        }
+      } catch (e) {
+        debugPrint('Failed to precache image: $e');
+      }
+    }
   }
 
   @override
@@ -33,28 +59,14 @@ class _HomePageState extends State<HomePage> {
       child: BlocBuilder<PostBloc, PostState>(
         builder: (context, state) {
           if (state is PostLoading) {
-            return const SizedBox.shrink();
+            return const Center(child: CircularProgressIndicator());
           } else if (state is PostsCombinedState) {
-            final posts =
-                state.showingUserPosts ? state.userPosts : state.generalPosts;
+            final posts = state.showingUserPosts ? state.userPosts : state.generalPosts;
+
+            // Schedule precaching for the next frame
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              final postsToPrecache = posts.take(3);
-              for (final post in postsToPrecache) {
-                if (post.imageUrl != null) {
-                  precacheImage(
-                          CachedNetworkImageProvider(post.imageUrl!), context)
-                      .catchError((e) {
-                    debugPrint('Failed to precache image: $e');
-                  });
-                }
-                if (post.music?['cover_art'] != null) {
-                  precacheImage(
-                          CachedNetworkImageProvider(post.music!['cover_art']),
-                          context)
-                      .catchError((e) {
-                    debugPrint('Failed to precache music cover: $e');
-                  });
-                }
+              if (mounted) {
+                _precacheImages(posts, context);
               }
             });
 
@@ -62,7 +74,7 @@ class _HomePageState extends State<HomePage> {
               slivers: [
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
-                    (context, index) {
+                        (context, index) {
                       final post = posts[index];
                       return Container(
                         color: Theme.of(context).brightness == Brightness.light
@@ -87,14 +99,12 @@ class _HomePageState extends State<HomePage> {
                               music: post.music,
                               imageUrl: post.imageUrl,
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 8),
                           ],
                         ),
                       );
                     },
                     childCount: posts.length,
-                    addAutomaticKeepAlives: true,
-                    addRepaintBoundaries: true,
                   ),
                 ),
               ],
@@ -109,3 +119,4 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+

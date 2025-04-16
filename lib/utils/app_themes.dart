@@ -3,58 +3,18 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:mozaik/app_colors.dart';
 
 class AppThemes {
-  static TextTheme get _baseTextTheme {
-    return TextTheme(
-      bodyLarge: TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.w400,
-        height: 1.5,
-        letterSpacing: 0.5,
-      ),
-      titleMedium: TextStyle(
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-      ),
-      labelMedium: TextStyle(
-        fontSize: 14,
-        fontWeight: FontWeight.w500,
-      ),
-    );
-  }
 
   static ThemeData get lightTheme {
     return ThemeData(
       brightness: Brightness.light,
       useMaterial3: true,
+      scaffoldBackgroundColor: AppColors.background,
       primaryColor: AppColors.primary,
       focusColor: AppColors.platinum,
       splashColor: Colors.transparent,
       splashFactory: NoSplash.splashFactory,
       highlightColor: Colors.transparent,
-      textTheme: GoogleFonts.montserratTextTheme(_baseTextTheme).copyWith(
-        bodyLarge: GoogleFonts.montserrat(
-          fontSize: 16,
-          fontWeight: FontWeight.w400,
-          height: 1.5,
-          letterSpacing: 0.5,
-          color: Colors.black87,
-        ),
-        titleMedium: GoogleFonts.montserrat(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-          color: Colors.black87,
-        ),
-        labelMedium: GoogleFonts.montserrat(
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-          color: Colors.grey[700],
-        ),
-      ),
-      textSelectionTheme: const TextSelectionThemeData(
-        cursorColor: AppColors.platinum,
-        selectionColor: AppColors.platinum,
-        selectionHandleColor: AppColors.platinum,
-      ),
+      textTheme: _buildMontserratTextTheme(Colors.black, Colors.grey[700]!),
     );
   }
 
@@ -62,35 +22,60 @@ class AppThemes {
     return ThemeData(
       brightness: Brightness.dark,
       useMaterial3: true,
+      scaffoldBackgroundColor: AppColors.backgroundDark,
       primaryColor: AppColors.primaryDark,
       focusColor: AppColors.platinumDark,
       splashColor: Colors.transparent,
       splashFactory: NoSplash.splashFactory,
       highlightColor: Colors.transparent,
-      textTheme: GoogleFonts.montserratTextTheme(_baseTextTheme).copyWith(
-        bodyLarge: GoogleFonts.montserrat(
-          fontSize: 16,
-          fontWeight: FontWeight.w400,
-          height: 1.5,
-          letterSpacing: 0.5,
-          color: Colors.white,
-        ),
-        titleMedium: GoogleFonts.montserrat(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
-        ),
-        labelMedium: GoogleFonts.montserrat(
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-          color: Colors.grey[400],
-        ),
+      textTheme: _buildMontserratTextTheme(Colors.white, Colors.grey[400]!),
+    );
+  }
+  static TextTheme _buildMontserratTextTheme(Color primaryColor, Color secondaryColor) {
+    return TextTheme(
+      // Headline Styles
+      headlineSmall: GoogleFonts.plusJakartaSans(
+        fontSize: 23,
+        fontWeight: FontWeight.w800,  // Heavy weight for titles
+        color: primaryColor,
       ),
-      textSelectionTheme: const TextSelectionThemeData(
-        cursorColor: AppColors.platinumDark,
-        selectionColor: AppColors.platinumDark,
-        selectionHandleColor: AppColors.platinumDark,
+      titleLarge: GoogleFonts.plusJakartaSans(
+        fontSize: 21,
+        fontWeight: FontWeight.w700,
+        color: primaryColor,
+      ),
+      titleMedium: GoogleFonts.plusJakartaSans(
+        fontSize: 19,
+        fontWeight: FontWeight.w700,  // Explicit w700 instead of .bold
+        color: primaryColor,
+      ),
+
+      // Body Styles
+      bodyLarge: GoogleFonts.plusJakartaSans(
+        fontSize: 17,
+        fontWeight: FontWeight.w500,  // Medium instead of normal
+        height: 1.5,
+        letterSpacing: 0.5,
+        color: primaryColor,
+      ),
+      bodyMedium: GoogleFonts.plusJakartaSans(
+        fontSize: 15,
+        fontWeight: FontWeight.w400,
+        color: primaryColor,
+      ),
+
+      // Label/Button Styles
+      labelLarge: GoogleFonts.plusJakartaSans(
+        fontSize: 17,
+        fontWeight: FontWeight.w600,  // Semi-bold for buttons
+        color: primaryColor,
+      ),
+      labelMedium: GoogleFonts.plusJakartaSans(
+        fontSize: 15,
+        fontWeight: FontWeight.w500,
+        color: secondaryColor,
       ),
     );
   }
 }
+

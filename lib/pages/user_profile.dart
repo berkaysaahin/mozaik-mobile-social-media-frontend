@@ -31,154 +31,130 @@ class _UserProfilePageState extends State<UserProfilePage> {
     context.read<UserBloc>().add(FetchUserById(widget.userId));
     context.read<PostBloc>().add(FetchPostsByUser(widget.userId));
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(36),
-        ),
-        elevation: 0,
-        backgroundColor: Theme.of(context).primaryColor,
-        onPressed: () {},
-        child: Icon(
-          size: 28,
-          FluentIcons.compose_12_regular,
-          color: Theme.of(context).dialogBackgroundColor,
-        ),
-      ),
       body: SafeArea(
-        child: NestedScrollView(
-          headerSliverBuilder: (context, innerBoxIsScrolled) {
-            return [
-              BlocBuilder<UserBloc, UserState>(
-                builder: (context, userState) {
-                  if (userState is UserLoading) {
-                    return SliverAppBar(
-                      expandedHeight: 200,
-                      flexibleSpace: Center(
-                        child: CircularProgressIndicator(
-                          color: Theme.of(context).primaryColor,
-                          strokeWidth: 3,
-                        ),
+        child: CustomScrollView(
+          slivers: [
+            BlocBuilder<UserBloc, UserState>(
+              builder: (context, userState) {
+                if (userState is UserLoading) {
+                  return SliverAppBar(
+                    expandedHeight: 180,
+                    flexibleSpace: Center(
+                      child: CircularProgressIndicator(
+                        color: Theme.of(context).primaryColor,
+                        strokeWidth: 3,
                       ),
-                    );
-                  } else if (userState is UserLoaded) {
-                    final user = userState.user;
-                    return SliverAppBar(
-                      expandedHeight: 210,
-                      collapsedHeight: 0,
-                      toolbarHeight: 0,
-                      pinned: true,
-                      backgroundColor:
-                          Theme.of(context).brightness == Brightness.light
-                              ? AppColors.background
-                              : AppColors.backgroundDark,
-                      automaticallyImplyLeading: false,
-                      flexibleSpace: FlexibleSpaceBar(
-                        background: Stack(
-                          children: [
-                            CachedNetworkImage(
-                              imageUrl: user.cover,
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                              height: 150,
-                              placeholder: (context, url) => Center(
-                                child: CircularProgressIndicator(
-                                  color: Theme.of(context).primaryColor,
-                                  strokeWidth: 3,
+                    ),
+                  );
+                } else if (userState is UserLoaded) {
+                  final user = userState.user;
+                  return SliverAppBar(
+                    expandedHeight: 180,
+                    collapsedHeight: 0,
+                    toolbarHeight: 0,
+                    pinned: true,
+                    backgroundColor:
+                        Theme.of(context).brightness == Brightness.light
+                            ? AppColors.background
+                            : AppColors.backgroundDark,
+                    automaticallyImplyLeading: false,
+                    flexibleSpace: FlexibleSpaceBar(
+                      background: Stack(
+                        children: [
+                          Column(
+                            children: [
+                              CachedNetworkImage(
+                                imageUrl: user.cover,
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                                height: 140,
+                                placeholder: (context, url) => Center(
+                                  child: CircularProgressIndicator(
+                                    color: Theme.of(context).primaryColor,
+                                    strokeWidth: 3,
+                                  ),
+                                ),
+                                errorWidget: (context, url, error) =>
+                                    const Icon(Icons.error),
+                              ),
+                              Container(
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).brightness ==
+                                          Brightness.light
+                                      ? AppColors.background
+                                      : AppColors.backgroundDark,
                                 ),
                               ),
-                              errorWidget: (context, url, error) =>
-                                  const Icon(Icons.error),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Row(
-                                children: [
-                                  AppRoundedButton(
-                                      size: 36,
-                                      onTap: () {
-                                        context
-                                            .read<PostBloc>()
-                                            .add(ClearUserPosts());
-
-                                        context
-                                            .read<PostBloc>()
-                                            .add(FetchPosts());
-
-                                        if (context.mounted) {
-                                          Navigator.pop(context);
-                                        }
-                                      },
-                                      iconColor: Theme.of(context)
-                                          .dialogBackgroundColor,
-                                      iconData:
-                                          FluentIcons.arrow_left_12_regular,
-                                      backgroundColor:
-                                          Theme.of(context).primaryColor),
-                                  const Spacer(),
+                            ],
+                          ),
+                          // Gradient overlay
+                          Container(
+                            height: 140,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.bottomCenter,
+                                end: Alignment.topCenter,
+                                colors: [
+                                  Colors.black.withValues(alpha: 0.3),
+                                  Colors.transparent,
                                 ],
                               ),
                             ),
-                            IgnorePointer(
-                              child: Container(
-                                height: 170,
-                                decoration: BoxDecoration(
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color:
-                                          Colors.black.withValues(alpha: 0.1),
-                                      offset: const Offset(0, -140),
-                                      blurRadius: 6,
-                                    ),
-                                  ],
-                                ),
-                              ),
+                          ),
+                          // Back button
+                          Positioned(
+                            top: 8,
+                            left: 8,
+                            child: AppRoundedButton(
+                              size: 36,
+                              onTap: () {
+                                context.read<PostBloc>().add(ClearUserPosts());
+                                context.read<PostBloc>().add(FetchPosts());
+                                context
+                                    .read<PostBloc>()
+                                    .add(const FetchPostsByUser('b2ecc8ae-9e16-42eb-915f-d2e1e2022f6c'));
+                                Navigator.pop(context);
+                              },
+                              iconColor:
+                                  Theme.of(context).dialogBackgroundColor,
+                              iconData: FluentIcons.arrow_left_12_regular,
+                              backgroundColor: Theme.of(context).primaryColor,
                             ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                              ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 10),
-                                    child: Align(
-                                      alignment: Alignment.bottomLeft,
-                                      child: Container(
-                                        width: 100,
-                                        height: 100,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(64),
-                                          border: Border.all(
-                                            color:
-                                                Theme.of(context).brightness ==
-                                                        Brightness.light
-                                                    ? AppColors.background
-                                                    : AppColors.backgroundDark,
-                                            width: 4,
-                                          ),
-                                        ),
-                                        child: CircleAvatar(
-                                          backgroundColor:
-                                              Theme.of(context).brightness ==
-                                                      Brightness.light
-                                                  ? AppColors.background
-                                                  : AppColors.backgroundDark,
-                                          backgroundImage:
-                                              CachedNetworkImageProvider(
-                                                  user.profilePic),
-                                        ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Align(
+                                  alignment: Alignment.bottomLeft,
+                                  child: Container(
+                                    margin: const EdgeInsets.only(top: 80),
+                                    width: 88,
+                                    height: 88,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(44),
+                                      border: Border.all(
+                                        color: Theme.of(context).brightness == Brightness.light
+                                            ? AppColors.background
+                                            : AppColors.backgroundDark,
+                                        width: 4,
+                                      ),
+                                      image: DecorationImage(
+                                        image: CachedNetworkImageProvider(user.profilePic),
+                                        fit: BoxFit.cover, // This makes the image cover the entire circle
                                       ),
                                     ),
                                   ),
-                                  Align(
-                                    alignment: Alignment.bottomRight,
+                                ),
+                                Align(
+                                  alignment: Alignment.bottomRight,
+                                  child: Container(
+                                    margin: const EdgeInsets.only(top: 150),
                                     child: Row(
                                       children: [
                                         RoundedRectangleButton(
@@ -194,7 +170,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                                       Colors.white, 0.2),
                                           textColor:
                                               Theme.of(context).primaryColor,
-                                          fontWeight: FontWeight.bold,
+
                                         ),
                                         SizedBox(
                                           width: 12,
@@ -213,185 +189,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                                 .more_horizontal_32_regular,
                                             color:
                                                 Theme.of(context).primaryColor,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  } else if (userState is UserError) {
-                    return SliverAppBar(
-                      expandedHeight: 200,
-                      flexibleSpace: Center(
-                        child: Text(userState.message),
-                      ),
-                    );
-                  } else {
-                    return const SliverAppBar(
-                      expandedHeight: 200,
-                      flexibleSpace: Center(
-                        child: Text('No user data available.'),
-                      ),
-                    );
-                  }
-                },
-              ),
-            ];
-          },
-          body: BlocBuilder<UserBloc, UserState>(
-            builder: (context, userState) {
-              if (userState is UserLoaded) {
-                final user = userState.user;
-                return BlocBuilder<PostBloc, PostState>(
-                  builder: (context, postState) {
-                    if (postState is PostLoading) {
-                      return Center(
-                        child: CircularProgressIndicator(
-                          color: Theme.of(context).primaryColor,
-                          strokeWidth: 3,
-                        ),
-                      );
-                    } else if (postState is PostsCombinedState) {
-                      final posts = postState.userPosts.isNotEmpty
-                          ? postState.userPosts
-                          : postState.generalPosts;
-                      return ListView(
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).brightness ==
-                                      Brightness.light
-                                  ? AppColors.background
-                                  : AppColors.backgroundDark,
-                            ),
-                            child: Column(
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    border: Border(
-                                      bottom: BorderSide(
-                                        color: Theme.of(context).brightness ==
-                                                Brightness.light
-                                            ? AppColors.backgroundDark
-                                            : AppColors.background,
-                                        width: 0.1,
-                                      ),
-                                    ),
-                                  ),
-                                  child: ConstrainedBox(
-                                    constraints: BoxConstraints(
-                                      minHeight:
-                                          MediaQuery.sizeOf(context).height / 6,
-                                    ),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 16, vertical: 8),
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                user.username,
-                                                style: const TextStyle(
-                                                  fontSize: 26,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              Text(
-                                                '@${user.handle}',
-                                                style: TextStyle(
-                                                  fontSize: 16,
-                                                  color: Colors.grey[600],
-                                                ),
-                                              ),
-                                              const SizedBox(height: 8),
-                                              const Text(
-                                                "well this time I break, I will never live, another day",
-                                                style: TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight:
-                                                        FontWeight.w100),
-                                                maxLines: 2,
-                                              ),
-                                              const SizedBox(height: 8),
-                                              const Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    '8',
-                                                    style: TextStyle(
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                  SizedBox(
-                                                    width: 4,
-                                                  ),
-                                                  Text(
-                                                    'Followers',
-                                                    style: TextStyle(
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.w500),
-                                                  ),
-                                                  SizedBox(
-                                                    width: 8,
-                                                  ),
-                                                  Text(
-                                                    '12',
-                                                    style: TextStyle(
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                  SizedBox(
-                                                    width: 4,
-                                                  ),
-                                                  Text(
-                                                    'Following',
-                                                    style: TextStyle(
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.w500),
-                                                  ),
-                                                  SizedBox(
-                                                    width: 8,
-                                                  ),
-                                                  Text(
-                                                    '3',
-                                                    style: TextStyle(
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                  SizedBox(
-                                                    width: 4,
-                                                  ),
-                                                  Text(
-                                                    'Posts',
-                                                    style: TextStyle(
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.w500),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
+                                            size: 20,
                                           ),
                                         ),
                                       ],
@@ -401,56 +199,192 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               ],
                             ),
                           ),
-                          ...posts.map((post) {
-                            return Container(
-                              color: Theme.of(context).brightness ==
-                                      Brightness.light
-                                  ? AppColors.background
-                                  : AppColors.backgroundDark,
+                        ],
+                      ),
+                    ),
+                  );
+                } else if (userState is UserError) {
+                  return SliverAppBar(
+                    expandedHeight: 180,
+                    flexibleSpace: Center(
+                      child: Text(userState.message),
+                    ),
+                  );
+                } else {
+                  return const SliverAppBar(
+                    expandedHeight: 180,
+                    flexibleSpace: Center(
+                      child: Text('No user data available.'),
+                    ),
+                  );
+                }
+              },
+            ),
+            BlocBuilder<UserBloc, UserState>(
+              builder: (context, userState) {
+                if (userState is UserLoaded) {
+                  final user = userState.user;
+                  return BlocBuilder<PostBloc, PostState>(
+                    builder: (context, postState) {
+                      if (postState is PostLoading) {
+                        return SliverFillRemaining(
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              color: Theme.of(context).primaryColor,
+                              strokeWidth: 3,
+                            ),
+                          ),
+                        );
+                      } else if (postState is PostsCombinedState) {
+                        final posts = postState.userPosts;
+                        return SliverList(
+                          delegate: SliverChildListDelegate([
+                            Container(
+                              padding: const EdgeInsets.only(top: 22),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).brightness ==
+                                        Brightness.light
+                                    ? AppColors.background
+                                    : AppColors.backgroundDark,
+                              ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  TextPost(
-                                    userId: post.userId,
-                                    id: post.id,
-                                    username: post.username,
-                                    handle: post.handle,
-                                    content: post.content,
-                                    likeCount: post.likeCount,
-                                    reblogCount: post.reblogCount,
-                                    hasLiked: post.hasLiked,
-                                    hasReblogged: post.hasReblogged,
-                                    comments: post.comments,
-                                    timestamp: post.timestamp,
-                                    profilePic: post.profilePic,
-                                    music: post.music,
-                                    imageUrl: post.imageUrl,
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const SizedBox(height: 8),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              user.username,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleLarge,
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Text(
+                                              '@${user.handle}',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .labelMedium,
+                                            ),
+                                          ],
+                                        ),
+
+                                        const SizedBox(height: 12),
+                                        Text(
+                                          "well this time I break, I will never live, another day",
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyLarge,
+                                          maxLines: 2,
+                                        ),
+                                        const SizedBox(height: 16),
+                                        // Stats row
+                                        Row(
+                                          children: [
+                                            _buildStatItem('8', 'Followers'),
+                                            const SizedBox(width: 16),
+                                            _buildStatItem('12', 'Following'),
+                                            const SizedBox(width: 16),
+                                            _buildStatItem('3', 'Posts'),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                  const SizedBox(height: 12),
+                                  const SizedBox(height: 16),
                                 ],
                               ),
-                            );
-                          }),
-                        ],
-                      );
-                    } else if (postState is PostError) {
-                      return Center(
-                        child: Text(postState.message),
-                      );
-                    } else {
-                      return const Center(
-                        child: Text('No posts available.'),
-                      );
-                    }
-                  },
-                );
-              } else {
-                return const SizedBox.shrink();
-              }
-            },
-          ),
+                            ),
+                            ...posts.map((post) => Container(
+                                  color: Theme.of(context).brightness ==
+                                          Brightness.light
+                                      ? AppColors.background
+                                      : AppColors.backgroundDark,
+                                  child: Column(
+                                    children: [
+                                      TextPost(
+                                        userId: post.userId,
+                                        id: post.id,
+                                        username: post.username,
+                                        handle: post.handle,
+                                        content: post.content,
+                                        likeCount: post.likeCount,
+                                        reblogCount: post.reblogCount,
+                                        hasLiked: post.hasLiked,
+                                        hasReblogged: post.hasReblogged,
+                                        comments: post.comments,
+                                        timestamp: post.timestamp,
+                                        profilePic: post.profilePic,
+                                        imageUrl: post.imageUrl,
+                                        music: post.music,
+                                      ),
+                                      const SizedBox(height: 8),
+                                    ],
+                                  ),
+                                )),
+                          ]),
+                        );
+                      } else if (postState is PostError) {
+                        return SliverFillRemaining(
+                          child: Center(
+                            child: Text(postState.message),
+                          ),
+                        );
+                      } else {
+                        return const SliverFillRemaining(
+                          child: Center(
+                            child: Text('No posts available.'),
+                          ),
+                        );
+                      }
+                    },
+                  );
+                } else {
+                  return const SliverToBoxAdapter(child: SizedBox.shrink());
+                }
+              },
+            ),
+          ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(36),
+        ),
+        elevation: 0,
+        backgroundColor: Theme.of(context).primaryColor,
+        onPressed: () {},
+        child: Icon(
+          size: 28,
+          FluentIcons.compose_12_regular,
+          color: Theme.of(context).dialogBackgroundColor,
+        ),
+      ),
+    );
+  }
+  Widget _buildStatItem(String count, String label) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          count,
+          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          label,
+          style: Theme.of(context).textTheme.labelLarge,
+        ),
+      ],
     );
   }
 }

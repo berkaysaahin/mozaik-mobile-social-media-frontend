@@ -117,10 +117,9 @@ class _MusicCardState extends State<MusicCard> {
                     children: [
                       Text(
                         widget.music?['track_name'] ?? 'Unknown Track',
-                        style: TextStyle(
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           color: textColor,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -128,9 +127,9 @@ class _MusicCardState extends State<MusicCard> {
                       const SizedBox(height: 4),
                       Text(
                         widget.music?['artist'] ?? 'Unknown Artist',
-                        style: TextStyle(
+                        style: Theme.of(context).textTheme.labelMedium?.copyWith(
                           color: textColor.withValues(alpha: 0.8),
-                          fontSize: 14,
+
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,

@@ -40,17 +40,17 @@ class MessageBubble extends StatelessWidget {
           children: [
             Text(
               text,
-              style: TextStyle(
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 color: isSent ? Colors.white : Theme.of(context).primaryColor,
-                fontSize: 16,
+
               ),
             ),
             Padding(
               padding: const EdgeInsets.only(top: 4),
               child: Text(
                 "15:25",
-                style: TextStyle(
-                  fontSize: 12,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+
                   color: isSent ? Colors.white : Colors.grey[600],
                 ),
               ),

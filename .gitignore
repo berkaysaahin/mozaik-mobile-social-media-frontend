@@ -1,0 +1,66 @@
+# Flutter & Dart
+**/android/**/gradle-wrapper.jar
+**/android/.gradle/
+**/android/captures/
+**/android/gradlew
+**/android/gradlew.bat
+**/android/local.properties
+**/android/**/GeneratedPluginRegistrant.java
+**/ios/Flutter/.last_build_id
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/Flutter/App.framework/
+**/ios/Flutter/Flutter.framework/
+**/ios/Flutter/Flutter.podspec
+**/ios/Flutter/Generated.xcconfig
+**/ios/ServiceDefinitions.json
+**/ios/Runner/GeneratedPluginRegistrant.*
+**/ios/Podfile.lock
+**/ios/.symlinks/
+**/ios/Pods/
+**/ios/Runner.xcworkspace/
+**/ios/Runner.xcodeproj/project.xcworkspace/
+**/ios/Runner.xcodeproj/xcuserdata/
+**/lib/generated_plugin_registrant.dart
+**/.dart_tool/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.packages
+**/.metadata
+**/pubspec.lock
+**/build/
+**/app.*
+**/Generated/
+
+# Firebase & Secrets
+**/android/app/google-services.json  # Only if using manual Firebase setup
+**/ios/Runner/GoogleService-Info.plist  # Only if using manual Firebase setup
+**/firebase_options.dart  # If generated via FlutterFire CLI
+**/keys/
+**/config/
+**/*.env
+**/*.env.*
+
+# IDE & OS
+**/.idea/
+**/.vscode/
+**/*.iml
+**/.DS_Store
+**/.fvm/
+**/doc/api/
+**/.pub-cache/
+**/.pub/
+**/flutter_*.png
+**/profile
+
+# Add to your existing .gitignore
+**/android/app/.cxx/
+**/macos/Flutter/ephemeral/
+# Debug/Release files
+**/*.log
+**/*.keystore
+**/*.jks
+**/*.key
+**/*.p12
+**/*.pem
+**/*.swp
+**/*.swo

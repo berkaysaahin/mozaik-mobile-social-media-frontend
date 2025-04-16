@@ -58,7 +58,7 @@ class _DirectMessagePageState extends State<DirectMessagePage> {
           Navigator.pop(context);
         },
         onRightWidgetTap: (BuildContext context) {},
-        customWidget: const Align(
+        customWidget:  Align(
           alignment: Alignment.centerLeft,
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -72,11 +72,8 @@ class _DirectMessagePageState extends State<DirectMessagePage> {
                 width: 8,
               ),
               Text(
-                "Some Corp Comp",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w800,
-                ),
+                "Someone",
+                style: Theme.of(context).textTheme.titleMedium,
               ),
             ],
           ),
@@ -88,15 +85,12 @@ class _DirectMessagePageState extends State<DirectMessagePage> {
             : AppColors.backgroundDark,
         child: Column(
           children: [
-            const Padding(
+             Padding(
               padding: EdgeInsets.all(8.0),
               child: Text(
                 "Today",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: AppColors.amanojaku,
-                ),
+                style: Theme.of(context).textTheme.labelMedium,
+
               ),
             ),
             Expanded(
@@ -106,28 +100,28 @@ class _DirectMessagePageState extends State<DirectMessagePage> {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: MessageBubble(
-                      text: "Hi you can send your cv",
+                      text: "Hi lorem ipsum",
                       isSent: false,
                     ),
                   ),
                   Align(
                     alignment: Alignment.centerRight,
                     child: MessageBubble(
-                      text: "I'm sending",
+                      text: "lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum",
                       isSent: true,
                     ),
                   ),
                   Align(
                     alignment: Alignment.centerLeft,
                     child: MessageBubble(
-                      text: "Ok but we won't check go fuck yourself",
+                      text: "lorem ipsum lorem ipsum lorem ipsum",
                       isSent: false,
                     ),
                   ),
                   Align(
                     alignment: Alignment.centerRight,
                     child: MessageBubble(
-                      text: "ok thank you have a great day",
+                      text: "lorem ipsum",
                       isSent: true,
                     ),
                   ),
@@ -178,10 +172,7 @@ class _DirectMessagePageState extends State<DirectMessagePage> {
                           onPressed: _toggleEmojiKeyboard,
                         ),
                       ),
-                      style: const TextStyle(
-                        color: Colors.black,
-                        fontSize: 16,
-                      ),
+                      style:  Theme.of(context).textTheme.bodyMedium,
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -222,14 +213,14 @@ class _DirectMessagePageState extends State<DirectMessagePage> {
                   },
                   config: Config(
                     bottomActionBarConfig: BottomActionBarConfig(
-                      backgroundColor: AppColors.weeping,
-                      buttonColor: AppColors.weeping,
+                      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                      buttonColor: Theme.of(context).primaryColor,
                       buttonIconColor: AppColors.amanojaku,
                     ),
                     emojiViewConfig: EmojiViewConfig(
                       columns: 9,
                       emojiSizeMax: 28,
-                      backgroundColor: AppColors.weeping,
+                      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                     ),
                     categoryViewConfig: CategoryViewConfig(
                       backgroundColor: AppColors.amanojaku,

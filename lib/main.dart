@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -152,214 +153,198 @@ class _MyHomePageState extends State<MyHomePage>
     final appBarConfig = appBarConfigs[selectedIndex];
 
     return Scaffold(
+      backgroundColor: Theme.of(context).brightness == Brightness.light
+          ? AppColors.background
+          : AppColors.backgroundDark,
       drawer: Drawer(
+        width: MediaQuery.of(context).size.width * 0.85,
         backgroundColor: Theme.of(context).brightness == Brightness.light
             ? AppColors.background
             : AppColors.backgroundDark,
-        shape: ShapeBorder.lerp(
-          RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(0),
-          ),
-          RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(0),
-          ),
-          0.5,
-        ),
-        child: Column(
-          children: [
-            Container(
-              height: 160,
-              decoration: BoxDecoration(
-                color: Theme.of(context).brightness == Brightness.light
-                    ? AppColors.background
-                    : AppColors.backgroundDark,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 4,
+        child: SafeArea(
+          child: Column(
+            children: [
+
+              // Header Section (with flexible height)
+              Container(
+                constraints: BoxConstraints(
+                  minHeight: 120,
+                  maxHeight: MediaQuery.of(context).size.height * 0.25,
                 ),
+                padding: const EdgeInsets.fromLTRB(20, 40, 20, 20),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    BlocBuilder<ProfileBloc, ProfileState>(
-                      builder: (context, state) {
-                        if (state is ProfileLoaded) {
-                          return CircleAvatar(
-                            radius: 30,
-                            backgroundColor: AppColors.ashBlue,
-                            child: ClipOval(
-                              child: Image.network(
-                                state.user.profilePic,
-                                width: 60,
-                                height: 60,
-                                fit: BoxFit.cover,
+                    // Profile row
+                    Row(
+                      children: [
+                        Stack(
+                          children: [
+                            BlocBuilder<ProfileBloc, ProfileState>(
+                              builder: (context, state) {
+                                if (state is ProfileLoaded) {
+                                  return CircleAvatar(
+                                    radius: 32,
+                                    backgroundImage: CachedNetworkImageProvider(
+                                      state.user.profilePic,
+                                    ),
+                                  );
+                                }
+                                return const CircleAvatar(
+                                  radius: 32,
+                                  child: Icon(Icons.person),
+                                );
+                              },
+                            ),
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: Container(
+                                width: 16,
+                                height: 16,
+                                decoration: BoxDecoration(
+                                  color: Colors.green,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Theme.of(context).scaffoldBackgroundColor,
+                                    width: 2,
+                                  ),
+                                ),
                               ),
                             ),
-                          );
-                        } else if (state is ProfileError) {
-                          return const Icon(Icons.error);
-                        } else {
-                          return CircularProgressIndicator(
-                            color: Theme.of(context).primaryColor,
-                            strokeWidth: 3,
-                          );
-                        }
-                      },
-                    ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        BlocBuilder<ProfileBloc, ProfileState>(
-                          builder: (context, state) {
-                            if (state is ProfileLoaded) {
-                              return Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    state.user.username,
-                                    style: const TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 1,
-                                  ),
-                                  Text(
-                                    state.user.handle,
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w200,
-                                      color: Theme.of(context)
-                                          .primaryColor
-                                          .withValues(
-                                            alpha: 0.6,
+                          ],
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              BlocBuilder<ProfileBloc, ProfileState>(
+                                builder: (context, state) {
+                                  if (state is ProfileLoaded) {
+                                    return Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          state.user.username,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleLarge
+                                              ?.copyWith(
+                                            fontWeight: FontWeight.bold,
                                           ),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            } else if (state is ProfileError) {
-                              return const Icon(Icons.error);
-                            } else {
-                              return CircularProgressIndicator(
-                                color: Theme.of(context).primaryColor,
-                                strokeWidth: 3,
-                              );
-                            }
-                          },
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          '@${state.user.handle}',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium
+                                              ?.copyWith(
+                                            color: Theme.of(context).hintColor,
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  }
+                                  return const Text('Loading...');
+                                },
+                              ),
+                            ],
+                          ),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.brightness_6),
+                          icon: Icon(
+                            Icons.brightness_6,
+                            color: Theme.of(context).iconTheme.color,
+                          ),
                           onPressed: () {
                             context.read<ThemeBloc>().add(ToggleThemeEvent());
                           },
                         ),
                       ],
                     ),
+                    const SizedBox(height: 16),
+                    // Stats Row
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        _buildStatItem('128', 'Following'),
+                        _buildStatItem('1.2K', 'Followers'),
+                        _buildStatItem('24', 'Posts'),
+                      ],
+                    ),
                   ],
                 ),
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Divider(
-                thickness: 0.1,
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
-            Expanded(
-              child: ListView(
-                padding: EdgeInsets.zero,
-                children: <Widget>[
-                  ListTile(
-                    visualDensity: const VisualDensity(
-                      horizontal: -4,
+
+              // Menu Items (now properly constrained)
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  children: [
+                    _buildDrawerItem(
+                      icon: FluentIcons.home_32_filled,
+                      label: 'Home',
+                      onTap: () => _navigateAndClose(context, '/home'),
                     ),
-                    leading: const Icon(
-                      FluentIcons.home_32_regular,
-                      size: 22,
+                    _buildDrawerItem(
+                      icon: FluentIcons.person_32_filled,
+                      label: 'Profile',
+                      onTap: () => _navigateAndClose(context, '/profile'),
                     ),
-                    title: const Text(
-                      'Home',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    _buildDrawerItem(
+                      icon: FluentIcons.bookmark_32_filled,
+                      label: 'Saved',
+                      badgeCount: 3,
                     ),
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                  ListTile(
-                    visualDensity: const VisualDensity(
-                      horizontal: -4,
+                    _buildDrawerItem(
+                      icon: FluentIcons.settings_32_filled,
+                      label: 'Settings',
                     ),
-                    leading: const Icon(
-                      FluentIcons.settings_32_regular,
-                      size: 22,
+                    _buildDrawerItem(
+                      icon: FluentIcons.add_32_light,
+                      label: 'Login',
+                      onTap: () => Navigator.pushNamed(context, '/login'),
                     ),
-                    title: const Text(
-                      'Settings',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    const Divider(height: 24),
+                    _buildDrawerItem(
+                      icon: Icons.help_center,
+                      label: 'Help & Feedback',
                     ),
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                  ListTile(
-                    visualDensity: const VisualDensity(
-                      horizontal: -4,
-                    ),
-                    leading: const Icon(
-                      CupertinoIcons.goforward,
-                      size: 22,
-                    ),
-                    title: const Text(
-                      'Login',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    onTap: () {
-                      Navigator.pushNamed(context, '/login');
-                    },
-                  ),
-                ],
-              ),
-            ),
-            const Spacer(),
-            ListTile(
-              visualDensity: const VisualDensity(
-                horizontal: -4,
-              ),
-              leading: const Icon(
-                CupertinoIcons.gobackward,
-                size: 22,
-              ),
-              title: const Text(
-                'Logout',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
+                  ],
                 ),
               ),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
+
+              // Footer (now outside Expanded)
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    const Divider(),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'App Version 1.0.0',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.logout),
+                          onPressed: _confirmLogout,
+                          tooltip: 'Logout',
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
       appBar: selectedIndex != 3
@@ -517,7 +502,7 @@ class _MyHomePageState extends State<MyHomePage>
                                   ),
                                 ),
                               ),
-                              const Spacer(),
+
                               TextButton(
                                 onPressed: () {
                                   Navigator.of(context, rootNavigator: true)
@@ -550,4 +535,71 @@ class _MyHomePageState extends State<MyHomePage>
       },
     );
   }
+  Widget _buildDrawerItem({
+    required IconData icon,
+    required String label,
+    int? badgeCount,
+    VoidCallback? onTap,
+  }) {
+    return ListTile(
+      leading: Badge(
+        isLabelVisible: badgeCount != null,
+        label: badgeCount != null ? Text('$badgeCount') : null,
+        child: Icon(icon, size: 24),
+      ),
+      title: Text(
+        label,
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      trailing: const Icon(Icons.chevron_right),
+      onTap: onTap,
+    );
+  }
+
+  Widget _buildStatItem(String value, String label) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          value,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Text(
+          label,
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+      ],
+    );
+  }
+
+  void _navigateAndClose(BuildContext context, String route) {
+    Navigator.pop(context);
+    Navigator.pushNamed(context, route);
+  }
+
+  void _confirmLogout() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Logout'),
+        content: const Text('Are you sure you want to logout?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              // Handle logout
+              Navigator.popUntil(ctx, (route) => route.isFirst);
+            },
+            child: const Text('Logout'),
+          ),
+        ],
+      ),
+    );
+  }
 }
+

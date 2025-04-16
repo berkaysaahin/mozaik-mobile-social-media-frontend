@@ -47,10 +47,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           if (title != null)
             Text(
               title!,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(context).textTheme.titleLarge
             ),
           if (customWidget != null) customWidget!,
         ],

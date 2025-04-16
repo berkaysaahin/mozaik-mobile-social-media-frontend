@@ -32,7 +32,6 @@ class RoundedRectangleButton extends StatelessWidget {
         elevation: elevation,
         padding: const EdgeInsets.symmetric(
           horizontal: 24.0,
-          vertical: 2.0,
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(borderRadius),
@@ -40,10 +39,7 @@ class RoundedRectangleButton extends StatelessWidget {
       ),
       child: Text(
         text,
-        style: TextStyle(
-          fontSize: fontSize,
-          fontWeight: fontWeight,
-        ),
+        style: Theme.of(context).textTheme.labelLarge
       ),
     );
   }

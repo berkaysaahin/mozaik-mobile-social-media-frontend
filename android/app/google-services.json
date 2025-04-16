@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "580682843069",
+    "project_id": "mozaik-16497",
+    "storage_bucket": "mozaik-16497.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:580682843069:android:dd00de2538234b54a708d4",
+        "android_client_info": {
+          "package_name": "com.example.mozaik"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAdqW0k3vjOVDPHfIyyZhhD7JWry4todT0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

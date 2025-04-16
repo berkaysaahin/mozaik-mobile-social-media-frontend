@@ -133,27 +133,18 @@ class _SinglePostPageState extends State<SinglePostPage> {
                         children: [
                           Text(
                             widget.username,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
+                            style: Theme.of(context).textTheme.titleMedium,
                           ),
                           Text(
                             '@${widget.userHandle}',
-                            style: TextStyle(
-                              color: Colors.grey[500],
-                              fontSize: 14,
-                            ),
+                            style: Theme.of(context).textTheme.labelMedium,
                           ),
                         ],
                       ),
                       const Spacer(),
                       Text(
                         formatTimestamp(widget.timestamp),
-                        style: TextStyle(
-                          color: Colors.grey[500],
-                          fontSize: 14,
-                        ),
+                        style: Theme.of(context).textTheme.labelMedium,
                       ),
                     ],
                   ),
@@ -165,7 +156,11 @@ class _SinglePostPageState extends State<SinglePostPage> {
                     children: [
                       Text(
                         widget.description,
-                        style: const TextStyle(fontSize: 16),
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+
+                          height: 1.4,
+                          letterSpacing: 0.2,
+                        ),
                       ),
                       const SizedBox(height: 16),
                       if (widget.imageUrl != null &&
@@ -242,17 +237,14 @@ class _SinglePostPageState extends State<SinglePostPage> {
             sliver: SliverToBoxAdapter(
               child: Row(
                 children: [
-                  const Text(
+                   Text(
                     'Comments',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const Spacer(),
                   Text(
                     '${widget.commentsCount} Comments',
-                    style: TextStyle(color: Colors.grey[500]),
+                    style: Theme.of(context).textTheme.labelMedium,
                   ),
                 ],
               ),
@@ -298,13 +290,7 @@ class _SinglePostPageState extends State<SinglePostPage> {
                             Colors.white, Colors.grey, 0.2) // Light mode
                         : Color.lerp(Colors.black, Colors.white, 0.2),
                     hintText: "Type a message...",
-                    hintStyle: TextStyle(
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Color.lerp(
-                              Colors.white, Colors.grey, 0.2) // Light mode
-                          : Color.lerp(Colors.black, Colors.white, 0.2),
-                      fontSize: 16,
-                    ),
+                    hintStyle: Theme.of(context).textTheme.labelMedium,
                     contentPadding: const EdgeInsets.symmetric(
                       vertical: 12,
                       horizontal: 16,
@@ -349,22 +335,17 @@ class _SinglePostPageState extends State<SinglePostPage> {
                   children: [
                     Text(
                       comment['user'],
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: Theme.of(context).textTheme.labelLarge,
                     ),
                     const SizedBox(width: 8),
                     Text(
                       comment['time'],
-                      style: TextStyle(
-                        color: Colors.grey[500],
-                        fontSize: 12,
-                      ),
+                      style: Theme.of(context).textTheme.labelMedium,
                     ),
                   ],
                 ),
                 const SizedBox(height: 4),
-                Text(comment['text']),
+                Text(comment['text'],style: Theme.of(context).textTheme.bodyMedium,),
                 const SizedBox(height: 8),
                 Row(
                   children: [
@@ -372,9 +353,9 @@ class _SinglePostPageState extends State<SinglePostPage> {
                       icon: const Icon(Icons.favorite_border, size: 18),
                       onPressed: () {},
                     ),
-                    Text(comment['likes'].toString()),
+                    Text(comment['likes'].toString(),style: Theme.of(context).textTheme.labelMedium,),
                     const SizedBox(width: 16),
-                    const Text('Reply'),
+                     Text('Reply',style: Theme.of(context).textTheme.labelMedium,),
                   ],
                 ),
               ],
