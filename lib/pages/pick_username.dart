@@ -66,33 +66,28 @@ class _PickUsernamePageState extends State<PickUsernamePage> {
                     hintStyle: Theme.of(context).textTheme.labelMedium,
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(
-                        color: Theme.of(context)
-                            .primaryColor, // Change this to your desired color
+                        color: Theme.of(context).primaryColor,
                         width: 2.0,
                       ),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    // Focused border
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(
-                        color: Theme.of(context)
-                            .primaryColor, // Or any color you want when focused
+                        color: Theme.of(context).primaryColor,
                         width: 2.0,
                       ),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    // Error border
                     errorBorder: OutlineInputBorder(
                       borderSide: BorderSide(
-                        color: Colors.red, // Error color
+                        color: Colors.red,
                         width: 1.0,
                       ),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    // Focused error border
                     focusedErrorBorder: OutlineInputBorder(
                       borderSide: BorderSide(
-                        color: Colors.red, // Error color when focused
+                        color: Colors.red,
                         width: 2.0,
                       ),
                       borderRadius: BorderRadius.circular(8),
@@ -130,7 +125,8 @@ class _PickUsernamePageState extends State<PickUsernamePage> {
                               .textTheme
                               .titleMedium
                               ?.copyWith(
-                                color: Theme.of(context).scaffoldBackgroundColor,
+                                color:
+                                    Theme.of(context).scaffoldBackgroundColor,
                               ),
                         ),
                       ),

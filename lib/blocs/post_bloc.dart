@@ -10,8 +10,9 @@ class PostBloc extends Bloc<PostEvent, PostState> {
   final List<Post> _userPostsCache = [];
   final Set<int> _loadedPostIds = {};
   final Set<int> _loadingPostIds = {};
+  final String? currentUserId;
 
-  PostBloc() : super(PostInitial()) {
+  PostBloc({this.currentUserId}) : super(PostInitial()) {
     on<CreatePostEvent>(_onCreatePostEvent);
     on<FetchPosts>(_onFetchPosts);
     on<FetchPostsByUser>(_onFetchPostsByUser);
@@ -112,7 +113,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     }
 
     try {
-      final posts = await PostService.fetchPosts();
+      final posts = await PostService.fetchPosts(currentUserId: currentUserId);
       _generalPostsCache = posts;
       _loadedPostIds.addAll(posts.map((post) => post.id));
 
@@ -160,7 +161,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
         }
       }
       await PostService.deletePost(event.postId);
-      final posts = await PostService.fetchPosts();
+      final posts = await PostService.fetchPosts(currentUserId: currentUserId);
 
       _generalPostsCache = posts;
       if (_generalPostsCache.isNotEmpty) {

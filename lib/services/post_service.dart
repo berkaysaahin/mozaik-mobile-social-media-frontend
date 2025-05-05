@@ -6,9 +6,9 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 class PostService {
   static String baseUrl = dotenv.env['HOST_URL']!;
 
-  static Future<List<Post>> fetchPosts() async {
+  static Future<List<Post>> fetchPosts({String? currentUserId}) async {
     final response = await http.get(Uri.parse(
-        '$baseUrl/api/posts/get?user_id=b2ecc8ae-9e16-42eb-915f-d2e1e2022f6c'));
+        '$baseUrl/api/posts/get?user_id=$currentUserId'));
 
     if (response.statusCode == 200) {
       final List<dynamic> jsonData = json.decode(response.body);

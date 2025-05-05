@@ -6,8 +6,10 @@ class User {
   final DateTime createdAt;
   final String profilePic;
   final String cover;
+  final bool isNewUser;
+  final bool hasPassword;
 
-  User({
+  User( {
     required this.userId,
     required this.username,
     required this.handle,
@@ -15,6 +17,8 @@ class User {
     required this.createdAt,
     required this.profilePic,
     required this.cover,
+    required this.isNewUser,
+    required this.hasPassword,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -26,6 +30,22 @@ class User {
       profilePic: json['profile_picture'],
       cover: json['cover'],
       createdAt: DateTime.parse(json['createdAt']),
+      isNewUser: json['isNewUser'] ?? false,
+      hasPassword: json['hasPassword'] ?? false,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': userId,
+      'username': username,
+      'email': email,
+      'handle': handle,
+      'profile_picture': profilePic,
+      'cover': cover,
+      'createdAt': createdAt.toIso8601String(),
+      'isNewUser': isNewUser,
+      'hasPassword': hasPassword,
+    };
   }
 }

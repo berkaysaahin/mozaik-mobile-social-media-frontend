@@ -31,6 +31,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     context.read<UserBloc>().add(FetchUserById(widget.userId));
     context.read<PostBloc>().add(FetchPostsByUser(widget.userId));
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -91,7 +92,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               ),
                             ],
                           ),
-                          // Gradient overlay
                           Container(
                             height: 140,
                             decoration: BoxDecoration(
@@ -105,7 +105,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               ),
                             ),
                           ),
-                          // Back button
                           Positioned(
                             top: 8,
                             left: 8,
@@ -114,9 +113,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               onTap: () {
                                 context.read<PostBloc>().add(ClearUserPosts());
                                 context.read<PostBloc>().add(FetchPosts());
-                                context
-                                    .read<PostBloc>()
-                                    .add(const FetchPostsByUser('b2ecc8ae-9e16-42eb-915f-d2e1e2022f6c'));
+                                context.read<PostBloc>().add(const FetchPostsByUser(
+                                    'b2ecc8ae-9e16-42eb-915f-d2e1e2022f6c')); //buraya dön!!
                                 Navigator.pop(context);
                               },
                               iconColor:
@@ -139,14 +137,16 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(44),
                                       border: Border.all(
-                                        color: Theme.of(context).brightness == Brightness.light
+                                        color: Theme.of(context).brightness ==
+                                                Brightness.light
                                             ? AppColors.background
                                             : AppColors.backgroundDark,
                                         width: 4,
                                       ),
                                       image: DecorationImage(
-                                        image: CachedNetworkImageProvider(user.profilePic),
-                                        fit: BoxFit.cover, // This makes the image cover the entire circle
+                                        image: CachedNetworkImageProvider(
+                                            user.profilePic),
+                                        fit: BoxFit.cover,
                                       ),
                                     ),
                                   ),
@@ -170,7 +170,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                                       Colors.white, 0.2),
                                           textColor:
                                               Theme.of(context).primaryColor,
-
                                         ),
                                         SizedBox(
                                           width: 12,
@@ -275,7 +274,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                             ),
                                           ],
                                         ),
-
                                         const SizedBox(height: 12),
                                         Text(
                                           "well this time I break, I will never live, another day",
@@ -285,7 +283,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                           maxLines: 2,
                                         ),
                                         const SizedBox(height: 16),
-                                        // Stats row
                                         Row(
                                           children: [
                                             _buildStatItem('8', 'Followers'),
@@ -369,6 +366,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       ),
     );
   }
+
   Widget _buildStatItem(String count, String label) {
     return Row(
       mainAxisSize: MainAxisSize.min,

@@ -10,6 +10,9 @@ class ProfileLoaded extends ProfileState {
   final User user;
 
   ProfileLoaded(this.user);
+
+  @override
+  List<Object> get props => [user];
 }
 
 class ProfileError extends ProfileState {

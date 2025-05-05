@@ -147,13 +147,13 @@ class _DirectMessagePageState extends State<DirectMessagePage> {
                         fillColor: Theme.of(context).brightness ==
                                 Brightness.light
                             ? Color.lerp(
-                                Colors.white, Colors.grey, 0.2) // Light mode
+                                Colors.white, Colors.grey, 0.2)
                             : Color.lerp(Colors.black, Colors.white, 0.2),
                         hintText: "Type a message...",
                         hintStyle: TextStyle(
                           color: Theme.of(context).brightness == Brightness.dark
                               ? Color.lerp(
-                                  Colors.white, Colors.grey, 0.2) // Light mode
+                                  Colors.white, Colors.grey, 0.2)
                               : Color.lerp(Colors.black, Colors.white, 0.2),
                           fontSize: 16,
                         ),

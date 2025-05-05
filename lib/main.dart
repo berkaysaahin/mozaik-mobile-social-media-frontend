@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:mozaik/app_colors.dart';
+import 'package:mozaik/blocs/auth_bloc.dart';
 import 'package:mozaik/blocs/post_bloc.dart';
 import 'package:mozaik/blocs/profile_bloc.dart';
 import 'package:mozaik/blocs/theme_bloc.dart';
@@ -14,6 +15,7 @@ import 'package:mozaik/components/bottom_nav_bar.dart';
 import 'package:mozaik/components/custom_app_bar.dart';
 import 'package:mozaik/components/floating_action_button.dart';
 import 'package:mozaik/components/profile_icon.dart';
+import 'package:mozaik/events/auth_event.dart';
 import 'package:mozaik/events/post_event.dart';
 import 'package:mozaik/events/profile_event.dart';
 import 'package:mozaik/events/theme_event.dart';
@@ -27,8 +29,12 @@ import 'package:mozaik/pages/notifications.dart';
 import 'package:mozaik/pages/pick_username.dart';
 import 'package:mozaik/pages/profile.dart';
 import 'package:mozaik/pages/register.dart';
+import 'package:mozaik/services/google_sign_in_service.dart';
+import 'package:mozaik/services/user_service.dart';
+import 'package:mozaik/states/auth_state.dart';
 import 'package:mozaik/states/profile_state.dart';
 import 'package:mozaik/states/theme_state.dart';
+import 'package:mozaik/utils/auth_wrapper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 
@@ -39,6 +45,9 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await dotenv.load(fileName: ".env");
+  final userService = UserService(baseUrl: dotenv.env['HOST_URL']!);
+  final googleSignInService = GoogleSignInService();
+
   final prefs = await SharedPreferences.getInstance();
   final savedTheme = prefs.getString('app_theme');
   final initialTheme =
@@ -46,11 +55,34 @@ void main() async {
   runApp(
     MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => PostBloc()..add(FetchPosts())),
         BlocProvider(
-            create: (context) => ProfileBloc()
-              ..add(FetchProfileById('b2ecc8ae-9e16-42eb-915f-d2e1e2022f6c'))),
-        BlocProvider(create: (context) => UserBloc()),
+          create: (context) => AuthBloc(
+            googleSignInService: googleSignInService,
+            userService: userService,
+            prefs: prefs,
+          )..add(AuthStatusChecked()),
+        ),
+        BlocProvider(
+          create: (context) => ProfileBloc(
+            userService: userService,
+            authBloc: AuthBloc(
+              googleSignInService: googleSignInService,
+              userService: userService,
+              prefs: prefs,
+            ),
+          ),
+        ),
+        BlocProvider(
+          create: (context) => UserBloc(userService: userService),
+        ),
+        BlocProvider(
+            create: (context) => PostBloc(
+                  currentUserId: context.read<AuthBloc>().state is Authenticated
+                      ? (context.read<AuthBloc>().state as Authenticated)
+                          .user
+                          .userId
+                      : null,
+                )..add(FetchPosts())),
         BlocProvider(create: (context) => ThemeBloc()),
       ],
       child: MyApp(
@@ -85,7 +117,7 @@ class MyApp extends StatelessWidget {
           theme: state.lightTheme,
           darkTheme: state.darkTheme,
           themeMode: state.themeMode,
-          home: const MyHomePage(),
+          home: const AuthWrapper(),
         );
       },
     );
@@ -164,8 +196,6 @@ class _MyHomePageState extends State<MyHomePage>
         child: SafeArea(
           child: Column(
             children: [
-
-              // Header Section (with flexible height)
               Container(
                 constraints: BoxConstraints(
                   minHeight: 120,
@@ -176,18 +206,17 @@ class _MyHomePageState extends State<MyHomePage>
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Profile row
                     Row(
                       children: [
                         Stack(
                           children: [
-                            BlocBuilder<ProfileBloc, ProfileState>(
-                              builder: (context, state) {
-                                if (state is ProfileLoaded) {
+                            BlocBuilder<AuthBloc, AuthState>(
+                              builder: (context, authState) {
+                                if (authState is Authenticated) {
                                   return CircleAvatar(
                                     radius: 32,
                                     backgroundImage: CachedNetworkImageProvider(
-                                      state.user.profilePic,
+                                      authState.user.profilePic,
                                     ),
                                   );
                                 }
@@ -207,7 +236,8 @@ class _MyHomePageState extends State<MyHomePage>
                                   color: Colors.green,
                                   shape: BoxShape.circle,
                                   border: Border.all(
-                                    color: Theme.of(context).scaffoldBackgroundColor,
+                                    color: Theme.of(context)
+                                        .scaffoldBackgroundColor,
                                     width: 2,
                                   ),
                                 ),
@@ -220,32 +250,34 @@ class _MyHomePageState extends State<MyHomePage>
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              BlocBuilder<ProfileBloc, ProfileState>(
-                                builder: (context, state) {
-                                  if (state is ProfileLoaded) {
+                              BlocBuilder<AuthBloc, AuthState>(
+                                builder: (context, authState) {
+                                  if (authState is Authenticated) {
                                     return Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          state.user.username,
+                                          authState.user.username,
                                           style: Theme.of(context)
                                               .textTheme
                                               .titleLarge
                                               ?.copyWith(
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         const SizedBox(height: 4),
                                         Text(
-                                          '@${state.user.handle}',
+                                          '@${authState.user.handle}',
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodyMedium
                                               ?.copyWith(
-                                            color: Theme.of(context).hintColor,
-                                          ),
+                                                color:
+                                                    Theme.of(context).hintColor,
+                                              ),
                                         ),
                                       ],
                                     );
@@ -268,7 +300,6 @@ class _MyHomePageState extends State<MyHomePage>
                       ],
                     ),
                     const SizedBox(height: 16),
-                    // Stats Row
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
@@ -280,8 +311,6 @@ class _MyHomePageState extends State<MyHomePage>
                   ],
                 ),
               ),
-
-              // Menu Items (now properly constrained)
               Expanded(
                 child: ListView(
                   padding: const EdgeInsets.symmetric(vertical: 8),
@@ -318,8 +347,6 @@ class _MyHomePageState extends State<MyHomePage>
                   ],
                 ),
               ),
-
-              // Footer (now outside Expanded)
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -365,12 +392,12 @@ class _MyHomePageState extends State<MyHomePage>
           const HomePage(),
           const DiscoverPage(),
           const MessagesPage(),
-          BlocBuilder<ProfileBloc, ProfileState>(
-            builder: (context, state) {
-              if (state is ProfileLoaded) {
+          BlocBuilder<AuthBloc, AuthState>(
+            builder: (context, authState) {
+              if (authState is Authenticated) {
                 return const ProfilePage();
-              } else if (state is ProfileError) {
-                return Center(child: Text(state.message));
+              } else if (authState is Unauthenticated) {
+                return Center(child: Text("Log in to see your profile"));
               } else {
                 return const Center(child: CircularProgressIndicator());
               }
@@ -502,7 +529,6 @@ class _MyHomePageState extends State<MyHomePage>
                                   ),
                                 ),
                               ),
-
                               TextButton(
                                 onPressed: () {
                                   Navigator.of(context, rootNavigator: true)
@@ -535,6 +561,7 @@ class _MyHomePageState extends State<MyHomePage>
       },
     );
   }
+
   Widget _buildDrawerItem({
     required IconData icon,
     required String label,
@@ -563,8 +590,8 @@ class _MyHomePageState extends State<MyHomePage>
         Text(
           value,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+                fontWeight: FontWeight.bold,
+              ),
         ),
         Text(
           label,
@@ -592,8 +619,8 @@ class _MyHomePageState extends State<MyHomePage>
           ),
           TextButton(
             onPressed: () {
-              // Handle logout
-              Navigator.popUntil(ctx, (route) => route.isFirst);
+              context.read<AuthBloc>().add(SignOutRequested());
+              Navigator.pushReplacementNamed(context, '/login');
             },
             child: const Text('Logout'),
           ),
@@ -602,4 +629,3 @@ class _MyHomePageState extends State<MyHomePage>
     );
   }
 }
-

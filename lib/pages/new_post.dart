@@ -5,11 +5,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mozaik/app_colors.dart';
+import 'package:mozaik/blocs/auth_bloc.dart';
 import 'package:mozaik/blocs/post_bloc.dart';
 import 'package:mozaik/blocs/profile_bloc.dart';
 import 'package:mozaik/components/custom_app_bar.dart';
 import 'package:mozaik/events/post_event.dart';
 import 'package:mozaik/pages/track_search.dart';
+import 'package:mozaik/states/auth_state.dart';
 import 'package:mozaik/states/post_state.dart';
 import 'package:mozaik/states/profile_state.dart';
 import 'package:shimmer/shimmer.dart';
@@ -84,6 +86,14 @@ class _NewPostPageState extends State<NewPostPage> {
   Future<void> _publishPost() async {
     if (_isUploading) return;
 
+    final authState = context.read<AuthBloc>().state;
+    if (authState is! Authenticated) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('You must be logged in to post')),
+      );
+      return;
+    }
+
     setState(() => _isUploading = true);
 
     try {
@@ -99,7 +109,7 @@ class _NewPostPageState extends State<NewPostPage> {
 
       final postBloc = context.read<PostBloc>();
       postBloc.add(CreatePostEvent(
-        userId: 'b2ecc8ae-9e16-42eb-915f-d2e1e2022f6c',
+        userId: authState.user.userId,
         content: _postController.text,
         spotifyTrackId: _spotifyTrackId,
         visibility: _visibility.toLowerCase(),
@@ -126,8 +136,10 @@ class _NewPostPageState extends State<NewPostPage> {
           onPressed: _isUploading ? null : _publishPost,
           child: _isUploading
               ? Shimmer.fromColors(
-                  baseColor: Theme.of(context).primaryColor.withValues(alpha: 0.4),
-                  highlightColor: Theme.of(context).primaryColor.withValues(alpha: 0.2),
+                  baseColor:
+                      Theme.of(context).primaryColor.withValues(alpha: 0.4),
+                  highlightColor:
+                      Theme.of(context).primaryColor.withValues(alpha: 0.2),
                   child: Container(
                     width: 64,
                     height: 24,
@@ -140,7 +152,6 @@ class _NewPostPageState extends State<NewPostPage> {
               : Text(
                   "Publish",
                   style: Theme.of(context).textTheme.labelLarge,
-
                 ),
         ),
       ),
@@ -178,9 +189,9 @@ class _NewPostPageState extends State<NewPostPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          BlocBuilder<ProfileBloc, ProfileState>(
-                            builder: (context, profileState) {
-                              if (profileState is ProfileLoaded) {
+                          BlocBuilder<AuthBloc, AuthState>(
+                            builder: (context, authState) {
+                              if (authState is Authenticated) {
                                 return Padding(
                                   padding: const EdgeInsets.all(24.0),
                                   child: Row(
@@ -190,7 +201,7 @@ class _NewPostPageState extends State<NewPostPage> {
                                       CircleAvatar(
                                         radius: 24,
                                         backgroundImage: NetworkImage(
-                                            profileState.user.profilePic),
+                                            authState.user.profilePic),
                                       ),
                                       const SizedBox(width: 16),
                                       Column(
@@ -198,8 +209,10 @@ class _NewPostPageState extends State<NewPostPage> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            profileState.user.username,
-                                            style: Theme.of(context).textTheme.titleMedium,
+                                            authState.user.username,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleMedium,
                                           ),
                                           GestureDetector(
                                             onTap: _changeVisibility,
@@ -207,14 +220,17 @@ class _NewPostPageState extends State<NewPostPage> {
                                               children: [
                                                 Text(
                                                   _visibility,
-                                                  style: Theme.of(context).textTheme.labelMedium
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .labelMedium,
                                                 ),
                                                 const SizedBox(width: 4),
-                                                 Icon(
+                                                Icon(
                                                   FluentIcons
                                                       .chevron_down_12_regular,
                                                   size: 16,
-                                                  color: Theme.of(context).primaryColor
+                                                  color: Theme.of(context)
+                                                      .primaryColor,
                                                 ),
                                               ],
                                             ),
@@ -232,15 +248,15 @@ class _NewPostPageState extends State<NewPostPage> {
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 24),
                             child: TextField(
-                              controller: _postController,
-                              maxLines: null,
-                              decoration: InputDecoration(
-                                hintText: 'What\'s on your mind?',
-                                border: InputBorder.none,
-                                hintStyle: Theme.of(context).textTheme.labelMedium
-                              ),
-                              style: Theme.of(context).textTheme.bodyMedium
-                            ),
+                                controller: _postController,
+                                maxLines: null,
+                                decoration: InputDecoration(
+                                    hintText: 'What\'s on your mind?',
+                                    border: InputBorder.none,
+                                    hintStyle: Theme.of(context)
+                                        .textTheme
+                                        .labelMedium),
+                                style: Theme.of(context).textTheme.bodyMedium),
                           ),
                           const Spacer(),
                           if (_spotifyTrackId != null)
@@ -278,13 +294,17 @@ class _NewPostPageState extends State<NewPostPage> {
                                           children: [
                                             Text(
                                               _trackName ?? 'Unknown Track',
-                                              style: Theme.of(context).textTheme.labelLarge,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .labelLarge,
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
                                             ),
                                             Text(
                                               _trackArtist ?? 'Unknown Artist',
-                                              style: Theme.of(context).textTheme.labelMedium,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .labelMedium,
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
                                             ),
@@ -335,9 +355,10 @@ class _NewPostPageState extends State<NewPostPage> {
                                               shape: BoxShape.circle,
                                               color: Colors.black54,
                                             ),
-                                            child:  Icon(
+                                            child: Icon(
                                               Icons.close,
-                                              color: Theme.of(context).primaryColor,
+                                              color: Theme.of(context)
+                                                  .primaryColor,
                                               size: 20,
                                             ),
                                           ),
@@ -366,7 +387,7 @@ class _NewPostPageState extends State<NewPostPage> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                 SizedBox(
+                                SizedBox(
                                   width: 52,
                                   height: 52,
                                   child: Icon(
@@ -379,7 +400,7 @@ class _NewPostPageState extends State<NewPostPage> {
                                   height: 52,
                                   child: IconButton(
                                     onPressed: _pickImage,
-                                    icon:  Icon(
+                                    icon: Icon(
                                       FluentIcons.camera_24_regular,
                                     ),
                                     color: Theme.of(context).primaryColor,
@@ -390,12 +411,12 @@ class _NewPostPageState extends State<NewPostPage> {
                                   height: 52,
                                   child: IconButton(
                                       onPressed: openTrackSearch,
-                                      icon:  Icon(
+                                      icon: Icon(
                                         FluentIcons.music_note_1_20_regular,
                                         color: Theme.of(context).primaryColor,
                                       )),
                                 ),
-                                 SizedBox(
+                                SizedBox(
                                   width: 52,
                                   height: 52,
                                   child: Icon(
@@ -412,10 +433,12 @@ class _NewPostPageState extends State<NewPostPage> {
                                       children: [
                                         Text(
                                           _visibility,
-                                          style: Theme.of(context).textTheme.labelMedium,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .labelMedium,
                                         ),
                                         const SizedBox(width: 4),
-                                         Icon(
+                                        Icon(
                                           FluentIcons.chevron_down_12_regular,
                                           size: 16,
                                           color: Theme.of(context).primaryColor,

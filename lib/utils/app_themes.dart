@@ -3,7 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:mozaik/app_colors.dart';
 
 class AppThemes {
-
   static ThemeData get lightTheme {
     return ThemeData(
       brightness: Brightness.light,
@@ -31,12 +30,13 @@ class AppThemes {
       textTheme: _buildMontserratTextTheme(Colors.white, Colors.grey[400]!),
     );
   }
-  static TextTheme _buildMontserratTextTheme(Color primaryColor, Color secondaryColor) {
+
+  static TextTheme _buildMontserratTextTheme(
+      Color primaryColor, Color secondaryColor) {
     return TextTheme(
-      // Headline Styles
       headlineSmall: GoogleFonts.plusJakartaSans(
         fontSize: 23,
-        fontWeight: FontWeight.w800,  // Heavy weight for titles
+        fontWeight: FontWeight.w800,
         color: primaryColor,
       ),
       titleLarge: GoogleFonts.plusJakartaSans(
@@ -46,14 +46,12 @@ class AppThemes {
       ),
       titleMedium: GoogleFonts.plusJakartaSans(
         fontSize: 19,
-        fontWeight: FontWeight.w700,  // Explicit w700 instead of .bold
+        fontWeight: FontWeight.w700,
         color: primaryColor,
       ),
-
-      // Body Styles
       bodyLarge: GoogleFonts.plusJakartaSans(
         fontSize: 17,
-        fontWeight: FontWeight.w500,  // Medium instead of normal
+        fontWeight: FontWeight.w500,
         height: 1.5,
         letterSpacing: 0.5,
         color: primaryColor,
@@ -63,11 +61,9 @@ class AppThemes {
         fontWeight: FontWeight.w400,
         color: primaryColor,
       ),
-
-      // Label/Button Styles
       labelLarge: GoogleFonts.plusJakartaSans(
         fontSize: 17,
-        fontWeight: FontWeight.w600,  // Semi-bold for buttons
+        fontWeight: FontWeight.w600,
         color: primaryColor,
       ),
       labelMedium: GoogleFonts.plusJakartaSans(
@@ -78,4 +74,3 @@ class AppThemes {
     );
   }
 }
-

@@ -14,6 +14,7 @@ class HomePage extends StatefulWidget {
   @override
   State<HomePage> createState() => _HomePageState();
 }
+
 class _HomePageState extends State<HomePage> {
   final List<String> _precachedUrls = [];
 
@@ -36,9 +37,7 @@ class _HomePageState extends State<HomePage> {
         if (post.music?['cover_art'] != null &&
             !_precachedUrls.contains(post.music!['cover_art'])) {
           precacheImage(
-              CachedNetworkImageProvider(post.music!['cover_art']),
-              context
-          );
+              CachedNetworkImageProvider(post.music!['cover_art']), context);
           _precachedUrls.add(post.music!['cover_art']);
         }
       } catch (e) {
@@ -61,9 +60,9 @@ class _HomePageState extends State<HomePage> {
           if (state is PostLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is PostsCombinedState) {
-            final posts = state.showingUserPosts ? state.userPosts : state.generalPosts;
+            final posts =
+                state.showingUserPosts ? state.userPosts : state.generalPosts;
 
-            // Schedule precaching for the next frame
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (mounted) {
                 _precacheImages(posts, context);
@@ -74,7 +73,7 @@ class _HomePageState extends State<HomePage> {
               slivers: [
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
-                        (context, index) {
+                    (context, index) {
                       final post = posts[index];
                       return Container(
                         color: Theme.of(context).brightness == Brightness.light
@@ -119,4 +118,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
