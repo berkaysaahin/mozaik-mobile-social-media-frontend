@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mozaik/app_colors.dart';
 import 'package:mozaik/blocs/auth_bloc.dart';
-import 'package:mozaik/blocs/profile_bloc.dart';
 import 'package:mozaik/states/auth_state.dart';
-import 'package:mozaik/states/profile_state.dart';
 
 class ProfileIcon extends StatelessWidget {
   const ProfileIcon({super.key});

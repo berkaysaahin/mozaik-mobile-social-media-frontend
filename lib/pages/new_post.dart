@@ -7,13 +7,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mozaik/app_colors.dart';
 import 'package:mozaik/blocs/auth_bloc.dart';
 import 'package:mozaik/blocs/post_bloc.dart';
-import 'package:mozaik/blocs/profile_bloc.dart';
 import 'package:mozaik/components/custom_app_bar.dart';
 import 'package:mozaik/events/post_event.dart';
 import 'package:mozaik/pages/track_search.dart';
 import 'package:mozaik/states/auth_state.dart';
 import 'package:mozaik/states/post_state.dart';
-import 'package:mozaik/states/profile_state.dart';
 import 'package:shimmer/shimmer.dart';
 
 class NewPostPage extends StatefulWidget {

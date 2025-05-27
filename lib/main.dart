@@ -1,14 +1,17 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:http/http.dart' as http;
 import 'package:mozaik/app_colors.dart';
 import 'package:mozaik/blocs/auth_bloc.dart';
+import 'package:mozaik/blocs/conversation_bloc.dart';
+import 'package:mozaik/blocs/message_bloc.dart';
 import 'package:mozaik/blocs/post_bloc.dart';
-import 'package:mozaik/blocs/profile_bloc.dart';
 import 'package:mozaik/blocs/theme_bloc.dart';
 import 'package:mozaik/blocs/user_bloc.dart';
 import 'package:mozaik/components/bottom_nav_bar.dart';
@@ -17,9 +20,7 @@ import 'package:mozaik/components/floating_action_button.dart';
 import 'package:mozaik/components/profile_icon.dart';
 import 'package:mozaik/events/auth_event.dart';
 import 'package:mozaik/events/post_event.dart';
-import 'package:mozaik/events/profile_event.dart';
 import 'package:mozaik/events/theme_event.dart';
-import 'package:mozaik/pages/direct_message.dart';
 import 'package:mozaik/pages/discover.dart';
 import 'package:mozaik/pages/home.dart';
 import 'package:mozaik/pages/login.dart';
@@ -28,11 +29,13 @@ import 'package:mozaik/pages/new_post.dart';
 import 'package:mozaik/pages/notifications.dart';
 import 'package:mozaik/pages/pick_username.dart';
 import 'package:mozaik/pages/profile.dart';
+import 'package:mozaik/pages/profile_edit.dart';
 import 'package:mozaik/pages/register.dart';
+import 'package:mozaik/services/conversation_service.dart';
 import 'package:mozaik/services/google_sign_in_service.dart';
+import 'package:mozaik/services/message_service.dart';
 import 'package:mozaik/services/user_service.dart';
 import 'package:mozaik/states/auth_state.dart';
-import 'package:mozaik/states/profile_state.dart';
 import 'package:mozaik/states/theme_state.dart';
 import 'package:mozaik/utils/auth_wrapper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -44,49 +47,73 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  await dotenv.load(fileName: ".env");
-  final userService = UserService(baseUrl: dotenv.env['HOST_URL']!);
-  final googleSignInService = GoogleSignInService();
 
+  await FirebaseAppCheck.instance.activate(
+    androidProvider: AndroidProvider.debug,
+  );
+
+  await dotenv.load(fileName: ".env");
+  final userService = UserService(
+    baseUrl: dotenv.env['HOST_URL']!,
+    client: http.Client(),
+  );
+  final conversationService = ConversationService(
+    baseUrl: dotenv.env['HOST_URL']!,
+    client: http.Client(),
+  );
+  final googleSignInService = GoogleSignInService();
+  final messageService = MessageService();
   final prefs = await SharedPreferences.getInstance();
   final savedTheme = prefs.getString('app_theme');
   final initialTheme =
       savedTheme?.contains('dark') ?? false ? ThemeMode.dark : ThemeMode.light;
   runApp(
-    MultiBlocProvider(
+    MultiRepositoryProvider(
       providers: [
-        BlocProvider(
-          create: (context) => AuthBloc(
-            googleSignInService: googleSignInService,
-            userService: userService,
-            prefs: prefs,
-          )..add(AuthStatusChecked()),
-        ),
-        BlocProvider(
-          create: (context) => ProfileBloc(
-            userService: userService,
-            authBloc: AuthBloc(
-              googleSignInService: googleSignInService,
-              userService: userService,
+        RepositoryProvider<UserService>.value(value: userService),
+        RepositoryProvider<ConversationService>.value(
+            value: conversationService),
+        RepositoryProvider<GoogleSignInService>.value(
+            value: googleSignInService),
+        RepositoryProvider<MessageService>.value(value: messageService),
+      ],
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) => AuthBloc(
+              googleSignInService: context.read<GoogleSignInService>(),
+              userService: context.read<UserService>(),
               prefs: prefs,
+            )..add(AuthStatusChecked()),
+          ),
+          BlocProvider(
+            create: (context) =>
+                UserBloc(userService: context.read<UserService>()),
+          ),
+          BlocProvider(
+            create: (context) => ConversationBloc(
+              conversationService: context.read<ConversationService>(),
             ),
           ),
-        ),
-        BlocProvider(
-          create: (context) => UserBloc(userService: userService),
-        ),
-        BlocProvider(
+          BlocProvider(
             create: (context) => PostBloc(
-                  currentUserId: context.read<AuthBloc>().state is Authenticated
-                      ? (context.read<AuthBloc>().state as Authenticated)
-                          .user
-                          .userId
-                      : null,
-                )..add(FetchPosts())),
-        BlocProvider(create: (context) => ThemeBloc()),
-      ],
-      child: MyApp(
-        initialTheme: initialTheme,
+              currentUserId: context.read<AuthBloc>().state is Authenticated
+                  ? (context.read<AuthBloc>().state as Authenticated)
+                      .user
+                      .userId
+                  : null,
+            )..add(FetchPosts()),
+          ),
+          BlocProvider(
+            create: (context) => MessageBloc(
+              messageService: context.read<MessageService>(),
+            ),
+          ),
+          BlocProvider(create: (context) => ThemeBloc()),
+        ],
+        child: MyApp(
+          initialTheme: initialTheme,
+        ),
       ),
     ),
   );
@@ -104,13 +131,13 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           routes: {
             '/home': (context) => const MyHomePage(),
-            '/directMessage': (context) => const DirectMessagePage(),
             '/login': (context) => const LoginPage(),
             '/register': (context) => const RegisterPage(),
             '/username': (context) => const PickUsernamePage(),
             '/newPost': (context) => const NewPostPage(),
             '/discover': (context) => const DiscoverPage(),
             '/profile': (context) => const ProfilePage(),
+            '/editProfile': (context) => const ProfileEditPage(),
             '/messages': (context) => const MessagesPage(),
           },
           title: 'Motsaich',
@@ -173,6 +200,107 @@ class _MyHomePageState extends State<MyHomePage>
     {},
   ];
 
+  Widget _buildDrawerHeader(BuildContext context) {
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, authState) {
+        if (authState is! Authenticated) {
+          return Container(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              children: [
+                const CircleAvatar(
+                  radius: 32,
+                  child: Icon(Icons.person),
+                ),
+                const SizedBox(height: 16),
+                Text('Guest User',
+                    style: Theme.of(context).textTheme.titleLarge),
+                const SizedBox(height: 8),
+                ElevatedButton(
+                  onPressed: () => Navigator.pushNamed(context, '/login'),
+                  child: const Text('Sign In'),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return Container(
+          padding: const EdgeInsets.fromLTRB(20, 40, 20, 20),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Stack(
+                    children: [
+                      CircleAvatar(
+                        radius: 32,
+                        backgroundImage: CachedNetworkImageProvider(
+                          authState.user.profilePic,
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          width: 16,
+                          height: 16,
+                          decoration: BoxDecoration(
+                            color: Colors.green,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Theme.of(context).scaffoldBackgroundColor,
+                              width: 2,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          authState.user.username,
+                          style: Theme.of(context).textTheme.titleLarge,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '@${authState.user.handle}',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.brightness_6),
+                    onPressed: () =>
+                        context.read<ThemeBloc>().add(ToggleThemeEvent()),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  _buildStatItem(authState.user.following, 'Following'),
+                  SizedBox(
+                    width: 24,
+                  ),
+                  _buildStatItem(authState.user.followers, 'Followers'),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   void onItemTapped(int index) {
     setState(() {
       selectedIndex = index;
@@ -196,121 +324,7 @@ class _MyHomePageState extends State<MyHomePage>
         child: SafeArea(
           child: Column(
             children: [
-              Container(
-                constraints: BoxConstraints(
-                  minHeight: 120,
-                  maxHeight: MediaQuery.of(context).size.height * 0.25,
-                ),
-                padding: const EdgeInsets.fromLTRB(20, 40, 20, 20),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Stack(
-                          children: [
-                            BlocBuilder<AuthBloc, AuthState>(
-                              builder: (context, authState) {
-                                if (authState is Authenticated) {
-                                  return CircleAvatar(
-                                    radius: 32,
-                                    backgroundImage: CachedNetworkImageProvider(
-                                      authState.user.profilePic,
-                                    ),
-                                  );
-                                }
-                                return const CircleAvatar(
-                                  radius: 32,
-                                  child: Icon(Icons.person),
-                                );
-                              },
-                            ),
-                            Positioned(
-                              bottom: 0,
-                              right: 0,
-                              child: Container(
-                                width: 16,
-                                height: 16,
-                                decoration: BoxDecoration(
-                                  color: Colors.green,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: Theme.of(context)
-                                        .scaffoldBackgroundColor,
-                                    width: 2,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              BlocBuilder<AuthBloc, AuthState>(
-                                builder: (context, authState) {
-                                  if (authState is Authenticated) {
-                                    return Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          authState.user.username,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .titleLarge
-                                              ?.copyWith(
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          '@${authState.user.handle}',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyMedium
-                                              ?.copyWith(
-                                                color:
-                                                    Theme.of(context).hintColor,
-                                              ),
-                                        ),
-                                      ],
-                                    );
-                                  }
-                                  return const Text('Loading...');
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                        IconButton(
-                          icon: Icon(
-                            Icons.brightness_6,
-                            color: Theme.of(context).iconTheme.color,
-                          ),
-                          onPressed: () {
-                            context.read<ThemeBloc>().add(ToggleThemeEvent());
-                          },
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _buildStatItem('128', 'Following'),
-                        _buildStatItem('1.2K', 'Followers'),
-                        _buildStatItem('24', 'Posts'),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+              _buildDrawerHeader(context),
               Expanded(
                 child: ListView(
                   padding: const EdgeInsets.symmetric(vertical: 8),
@@ -335,7 +349,7 @@ class _MyHomePageState extends State<MyHomePage>
                       label: 'Settings',
                     ),
                     _buildDrawerItem(
-                      icon: FluentIcons.add_32_light,
+                      icon: FluentIcons.add_20_filled,
                       label: 'Login',
                       onTap: () => Navigator.pushNamed(context, '/login'),
                     ),
@@ -583,19 +597,22 @@ class _MyHomePageState extends State<MyHomePage>
     );
   }
 
-  Widget _buildStatItem(String value, String label) {
-    return Column(
+  Widget _buildStatItem(int value, String label) {
+    return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          value,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+          '$value',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
         ),
+        SizedBox(
+          width: 4,
+        ),
         Text(
           label,
-          style: Theme.of(context).textTheme.bodySmall,
+          style: Theme.of(context).textTheme.bodyMedium,
         ),
       ],
     );

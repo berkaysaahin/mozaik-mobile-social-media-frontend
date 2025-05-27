@@ -6,8 +6,9 @@ import 'package:mozaik/services/post_service.dart';
 import 'package:mozaik/states/post_state.dart';
 
 class PostBloc extends Bloc<PostEvent, PostState> {
-  List<Post> _generalPostsCache = [];
-  final List<Post> _userPostsCache = [];
+  final List<Post> _generalPostsCache = [];
+  final List<Post> _currentUserPostsCache = [];
+  final List<Post> _viewedUserPostsCache = [];
   final Set<int> _loadedPostIds = {};
   final Set<int> _loadingPostIds = {};
   final String? currentUserId;
@@ -22,32 +23,26 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     on<StopPostLoading>(_onStopPostLoading);
   }
   void _onClearUserPosts(ClearUserPosts event, Emitter<PostState> emit) {
-    _userPostsCache.clear();
-    if (state is PostsCombinedState) {
-      emit((state as PostsCombinedState).copyWith(
-        userPosts: [],
-        showingUserPosts: true,
-        loadingPostIds: _loadingPostIds,
-        loadedPostIds: _loadedPostIds,
-      ));
-    } else {
-      emit(PostsCombinedState(
-        generalPosts: _generalPostsCache,
-        userPosts: [],
-        showingUserPosts: true,
-        loadingPostIds: _loadingPostIds,
-        loadedPostIds: _loadedPostIds,
-      ));
-    }
+    _viewedUserPostsCache.clear();
+    emit(PostsCombinedState(
+      generalPosts: _generalPostsCache,
+      currentUserPosts: _currentUserPostsCache,
+      viewedUserPosts: [],
+      viewType: PostViewType.general,
+      loadingPostIds: _loadingPostIds,
+      loadedPostIds: _loadedPostIds,
+    ));
   }
 
   Future<void> _onFetchPostsByUser(
       FetchPostsByUser event, Emitter<PostState> emit) async {
-    if (_userPostsCache.isNotEmpty && _userPostsCache[0].userId == event.id) {
+    if (_viewedUserPostsCache.isNotEmpty &&
+        _viewedUserPostsCache[0].userId == event.id) {
       emit(PostsCombinedState(
         generalPosts: _generalPostsCache,
-        userPosts: _userPostsCache,
-        showingUserPosts: true,
+        currentUserPosts: _currentUserPostsCache,
+        viewedUserPosts: _viewedUserPostsCache,
+        viewType: PostViewType.viewedUser,
         loadingPostIds: _loadingPostIds,
         loadedPostIds: _loadedPostIds,
       ));
@@ -57,7 +52,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
 
     try {
       final posts = await PostService.fetchPostsByUser(event.id);
-      _userPostsCache
+      _viewedUserPostsCache
         ..clear()
         ..addAll(posts);
 
@@ -65,8 +60,9 @@ class PostBloc extends Bloc<PostEvent, PostState> {
 
       emit(PostsCombinedState(
         generalPosts: _generalPostsCache,
-        userPosts: _userPostsCache,
-        showingUserPosts: true,
+        currentUserPosts: _currentUserPostsCache,
+        viewedUserPosts: _viewedUserPostsCache,
+        viewType: PostViewType.viewedUser,
         loadingPostIds: _loadingPostIds,
         loadedPostIds: _loadedPostIds,
       ));
@@ -103,8 +99,9 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     if (_generalPostsCache.isNotEmpty) {
       emit(PostsCombinedState(
         generalPosts: _generalPostsCache,
-        userPosts: _userPostsCache,
-        showingUserPosts: false,
+        currentUserPosts: _currentUserPostsCache,
+        viewedUserPosts: _viewedUserPostsCache,
+        viewType: PostViewType.general,
         loadingPostIds: _loadingPostIds,
         loadedPostIds: _loadedPostIds,
       ));
@@ -114,13 +111,24 @@ class PostBloc extends Bloc<PostEvent, PostState> {
 
     try {
       final posts = await PostService.fetchPosts(currentUserId: currentUserId);
-      _generalPostsCache = posts;
+      _generalPostsCache
+        ..clear()
+        ..addAll(posts);
+
+      if (currentUserId != null) {
+        _currentUserPostsCache
+          ..clear()
+          ..addAll(
+              posts.where((post) => post.userId == currentUserId).toList());
+      }
+
       _loadedPostIds.addAll(posts.map((post) => post.id));
 
       emit(PostsCombinedState(
         generalPosts: _generalPostsCache,
-        userPosts: _userPostsCache,
-        showingUserPosts: false,
+        currentUserPosts: _currentUserPostsCache,
+        viewedUserPosts: _viewedUserPostsCache,
+        viewType: PostViewType.general,
         loadingPostIds: _loadingPostIds,
         loadedPostIds: _loadedPostIds,
       ));
@@ -141,7 +149,12 @@ class PostBloc extends Bloc<PostEvent, PostState> {
         visibility: event.visibility,
         imageUrl: event.imageUrl,
       );
+
       _generalPostsCache.insert(0, newPost);
+      if (event.userId == currentUserId) {
+        _currentUserPostsCache.insert(0, newPost);
+      }
+
       emit(PostCreated(newPost));
       add(FetchPosts());
     } catch (e) {
@@ -160,18 +173,23 @@ class PostBloc extends Bloc<PostEvent, PostState> {
           emit(PostError('Failed to delete image: $e'));
         }
       }
-      await PostService.deletePost(event.postId);
-      final posts = await PostService.fetchPosts(currentUserId: currentUserId);
 
-      _generalPostsCache = posts;
-      if (_generalPostsCache.isNotEmpty) {
-        emit(PostsCombinedState(
-          generalPosts: _generalPostsCache,
-          userPosts: _userPostsCache,
-          showingUserPosts: false,
-        ));
-        return;
-      }
+      await PostService.deletePost(event.postId);
+
+      _generalPostsCache.removeWhere((post) => post.id == event.postId);
+      _currentUserPostsCache.removeWhere((post) => post.id == event.postId);
+      _viewedUserPostsCache.removeWhere((post) => post.id == event.postId);
+
+      emit(PostsCombinedState(
+        generalPosts: _generalPostsCache,
+        currentUserPosts: _currentUserPostsCache,
+        viewedUserPosts: _viewedUserPostsCache,
+        viewType: state is PostsCombinedState
+            ? (state as PostsCombinedState).viewType
+            : PostViewType.general,
+        loadingPostIds: _loadingPostIds,
+        loadedPostIds: _loadedPostIds,
+      ));
     } catch (e) {
       emit(PostError('Failed to delete post: $e'));
     }

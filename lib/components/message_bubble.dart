@@ -4,10 +4,12 @@ import 'package:mozaik/app_colors.dart';
 class MessageBubble extends StatelessWidget {
   final String text;
   final bool isSent;
+  final String timestamp;
 
   const MessageBubble({
     required this.text,
     required this.isSent,
+    required this.timestamp,
     super.key,
   });
 
@@ -41,18 +43,17 @@ class MessageBubble extends StatelessWidget {
             Text(
               text,
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: isSent ? Colors.white : Theme.of(context).primaryColor,
-
-              ),
+                    color:
+                        isSent ? Colors.white : Theme.of(context).primaryColor,
+                  ),
             ),
             Padding(
               padding: const EdgeInsets.only(top: 4),
               child: Text(
                 "15:25",
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-
-                  color: isSent ? Colors.white : Colors.grey[600],
-                ),
+                      color: isSent ? Colors.white : Colors.grey[600],
+                    ),
               ),
             ),
           ],

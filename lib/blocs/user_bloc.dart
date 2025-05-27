@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mozaik/models/user_model.dart';
 import 'package:mozaik/services/user_service.dart';
@@ -17,12 +19,11 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   ) async {
     emit(UserLoading());
     try {
-      final userJson = await userService.fetchPublicUserById(event.id);
+      final user = await userService.fetchPublicUserById(event.id);
 
-      final user = User.fromJson(userJson);
       emit(UserLoaded(user));
     } catch (e, stackTrace) {
-      print('User fetch error: $e\n$stackTrace');
+      log('User fetch error: $e', stackTrace: stackTrace);
       emit(UserError('Failed to load user: ${e.toString()}'));
     }
   }

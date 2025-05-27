@@ -60,9 +60,7 @@ class _HomePageState extends State<HomePage> {
           if (state is PostLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is PostsCombinedState) {
-            final posts =
-                state.showingUserPosts ? state.userPosts : state.generalPosts;
-
+            final posts = state.visiblePosts;
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (mounted) {
                 _precacheImages(posts, context);

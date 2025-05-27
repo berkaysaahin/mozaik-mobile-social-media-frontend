@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
 import 'package:mozaik/events/auth_event.dart';
@@ -24,6 +25,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<SignOutRequested>(_onSignOutRequested);
     on<AuthStatusChecked>(_onAuthStatusChecked);
     on<GoogleSignInRequested>(_onGoogleSignInRequested);
+    on<UserProfileUpdateRequested>(_onUpdateUserProfile);
   }
 
   Future<void> _onGoogleSignInRequested(
@@ -37,25 +39,51 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(const AuthError('Google sign-in failed'));
         return;
       }
-
       final userId = _parseUserIdFromToken(token);
+
       if (userId == null) {
         throw const FormatException('Invalid token format - missing user ID');
       }
-
-      final userJson = await _userService.fetchUserById(userId, token: token);
-      final user = User.fromJson(userJson);
+      final user = await _userService.fetchUserById(userId, token: token);
 
       await _persistAuthData(token, user);
 
       emit(Authenticated(token: token, user: user));
-    } on http.ClientException catch (e) {
-      emit(AuthError('Network error: ${e.message}'));
-    } on FormatException catch (e) {
-      emit(AuthError(e.message));
     } catch (e, stackTrace) {
       _logError('Google sign-in', e, stackTrace);
       emit(AuthError('Sign-in failed: ${e.toString()}'));
+    }
+  }
+
+  Future<void> _onUpdateUserProfile(
+    UserProfileUpdateRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    try {
+      if (state is Authenticated) {
+        final currentState = state as Authenticated;
+        emit(AuthLoading());
+
+        final updatedUser = await _userService.updateUserProfile(
+          userId: event.userId,
+          token: currentState.token,
+          profilePic: event.profilePic,
+          cover: event.cover,
+          username: event.username,
+          bio: event.bio,
+          handle: event.handle,
+          email: event.email,
+        );
+
+        await _persistAuthData(currentState.token, updatedUser);
+        emit(Authenticated(token: currentState.token, user: updatedUser));
+      }
+    } catch (e, stackTrace) {
+      _logError('Profile update', e, stackTrace);
+      emit(AuthError('Failed to update profile: ${e.toString()}'));
+      if (state is Authenticated) {
+        emit(state);
+      }
     }
   }
 
@@ -78,8 +106,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         return;
       }
 
-      final userJson = await _userService.fetchUserById(userId, token: token);
-      final user = User.fromJson(userJson);
+      final user = await _userService.fetchUserById(userId, token: token);
 
       emit(Authenticated(token: token, user: user));
     } catch (e, stackTrace) {
@@ -132,7 +159,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   void _logError(String operation, Object error, StackTrace? stackTrace) {
-    print('$operation error: $error');
-    if (stackTrace != null) print(stackTrace);
+    log('$operation error: $error');
   }
 }

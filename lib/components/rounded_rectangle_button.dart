@@ -37,10 +37,7 @@ class RoundedRectangleButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(borderRadius),
         ),
       ),
-      child: Text(
-        text,
-        style: Theme.of(context).textTheme.labelLarge
-      ),
+      child: Text(text, style: Theme.of(context).textTheme.labelMedium),
     );
   }
 }

@@ -8,8 +8,11 @@ class User {
   final String cover;
   final bool isNewUser;
   final bool hasPassword;
+  final int followers;
+  final int following;
+  final String? bio;
 
-  User( {
+  User({
     required this.userId,
     required this.username,
     required this.handle,
@@ -19,6 +22,9 @@ class User {
     required this.cover,
     required this.isNewUser,
     required this.hasPassword,
+    required this.followers,
+    required this.following,
+    this.bio,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -32,6 +38,9 @@ class User {
       createdAt: DateTime.parse(json['createdAt']),
       isNewUser: json['isNewUser'] ?? false,
       hasPassword: json['hasPassword'] ?? false,
+      followers: json['followers'],
+      following: json['following'],
+      bio: json['bio'],
     );
   }
 
@@ -46,6 +55,9 @@ class User {
       'createdAt': createdAt.toIso8601String(),
       'isNewUser': isNewUser,
       'hasPassword': hasPassword,
+      'followers': followers,
+      'following': following,
+      'bio': bio,
     };
   }
 }

@@ -4,16 +4,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mozaik/app_colors.dart';
 import 'package:mozaik/blocs/auth_bloc.dart';
 import 'package:mozaik/blocs/post_bloc.dart';
-import 'package:mozaik/blocs/profile_bloc.dart';
+import 'package:mozaik/components/rounded_rectangle_button.dart';
 import 'package:mozaik/components/text_post.dart';
-import 'package:mozaik/events/auth_event.dart';
 import 'package:mozaik/events/post_event.dart';
-import 'package:mozaik/services/user_service.dart';
 import 'package:mozaik/states/post_state.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:mozaik/states/profile_state.dart';
-
-import '../events/profile_event.dart';
 import '../states/auth_state.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -25,7 +20,6 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   @override
-  @override
   void initState() {
     super.initState();
   }
@@ -35,13 +29,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (authContext, authState) {
         if (authState is Authenticated) {
-          return BlocProvider(
-            create: (context) => ProfileBloc(
-              userService: context.read<UserService>(),
-              authBloc: authContext.read<AuthBloc>(),
-            )..add(SetProfileUser(authState.user)),
-            child: const _ProfileContent(),
-          );
+          return const _ProfileContent();
         } else if (authState is Unauthenticated) {
           return const Center(child: Text('Please sign in'));
         } else {
@@ -109,8 +97,7 @@ class __ProfileContentState extends State<_ProfileContent> {
                                     ),
                                 errorWidget: (context, url, error) =>
                                     const Center(
-                                      child:
-                                          Text("Tap to add your cover picture"),
+                                      child: Text(""),
                                     )),
                             Container(
                               height: 40,
@@ -145,22 +132,52 @@ class __ProfileContentState extends State<_ProfileContent> {
                                 alignment: Alignment.bottomLeft,
                                 child: Container(
                                   margin: const EdgeInsets.only(top: 80),
-                                  width: 88,
-                                  height: 88,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(44),
-                                    border: Border.all(
-                                      color: Theme.of(context).brightness ==
-                                              Brightness.light
-                                          ? AppColors.background
-                                          : AppColors.backgroundDark,
-                                      width: 4,
-                                    ),
-                                    image: DecorationImage(
-                                      image: CachedNetworkImageProvider(
-                                          user.profilePic),
-                                      fit: BoxFit.cover,
-                                    ),
+                                  child: Stack(
+                                    children: [
+                                      Container(
+                                        width: 88,
+                                        height: 88,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Theme.of(context)
+                                              .scaffoldBackgroundColor,
+                                        ),
+                                      ),
+                                      Positioned(
+                                        top: 2,
+                                        left: 2,
+                                        child: Container(
+                                          width: 84,
+                                          height: 84,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color:
+                                                Theme.of(context).brightness ==
+                                                        Brightness.light
+                                                    ? AppColors.background
+                                                    : AppColors.backgroundDark,
+                                          ),
+                                        ),
+                                      ),
+                                      Positioned(
+                                        top: 4,
+                                        left: 4,
+                                        child: ClipOval(
+                                          child: SizedBox(
+                                            width: 80,
+                                            height: 80,
+                                            child: OverflowBox(
+                                              maxWidth: 84,
+                                              maxHeight: 84,
+                                              child: CachedNetworkImage(
+                                                imageUrl: user.profilePic,
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
@@ -168,20 +185,41 @@ class __ProfileContentState extends State<_ProfileContent> {
                                 alignment: Alignment.bottomRight,
                                 child: Container(
                                   margin: const EdgeInsets.only(top: 150),
-                                  child: CircleAvatar(
-                                    backgroundColor: Theme.of(context)
-                                                .brightness ==
-                                            Brightness.light
-                                        ? Color.lerp(
-                                            Colors.white, Colors.grey, 0.2)
-                                        : Color.lerp(
-                                            Colors.black, Colors.white, 0.2),
-                                    radius: 18,
-                                    child: Icon(
-                                      FluentIcons.more_horizontal_32_regular,
-                                      color: Theme.of(context).primaryColor,
-                                      size: 20,
-                                    ),
+                                  child: Row(
+                                    children: [
+                                      RoundedRectangleButton(
+                                        elevation: 0,
+                                        text: 'Edit',
+                                        onPressed: () => Navigator.pushNamed(
+                                            context, '/editProfile'),
+                                        backgroundColor: Theme.of(context)
+                                                    .brightness ==
+                                                Brightness.light
+                                            ? Color.lerp(
+                                                Colors.white, Colors.grey, 0.2)
+                                            : Color.lerp(Colors.black,
+                                                Colors.white, 0.2),
+                                        textColor:
+                                            Theme.of(context).primaryColor,
+                                      ),
+                                      const SizedBox(width: 12),
+                                      CircleAvatar(
+                                        backgroundColor: Theme.of(context)
+                                                    .brightness ==
+                                                Brightness.light
+                                            ? Color.lerp(
+                                                Colors.white, Colors.grey, 0.2)
+                                            : Color.lerp(Colors.black,
+                                                Colors.white, 0.2),
+                                        radius: 18,
+                                        child: Icon(
+                                          FluentIcons
+                                              .more_horizontal_32_regular,
+                                          color: Theme.of(context).primaryColor,
+                                          size: 20,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
@@ -225,7 +263,7 @@ class __ProfileContentState extends State<_ProfileContent> {
                         ),
                       );
                     } else if (postState is PostsCombinedState) {
-                      final posts = postState.userPosts;
+                      final posts = postState.viewedUserPosts;
                       return SliverList(
                         delegate: SliverChildListDelegate([
                           Container(
@@ -249,7 +287,6 @@ class __ProfileContentState extends State<_ProfileContent> {
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       const SizedBox(height: 8),
-
                                       Row(
                                         children: [
                                           Text(
@@ -267,28 +304,25 @@ class __ProfileContentState extends State<_ProfileContent> {
                                           ),
                                         ],
                                       ),
-
                                       const SizedBox(height: 12),
-
                                       Text(
-                                        "I can't ever talk about this DNA!",
+                                        user.bio ?? 'No bio available',
                                         style: Theme.of(context)
                                             .textTheme
                                             .bodyLarge,
                                         maxLines: 2,
                                       ),
-
                                       const SizedBox(height: 16),
-
                                       Row(
                                         children: [
-                                          _buildStatItem(
-                                              context, '8', 'Followers'),
+                                          _buildStatItem(context,
+                                              user.followers, 'Followers'),
+                                          const SizedBox(width: 16),
+                                          _buildStatItem(context,
+                                              user.following, 'Following'),
                                           const SizedBox(width: 16),
                                           _buildStatItem(
-                                              context, '12', 'Following'),
-                                          const SizedBox(width: 16),
-                                          _buildStatItem(context, '3', 'Posts'),
+                                              context, posts.length, 'Posts'),
                                         ],
                                       ),
                                     ],
@@ -352,12 +386,12 @@ class __ProfileContentState extends State<_ProfileContent> {
     );
   }
 
-  Widget _buildStatItem(BuildContext context, String count, String label) {
+  Widget _buildStatItem(BuildContext context, int count, String label) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          count,
+          '$count',
           style: Theme.of(context).textTheme.labelLarge?.copyWith(
                 fontWeight: FontWeight.bold,
               ),

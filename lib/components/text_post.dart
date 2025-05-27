@@ -62,7 +62,6 @@ class _TextPostState extends State<TextPost>
   bool _initialLoadCompleted = false;
   bool _isBookmarked = false;
   int _bookmarks = 0;
-
   @override
   void initState() {
     super.initState();
@@ -75,9 +74,7 @@ class _TextPostState extends State<TextPost>
     if (postBloc.state is PostsCombinedState) {
       final state = postBloc.state as PostsCombinedState;
       _initialLoadCompleted = state.loadedPostIds.contains(widget.id) ||
-          (state.showingUserPosts
-              ? state.userPosts.any((post) => post.id == widget.id)
-              : state.generalPosts.any((post) => post.id == widget.id));
+          state.visiblePosts.any((post) => post.id == widget.id);
     } else {
       _initialLoadCompleted = false;
     }
@@ -107,14 +104,12 @@ class _TextPostState extends State<TextPost>
     });
   }
 
-
   void _toggleBookmark() {
     setState(() {
       _isBookmarked = !_isBookmarked;
       _bookmarks += _isBookmarked ? 1 : -1;
     });
   }
-
 
   Future<void> _loadPostData() async {
     if (!mounted) return;
@@ -237,17 +232,20 @@ class _TextPostState extends State<TextPost>
                               children: [
                                 Text(
                                   '@${widget.handle}',
-                                  style: Theme.of(context).textTheme.labelMedium,
+                                  style:
+                                      Theme.of(context).textTheme.labelMedium,
                                 ),
                                 const SizedBox(width: 6),
                                 Text(
                                   '·',
-                                  style: Theme.of(context).textTheme.labelMedium,
+                                  style:
+                                      Theme.of(context).textTheme.labelMedium,
                                 ),
                                 const SizedBox(width: 6),
                                 Text(
                                   formatTimestamp(widget.timestamp),
-                                  style: Theme.of(context).textTheme.labelMedium,
+                                  style:
+                                      Theme.of(context).textTheme.labelMedium,
                                 ),
                               ],
                             ),
@@ -256,10 +254,9 @@ class _TextPostState extends State<TextPost>
                       ),
                       PopupMenuButton<String>(
                         padding: EdgeInsets.zero,
-                        color:
-                            Theme.of(context).brightness == Brightness.light
-                                ? AppColors.background
-                                : AppColors.backgroundDark,
+                        color: Theme.of(context).brightness == Brightness.light
+                            ? AppColors.background
+                            : AppColors.backgroundDark,
                         icon: const Icon(
                           CupertinoIcons.ellipsis_vertical,
                           size: 18,
@@ -298,9 +295,8 @@ class _TextPostState extends State<TextPost>
                   Text(
                     widget.content,
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-
-                      height: 1.4,
-                      letterSpacing: 0.2,
+                          height: 1.4,
+                          letterSpacing: 0.2,
                         ),
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.start,
@@ -318,14 +314,12 @@ class _TextPostState extends State<TextPost>
                           color: Colors.grey[200],
                           child: Center(child: CircularProgressIndicator()),
                         ),
-                        errorWidget: (context, url, error) =>
-                            Icon(Icons.error),
+                        errorWidget: (context, url, error) => Icon(Icons.error),
                       ),
                     ),
                   const SizedBox(height: 12),
                   if (widget.music != null) ...[
                     MusicCard(music: widget.music),
-
                   ],
                   const SizedBox(height: 12),
                   Padding(
@@ -337,7 +331,9 @@ class _TextPostState extends State<TextPost>
                           icon: _isBookmarked
                               ? CupertinoIcons.bookmark_fill
                               : CupertinoIcons.bookmark,
-                          color: _isBookmarked ? Theme.of(context).primaryColor : Colors.grey,
+                          color: _isBookmarked
+                              ? Theme.of(context).primaryColor
+                              : Colors.grey,
                           count: _bookmarks,
                           onTap: _toggleBookmark,
                         ),
@@ -351,8 +347,7 @@ class _TextPostState extends State<TextPost>
                               MaterialPageRoute(
                                 builder: (context) => SinglePostPage(
                                   coverArt: widget.music?['cover_art'] ?? '',
-                                  trackName:
-                                      widget.music?['track_name'] ?? '',
+                                  trackName: widget.music?['track_name'] ?? '',
                                   artist: widget.music?['artist'] ?? '',
                                   description: widget.content,
                                   likes: _likes,

@@ -1,14 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:mozaik/app_colors.dart';
+import 'package:mozaik/pages/direct_message.dart';
 
 class MessageComponent extends StatelessWidget {
-  const MessageComponent({super.key});
+  final String conversationId;
+  final String recipientName;
+  final String recipientHandle;
+  final String recipientAvatar;
+  final String lastMessage;
+  final String lastMessageTime;
+  final String currentUserId;
+  const MessageComponent(
+      {super.key,
+      required this.conversationId,
+      required this.recipientName,
+      required this.recipientHandle,
+      required this.recipientAvatar,
+      required this.lastMessage,
+      required this.currentUserId,
+      required this.lastMessageTime});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, '/directMessage'),
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DirectMessagePage(
+            conversationId: conversationId,
+            recipientName: recipientName,
+            recipientAvatar: recipientAvatar,
+            currentUserId: currentUserId,
+          ),
+        ),
+      ),
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
@@ -34,8 +60,7 @@ class MessageComponent extends StatelessWidget {
                   backgroundColor: Colors.transparent,
                   child: ClipOval(
                     child: CachedNetworkImage(
-                      imageUrl:
-                          "https://static.wikia.nocookie.net/projectsekai/images/f/ff/Dramaturgy_Game_Cover.png/revision/latest?cb=20201227073615",
+                      imageUrl: recipientAvatar,
                       fit: BoxFit.cover,
                       width: 64,
                       height: 64,
@@ -55,13 +80,14 @@ class MessageComponent extends StatelessWidget {
                 ),
                 SizedBox(
                   width: MediaQuery.of(context).size.width - 150,
-                  child:  Column(
+                  child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: [
                           Text(
-                            'Eve',
+                            recipientName,
                             style: Theme.of(context).textTheme.titleMedium,
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
@@ -71,7 +97,7 @@ class MessageComponent extends StatelessWidget {
                             width: 4,
                           ),
                           Text(
-                            '@evemusic',
+                            '@$recipientHandle',
                             style: Theme.of(context).textTheme.labelMedium,
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
@@ -80,7 +106,7 @@ class MessageComponent extends StatelessWidget {
                         ],
                       ),
                       Text(
-                        "You've been hoping to get something dramatic out of this storyline.",
+                        lastMessage,
                         style: Theme.of(context).textTheme.bodyMedium,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
@@ -89,10 +115,10 @@ class MessageComponent extends StatelessWidget {
                     ],
                   ),
                 ),
-                 Spacer(),
-                 Center(
+                Spacer(),
+                Center(
                   child: Text(
-                    'feb 20',
+                    lastMessageTime,
                     style: Theme.of(context).textTheme.labelSmall,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
