@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:another_flushbar/flushbar.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -31,9 +32,16 @@ class _LoginPageState extends State<LoginPage> {
       context.read<AuthBloc>().add(GoogleSignInRequested());
     } catch (error) {
       print("Google Sign-In Error: $error");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Login failed: $error")),
-      );
+      Flushbar(
+        message: "Couldn't Sign in",
+        duration: Duration(seconds: 2),
+        margin: EdgeInsets.all(16),
+        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        backgroundColor: AppColors.timberWolf,
+        borderRadius: BorderRadius.circular(12),
+        flushbarPosition: FlushbarPosition.BOTTOM,
+        messageColor: AppColors.primary,
+      ).show(context);
     }
   }
 
@@ -51,9 +59,18 @@ class _LoginPageState extends State<LoginPage> {
         if (state is Authenticated) {
           Navigator.pushReplacementNamed(context, '/home');
         } else if (state is AuthError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message)),
-          );
+          Future.microtask(() {
+            Flushbar(
+              message: state.message,
+              duration: Duration(seconds: 2),
+              margin: EdgeInsets.all(16),
+              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              backgroundColor: AppColors.timberWolf,
+              borderRadius: BorderRadius.circular(12),
+              flushbarPosition: FlushbarPosition.BOTTOM,
+              messageColor: AppColors.primary,
+            ).show(context);
+          });
         }
       },
       child: Scaffold(

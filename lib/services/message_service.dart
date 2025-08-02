@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -9,28 +10,40 @@ class MessageService {
 
   Future<List<Message>> getMessages(String conversationId) async {
     try {
+      final url = Uri.parse(
+          '$baseUrl/api/conversations/conversations/$conversationId/messages');
+
+      log('Request URL: $url');
+
       final response = await http.get(
-        Uri.parse(
-            '$baseUrl/api/conversations/conversations/$conversationId/messages?user_id=b2ecc8ae-9e16-42eb-915f-d2e1e2022f6c'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      );
+        url,
+        headers: {'Content-Type': 'application/json'},
+      ).timeout(const Duration(seconds: 10));
 
       log('Response Status: ${response.statusCode}');
       log('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
-        final json = jsonDecode(response.body);
-        final List data = json['data'];
-        return data.map((m) => Message.fromJson(m)).toList();
+        final json = jsonDecode(response.body) as Map<String, dynamic>;
+        final List data = json['data'] as List;
+        return data
+            .map((m) => Message.fromJson(m as Map<String, dynamic>))
+            .toList();
       } else {
         throw Exception(
-            'Failed to load messages. Status: ${response.statusCode}');
+            'Server responded with ${response.statusCode}: ${response.body}');
       }
+    } on http.ClientException catch (e) {
+      log('Network error: $e');
+      throw Exception('Network error: Please check your internet connection');
+    } on TimeoutException {
+      throw Exception('Request timed out');
+    } on FormatException catch (e) {
+      log('JSON parsing error: $e');
+      throw Exception('Invalid server response format');
     } catch (e, stackTrace) {
-      log('Stack trace: $stackTrace');
-      throw Exception('Failed to load messages');
+      log('Unexpected error: $e\n$stackTrace');
+      throw Exception('Failed to load messages: $e');
     }
   }
 

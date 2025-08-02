@@ -1,8 +1,10 @@
 import 'dart:io';
+import 'package:another_flushbar/flushbar.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mozaik/app_colors.dart';
 import 'package:mozaik/blocs/auth_bloc.dart';
@@ -86,9 +88,19 @@ class _NewPostPageState extends State<NewPostPage> {
 
     final authState = context.read<AuthBloc>().state;
     if (authState is! Authenticated) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('You must be logged in to post')),
-      );
+      Future.microtask(() {
+        Flushbar(
+          message: "You Must Be Logged In To Post",
+          duration: Duration(seconds: 2),
+          margin: EdgeInsets.all(16),
+          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          backgroundColor: AppColors.timberWolf,
+          borderRadius: BorderRadius.circular(12),
+          flushbarPosition: FlushbarPosition.BOTTOM,
+          messageColor: AppColors.primary,
+        ).show(context);
+      });
+
       return;
     }
 
@@ -115,9 +127,16 @@ class _NewPostPageState extends State<NewPostPage> {
       ));
     } catch (e) {
       setState(() => _isUploading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to publish: $e')),
-      );
+      Flushbar(
+        message: "Failed to Publish",
+        duration: Duration(seconds: 2),
+        margin: EdgeInsets.all(16),
+        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        backgroundColor: AppColors.timberWolf,
+        borderRadius: BorderRadius.circular(12),
+        flushbarPosition: FlushbarPosition.BOTTOM,
+        messageColor: AppColors.primary,
+      ).show(context);
     }
   }
 
@@ -156,14 +175,32 @@ class _NewPostPageState extends State<NewPostPage> {
       body: BlocListener<PostBloc, PostState>(
         listener: (context, state) {
           if (state is PostCreated) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Post created successfully!')),
-            );
+            Future.microtask(() {
+              Flushbar(
+                message: "Post Created",
+                duration: Duration(seconds: 2),
+                margin: EdgeInsets.all(16),
+                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                backgroundColor: AppColors.timberWolf,
+                borderRadius: BorderRadius.circular(12),
+                flushbarPosition: FlushbarPosition.BOTTOM,
+                messageColor: AppColors.primary,
+              ).show(context);
+            });
             Navigator.pop(context);
           } else if (state is PostError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
-            );
+            Future.microtask(() {
+              Flushbar(
+                message: "Couldn't Create Post",
+                duration: Duration(seconds: 2),
+                margin: EdgeInsets.all(16),
+                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                backgroundColor: AppColors.timberWolf,
+                borderRadius: BorderRadius.circular(12),
+                flushbarPosition: FlushbarPosition.BOTTOM,
+                messageColor: AppColors.primary,
+              ).show(context);
+            });
           }
         },
         child: BlocBuilder<PostBloc, PostState>(

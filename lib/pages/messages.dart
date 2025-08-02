@@ -1,3 +1,4 @@
+import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mozaik/app_colors.dart';
@@ -28,10 +29,16 @@ class MessagesPage extends StatelessWidget {
     return BlocConsumer<ConversationBloc, ConversationState>(
       listener: (context, state) {
         if (state is ConversationLoadFailure) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                content: Text('Failed to load conversations: ${state.error}')),
-          );
+          Flushbar(
+            message: "Failed to Load Conversation",
+            duration: Duration(seconds: 2),
+            margin: EdgeInsets.all(16),
+            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            backgroundColor: AppColors.timberWolf,
+            borderRadius: BorderRadius.circular(12),
+            flushbarPosition: FlushbarPosition.BOTTOM,
+            messageColor: AppColors.primary,
+          ).show(context);
         }
       },
       builder: (context, state) {

@@ -1,3 +1,4 @@
+import 'package:another_flushbar/flushbar.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -36,7 +37,12 @@ class _UserProfilePageState extends State<UserProfilePage> {
   void initState() {
     super.initState();
     context.read<UserBloc>().add(FetchUserById(widget.userId));
-    context.read<PostBloc>().add(FetchPostsByUser(widget.userId));
+    final authState = context.read<AuthBloc>().state;
+    final currentUserId =
+        authState is Authenticated ? authState.user.userId : null;
+    context
+        .read<PostBloc>()
+        .add(FetchPostsByUser(widget.userId, currentUserId!));
   }
 
   Future<void> _resetAndPop(BuildContext context) async {
@@ -44,7 +50,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
     context.read<PostBloc>().add(FetchPosts());
     final authState = context.read<AuthBloc>().state;
     if (authState is Authenticated) {
-      context.read<PostBloc>().add(FetchPostsByUser(authState.user.userId));
+      final currentUserId = authState.user.userId;
+      context
+          .read<PostBloc>()
+          .add(FetchPostsByUser(authState.user.userId, currentUserId!));
     }
     if (mounted) {
       Navigator.pop(context);
@@ -54,9 +63,16 @@ class _UserProfilePageState extends State<UserProfilePage> {
   Future<void> _startConversation(BuildContext context) async {
     final authState = context.read<AuthBloc>().state;
     if (authState is! Authenticated) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please sign in to start a conversation')),
-      );
+      Flushbar(
+        message: "Sign-in to Start a Conversation",
+        duration: Duration(seconds: 2),
+        margin: EdgeInsets.all(16),
+        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        backgroundColor: AppColors.timberWolf,
+        borderRadius: BorderRadius.circular(12),
+        flushbarPosition: FlushbarPosition.BOTTOM,
+        messageColor: AppColors.primary,
+      ).show(context);
       return;
     }
 
@@ -64,12 +80,16 @@ class _UserProfilePageState extends State<UserProfilePage> {
     final otherUserId = widget.userId;
     final conversationBloc = context.read<ConversationBloc>();
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Starting conversation...'),
-        duration: Duration(seconds: 2),
-      ),
-    );
+    Flushbar(
+      message: "Starting Conversation",
+      duration: Duration(seconds: 2),
+      margin: EdgeInsets.all(16),
+      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      backgroundColor: AppColors.timberWolf,
+      borderRadius: BorderRadius.circular(12),
+      flushbarPosition: FlushbarPosition.BOTTOM,
+      messageColor: AppColors.primary,
+    ).show(context);
 
     try {
       final conversation =
@@ -90,10 +110,16 @@ class _UserProfilePageState extends State<UserProfilePage> {
         ),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text('Failed to start conversation: ${e.toString()}')),
-      );
+      Flushbar(
+        message: "Failed to Start Conversation",
+        duration: Duration(seconds: 2),
+        margin: EdgeInsets.all(16),
+        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        backgroundColor: AppColors.timberWolf,
+        borderRadius: BorderRadius.circular(12),
+        flushbarPosition: FlushbarPosition.BOTTOM,
+        messageColor: AppColors.primary,
+      ).show(context);
     }
   }
 

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:another_flushbar/flushbar.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:mozaik/app_colors.dart';
@@ -53,9 +54,16 @@ class _TrackSearchState extends State<TrackSearch> {
       });
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error searching Spotify: $e')),
-        );
+        Flushbar(
+          message: "Error Searching Spotify",
+          duration: Duration(seconds: 2),
+          margin: EdgeInsets.all(16),
+          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          backgroundColor: AppColors.timberWolf,
+          borderRadius: BorderRadius.circular(12),
+          flushbarPosition: FlushbarPosition.BOTTOM,
+          messageColor: AppColors.primary,
+        ).show(context);
       }
     } finally {
       setState(() {
@@ -108,7 +116,6 @@ class _TrackSearchState extends State<TrackSearch> {
                     controller: _searchController,
                     cursorColor: Theme.of(context).primaryColor,
                     decoration: InputDecoration(
-
                       hintText: 'Search for a song...',
                       border: InputBorder.none,
                       enabledBorder: InputBorder.none,
@@ -143,7 +150,7 @@ class _TrackSearchState extends State<TrackSearch> {
                 ))
               : Expanded(
                   child: isSearchEmpty
-                      ?  Center(
+                      ? Center(
                           child: Text(
                             'No results found.',
                             style: Theme.of(context).textTheme.labelMedium,
@@ -166,8 +173,14 @@ class _TrackSearchState extends State<TrackSearch> {
                                     )
                                   : const Icon(
                                       FluentIcons.music_note_1_20_regular),
-                              title: Text(track['name'],style: Theme.of(context).textTheme.titleSmall,),
-                              subtitle: Text(track['artist'],style:Theme.of(context).textTheme.labelMedium,),
+                              title: Text(
+                                track['name'],
+                                style: Theme.of(context).textTheme.titleSmall,
+                              ),
+                              subtitle: Text(
+                                track['artist'],
+                                style: Theme.of(context).textTheme.labelMedium,
+                              ),
                               onTap: () {
                                 Navigator.pop(context, {
                                   'id': track['id'],

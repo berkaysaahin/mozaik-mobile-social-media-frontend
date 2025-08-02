@@ -157,10 +157,9 @@ class _SinglePostPageState extends State<SinglePostPage> {
                       Text(
                         widget.description,
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-
-                          height: 1.4,
-                          letterSpacing: 0.2,
-                        ),
+                              height: 1.4,
+                              letterSpacing: 0.2,
+                            ),
                       ),
                       const SizedBox(height: 16),
                       if (widget.imageUrl != null &&
@@ -237,7 +236,7 @@ class _SinglePostPageState extends State<SinglePostPage> {
             sliver: SliverToBoxAdapter(
               child: Row(
                 children: [
-                   Text(
+                  Text(
                     'Comments',
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
@@ -286,8 +285,7 @@ class _SinglePostPageState extends State<SinglePostPage> {
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: Theme.of(context).brightness == Brightness.light
-                        ? Color.lerp(
-                            Colors.white, Colors.grey, 0.2) // Light mode
+                        ? Color.lerp(Colors.white, Colors.grey, 0.2)
                         : Color.lerp(Colors.black, Colors.white, 0.2),
                     hintText: "Type a message...",
                     hintStyle: Theme.of(context).textTheme.labelMedium,
@@ -345,7 +343,10 @@ class _SinglePostPageState extends State<SinglePostPage> {
                   ],
                 ),
                 const SizedBox(height: 4),
-                Text(comment['text'],style: Theme.of(context).textTheme.bodyMedium,),
+                Text(
+                  comment['text'],
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
                 const SizedBox(height: 8),
                 Row(
                   children: [
@@ -353,9 +354,15 @@ class _SinglePostPageState extends State<SinglePostPage> {
                       icon: const Icon(Icons.favorite_border, size: 18),
                       onPressed: () {},
                     ),
-                    Text(comment['likes'].toString(),style: Theme.of(context).textTheme.labelMedium,),
+                    Text(
+                      comment['likes'].toString(),
+                      style: Theme.of(context).textTheme.labelMedium,
+                    ),
                     const SizedBox(width: 16),
-                     Text('Reply',style: Theme.of(context).textTheme.labelMedium,),
+                    Text(
+                      'Reply',
+                      style: Theme.of(context).textTheme.labelMedium,
+                    ),
                   ],
                 ),
               ],

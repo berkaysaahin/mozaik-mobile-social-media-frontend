@@ -2,10 +2,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mozaik/app_colors.dart';
+import 'package:mozaik/blocs/like_bloc.dart';
 import 'package:mozaik/blocs/post_bloc.dart';
 import 'package:mozaik/components/text_post.dart';
 import 'package:mozaik/events/post_event.dart';
 import 'package:mozaik/models/post_model.dart';
+import 'package:mozaik/states/like_state.dart';
 import 'package:mozaik/states/post_state.dart';
 
 class HomePage extends StatefulWidget {
@@ -55,63 +57,89 @@ class _HomePageState extends State<HomePage> {
         context.read<PostBloc>().add(FetchPosts());
         await Future.delayed(const Duration(seconds: 1));
       },
-      child: BlocBuilder<PostBloc, PostState>(
-        builder: (context, state) {
-          if (state is PostLoading) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (state is PostsCombinedState) {
-            final posts = state.visiblePosts;
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (mounted) {
-                _precacheImages(posts, context);
-              }
-            });
+      child: BlocListener<LikeBloc, LikeState>(
+        listener: (context, likeState) {
+          if (likeState is LikeUpdated) {
+            final postId = likeState.postId;
+            final liked = likeState.hasLiked;
+            final likeCount = likeState.likeCount;
 
-            return CustomScrollView(
-              slivers: [
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final post = posts[index];
-                      return Container(
-                        color: Theme.of(context).brightness == Brightness.light
-                            ? AppColors.background
-                            : AppColors.backgroundDark,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            TextPost(
-                              id: post.id,
-                              username: post.username,
-                              handle: post.handle,
-                              content: post.content,
-                              userId: post.userId,
-                              likeCount: post.likeCount,
-                              reblogCount: post.reblogCount,
-                              hasLiked: post.hasLiked,
-                              hasReblogged: post.hasReblogged,
-                              comments: post.comments,
-                              timestamp: post.timestamp,
-                              profilePic: post.profilePic,
-                              music: post.music,
-                              imageUrl: post.imageUrl,
-                            ),
-                            const SizedBox(height: 8),
-                          ],
-                        ),
-                      );
-                    },
-                    childCount: posts.length,
-                  ),
-                ),
-              ],
-            );
-          } else if (state is PostError) {
-            return Center(child: Text(state.message));
-          } else {
-            return const Center(child: Text('No posts available'));
+            final postBloc = context.read<PostBloc>();
+            final currentState = postBloc.state;
+            if (currentState is PostsCombinedState) {
+              final updatedPosts = currentState.generalPosts.map((post) {
+                if (post.id == postId) {
+                  return post.copyWith(
+                    hasLiked: liked,
+                    likeCount: likeCount,
+                  );
+                }
+                return post;
+              }).toList();
+
+              postBloc.add(UpdatePosts(updatedPosts));
+            }
           }
         },
+        child: BlocBuilder<PostBloc, PostState>(
+          builder: (context, state) {
+            if (state is PostLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is PostsCombinedState) {
+              final posts = state.generalPosts;
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted) {
+                  _precacheImages(posts, context);
+                }
+              });
+
+              return CustomScrollView(
+                slivers: [
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final post = posts[index];
+                        return Container(
+                          color:
+                              Theme.of(context).brightness == Brightness.light
+                                  ? AppColors.background
+                                  : AppColors.backgroundDark,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              TextPost(
+                                id: post.id,
+                                username: post.username,
+                                handle: post.handle,
+                                content: post.content,
+                                userId: post.userId,
+                                likeCount: post.likeCount,
+                                reblogCount: post.reblogCount,
+                                hasLiked: post.hasLiked,
+                                hasReblogged: post.hasReblogged,
+                                comments: post.comments,
+                                timestamp: post.timestamp,
+                                profilePic: post.profilePic,
+                                music: post.music,
+                                imageUrl: post.imageUrl,
+                              ),
+                              const SizedBox(height: 8),
+                            ],
+                          ),
+                        );
+                      },
+                      childCount: posts.length,
+                    ),
+                  ),
+                ],
+              );
+            } else if (state is PostError) {
+              return Center(child: Text(state.message));
+            } else {
+              return const Center(child: Text('No posts available'));
+            }
+          },
+        ),
       ),
     );
   }

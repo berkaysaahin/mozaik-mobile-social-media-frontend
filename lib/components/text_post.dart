@@ -4,12 +4,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mozaik/app_colors.dart';
+import 'package:mozaik/blocs/auth_bloc.dart';
+import 'package:mozaik/blocs/like_bloc.dart';
 import 'package:mozaik/blocs/post_bloc.dart';
 import 'package:mozaik/components/music_card.dart';
 import 'package:mozaik/components/post_button.dart';
+import 'package:mozaik/events/like_event.dart';
 import 'package:mozaik/events/post_event.dart';
 import 'package:mozaik/pages/single_post_page.dart';
 import 'package:mozaik/pages/user_profile.dart';
+import 'package:mozaik/states/auth_state.dart';
 import 'package:mozaik/states/post_state.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -91,10 +95,24 @@ class _TextPostState extends State<TextPost>
   }
 
   void _toggleLike() {
-    setState(() {
-      _isLiked = !_isLiked;
-      _likes += _isLiked ? 1 : -1;
-    });
+    final authState = context.read<AuthBloc>().state;
+    if (authState is Authenticated) {
+      final currentUserId = authState.user.userId;
+
+      final likeBloc = context.read<LikeBloc>();
+      if (_isLiked) {
+        likeBloc.add(UnlikePost(widget.id, currentUserId));
+      } else {
+        likeBloc.add(LikePost(widget.id, currentUserId));
+      }
+
+      setState(() {
+        _isLiked = !_isLiked;
+        _likes += _isLiked ? 1 : -1;
+      });
+    } else {
+      print("User not authenticated");
+    }
   }
 
   void _toggleShare() {
@@ -183,7 +201,12 @@ class _TextPostState extends State<TextPost>
             GestureDetector(
               onTap: () {
                 context.read<PostBloc>().add(ClearUserPosts());
-                context.read<PostBloc>().add(FetchPostsByUser(widget.userId));
+                final authState = context.read<AuthBloc>().state;
+                final currentUserId =
+                    authState is Authenticated ? authState.user.userId : null;
+                context
+                    .read<PostBloc>()
+                    .add(FetchPostsByUser(widget.userId, currentUserId!));
                 Navigator.push(
                   context,
                   MaterialPageRoute(

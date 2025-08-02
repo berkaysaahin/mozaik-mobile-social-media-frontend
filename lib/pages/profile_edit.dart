@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:another_flushbar/flushbar.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -117,9 +118,16 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
 
       if (mounted) {
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profile updated successfully!')),
-        );
+        Flushbar(
+          message: "Profile Updated Successfully",
+          duration: Duration(seconds: 2),
+          margin: EdgeInsets.all(16),
+          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          backgroundColor: AppColors.timberWolf,
+          borderRadius: BorderRadius.circular(12),
+          flushbarPosition: FlushbarPosition.BOTTOM,
+          messageColor: AppColors.primary,
+        ).show(context);
         setState(() {
           _isEdited = false;
           _newProfilePicFile = null;
@@ -129,9 +137,16 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     } catch (e) {
       if (mounted) {
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to update profile: ${e.toString()}')),
-        );
+        Flushbar(
+          message: "Failed to Update Profile",
+          duration: Duration(seconds: 2),
+          margin: EdgeInsets.all(16),
+          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          backgroundColor: AppColors.timberWolf,
+          borderRadius: BorderRadius.circular(12),
+          flushbarPosition: FlushbarPosition.BOTTOM,
+          messageColor: AppColors.primary,
+        ).show(context);
       }
     }
   }
@@ -147,9 +162,16 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       });
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to select image: ${e.toString()}')),
-        );
+        Flushbar(
+          message: "Failed to select image: ${e.toString()}",
+          duration: Duration(seconds: 2),
+          margin: EdgeInsets.all(16),
+          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          backgroundColor: AppColors.timberWolf,
+          borderRadius: BorderRadius.circular(12),
+          flushbarPosition: FlushbarPosition.BOTTOM,
+          messageColor: AppColors.primary,
+        ).show(context);
       }
     }
   }
@@ -165,9 +187,16 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       });
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to select image: ${e.toString()}')),
-        );
+        Flushbar(
+          message: "Failed to select image: ${e.toString()}",
+          duration: Duration(seconds: 2),
+          margin: EdgeInsets.all(16),
+          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          backgroundColor: AppColors.timberWolf,
+          borderRadius: BorderRadius.circular(12),
+          flushbarPosition: FlushbarPosition.BOTTOM,
+          messageColor: AppColors.primary,
+        ).show(context);
       }
     }
   }
@@ -313,8 +342,12 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     context.read<PostBloc>().add(ClearUserPosts());
     context.read<PostBloc>().add(FetchPosts());
     final authState = context.read<AuthBloc>().state;
+    final currentUserId =
+        authState is Authenticated ? authState.user.userId : null;
     if (authState is Authenticated) {
-      context.read<PostBloc>().add(FetchPostsByUser(authState.user.userId));
+      context
+          .read<PostBloc>()
+          .add(FetchPostsByUser(authState.user.userId, currentUserId!));
     }
     if (mounted) {
       Navigator.pop(context);

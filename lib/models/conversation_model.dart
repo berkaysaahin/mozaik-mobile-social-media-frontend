@@ -36,12 +36,12 @@ class Conversation extends Equatable {
       user1: json['user1'] as String,
       user2: json['user2'] as String,
       createdAt: DateTime.parse(json['created_at'] as String),
-      user1Username: json['user1_username'] as String,
-      user1ProfilePicture: json['user1_profile_picture'] as String,
-      user1Handle: json['user1_handle'] as String,
-      user2ProfilePicture: json['user2_profile_picture'] as String,
-      user2Handle: json['user2_handle'] as String,
-      user2Username: json['user2_username'] as String,
+      user1Username: (json['user1_username'] as String?) ?? 'Unknown',
+      user1ProfilePicture: (json['user1_profile_picture'] as String?) ?? '',
+      user1Handle: (json['user1_handle'] as String?) ?? '',
+      user2ProfilePicture: (json['user2_profile_picture'] as String?) ?? '',
+      user2Handle: (json['user2_handle'] as String?) ?? '',
+      user2Username: (json['user2_username'] as String?) ?? 'Unknown',
       lastMessage: json['last_message'] as String?,
       lastMessageTime: json['last_message_time'] != null
           ? DateTime.parse(json['last_message_time'] as String)

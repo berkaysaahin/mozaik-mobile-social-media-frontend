@@ -21,6 +21,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     on<ClearUserPosts>(_onClearUserPosts);
     on<StartPostLoading>(_onStartPostLoading);
     on<StopPostLoading>(_onStopPostLoading);
+    on<UpdatePosts>(_onUpdatePosts);
   }
   void _onClearUserPosts(ClearUserPosts event, Emitter<PostState> emit) {
     _viewedUserPostsCache.clear();
@@ -159,6 +160,20 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       add(FetchPosts());
     } catch (e) {
       emit(PostError('Failed to create post: $e'));
+    }
+  }
+
+  Future<void> _onUpdatePosts(
+      UpdatePosts event, Emitter<PostState> emit) async {
+    final currentState = state;
+    if (currentState is PostsCombinedState) {
+      emit(currentState.copyWith(
+        generalPosts: event.updatedPosts,
+        currentUserPosts: event.updatedPosts
+            .where((post) => post.userId == currentUserId)
+            .toList(),
+        viewedUserPosts: currentState.viewedUserPosts,
+      ));
     }
   }
 

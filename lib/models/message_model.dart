@@ -8,6 +8,7 @@ class Message extends Equatable {
   final String content;
   final DateTime sentAt;
   final bool seen;
+  final String? clientTag;
 
   const Message({
     required this.id,
@@ -16,6 +17,7 @@ class Message extends Equatable {
     required this.content,
     required this.sentAt,
     this.seen = false,
+    this.clientTag,
   });
 
   factory Message.fromJson(Map<String, dynamic> json) {
@@ -37,6 +39,7 @@ class Message extends Equatable {
       'content': content,
       'sent_at': sentAt.toIso8601String(),
       'seen': seen,
+      if (clientTag != null) 'clientTag': clientTag,
     };
   }
 

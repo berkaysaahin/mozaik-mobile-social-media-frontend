@@ -7,10 +7,9 @@ import 'package:mozaik/app_colors.dart';
 import 'package:mozaik/blocs/message_bloc.dart';
 import 'package:mozaik/components/custom_app_bar.dart';
 import 'package:mozaik/components/message_bubble.dart';
+import 'package:mozaik/events/message_event.dart';
 import 'package:mozaik/models/message_model.dart';
 import 'package:mozaik/states/message_state.dart';
-
-import '../events/message_event.dart';
 
 class DirectMessagePage extends StatefulWidget {
   final String conversationId;
@@ -38,8 +37,11 @@ class _DirectMessagePageState extends State<DirectMessagePage> {
   @override
   void initState() {
     super.initState();
-
-    context.read<MessageBloc>().add(LoadMessages(widget.conversationId));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<MessageBloc>().add(
+            LoadMessages(widget.conversationId),
+          );
+    });
   }
 
   @override
@@ -81,11 +83,13 @@ class _DirectMessagePageState extends State<DirectMessagePage> {
           );
       _messageController.clear();
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _scrollController.animateTo(
-          0,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
+        if (_scrollController.hasClients) {
+          _scrollController.animateTo(
+            _scrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        }
       });
     }
   }
@@ -93,95 +97,101 @@ class _DirectMessagePageState extends State<DirectMessagePage> {
   List<_MessageListItem> _flattenMessages(List<Message> messages) {
     final List<_MessageListItem> result = [];
     final DateFormat dateFormatter = DateFormat('yyyy-MM-dd');
-    final DateFormat todayFormatter = DateFormat('h:mm a');
 
-    final grouped = <String, List<Message>>{};
+    final sortedMessages = List<Message>.from(messages)
+      ..sort((a, b) => a.sentAt.compareTo(b.sentAt));
 
-    for (final msg in messages.reversed) {
+    String? currentDateHeader;
+
+    for (final msg in sortedMessages) {
       final dateKey = dateFormatter.format(msg.sentAt);
-      grouped.putIfAbsent(dateKey, () => []).add(msg);
+
+      if (dateKey != currentDateHeader) {
+        currentDateHeader = dateKey;
+        final now = DateTime.now();
+        final today = DateTime(now.year, now.month, now.day);
+        final yesterday = today.subtract(const Duration(days: 1));
+        final messageDate = DateTime.parse(dateKey);
+
+        String label;
+        if (messageDate == today) {
+          label = "Today";
+        } else if (messageDate == yesterday) {
+          label = "Yesterday";
+        } else {
+          label = DateFormat('MMM d, yyyy').format(messageDate);
+        }
+
+        result.add(_MessageListItem.date(label));
+      }
+
+      result.add(_MessageListItem.message(msg));
     }
-
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final yesterday = today.subtract(const Duration(days: 1));
-    final otherDayFormatter = DateFormat('MMM d, yyyy');
-
-    grouped.forEach((dateKey, msgs) {
-      final parsedDate = DateTime.parse(dateKey);
-      final dateOnly =
-          DateTime(parsedDate.year, parsedDate.month, parsedDate.day);
-      String label;
-      if (dateOnly == today) {
-        label = "Today";
-      } else if (dateOnly == yesterday) {
-        label = "Yesterday";
-      } else {
-        label = otherDayFormatter.format(parsedDate);
-      }
-      result.add(_MessageListItem.date(label));
-      for (final msg in msgs) {
-        result.add(_MessageListItem.message(msg));
-      }
-    });
 
     return result;
   }
 
   Widget _buildMessageList(List<Message> messages) {
     final items = _flattenMessages(messages);
+
     return ListView.builder(
       controller: _scrollController,
-      reverse: true,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      reverse: false,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       itemCount: items.length,
       itemBuilder: (context, index) {
         final item = items[index];
         if (item.dateHeader != null) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: Center(
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).brightness == Brightness.light
-                      ? Colors.grey[300]
-                      : Colors.grey[700],
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  item.dateHeader!,
-                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                        color: Theme.of(context).brightness == Brightness.light
-                            ? Colors.black54
-                            : Colors.white54,
-                      ),
-                ),
-              ),
-            ),
-          );
-        } else if (item.message != null) {
-          final message = item.message!;
-          return Align(
-            alignment: message.senderId == widget.currentUserId
-                ? Alignment.centerLeft
-                : Alignment.centerRight,
-            child: MessageBubble(
-              text: message.content,
-              isSent: message.senderId == widget.currentUserId,
-              timestamp: DateFormat('h:mm a').format(message.sentAt),
-            ),
-          );
+          return _buildDateHeader(item.dateHeader!);
         }
-        return const SizedBox.shrink();
+        return _buildMessageBubble(item.message!);
       },
+    );
+  }
+
+  Widget _buildDateHeader(String header) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Center(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          decoration: BoxDecoration(
+            color: Theme.of(context).brightness == Brightness.light
+                ? Colors.grey[300]
+                : Colors.grey[700],
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Text(
+            header,
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  color: Theme.of(context).brightness == Brightness.light
+                      ? Colors.black54
+                      : Colors.white54,
+                ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMessageBubble(Message message) {
+    return Align(
+      alignment: message.senderId == widget.currentUserId
+          ? Alignment.centerRight
+          : Alignment.centerLeft,
+      child: MessageBubble(
+        key: ValueKey('${message.id}_${message.sentAt.millisecondsSinceEpoch}'),
+        text: message.content,
+        isSent: message.senderId == widget.currentUserId,
+        timestamp: DateFormat('h:mm a').format(message.sentAt),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       backgroundColor: Theme.of(context).dialogBackgroundColor,
       appBar: CustomAppBar(
         leftIcon: const Icon(FluentIcons.arrow_left_24_regular),
@@ -213,19 +223,40 @@ class _DirectMessagePageState extends State<DirectMessagePage> {
         child: Column(
           children: [
             Expanded(
+                child: BlocListener<MessageBloc, MessageState>(
+              listener: (context, state) {
+                if (state is MessageLoadSuccess) {
+                  debugPrint('=== MESSAGE STATE UPDATE ===');
+                  debugPrint('Total messages: ${state.messages.length}');
+                  if (state.messages.isNotEmpty) {
+                    debugPrint(
+                        'Oldest: ${state.messages.last.sentAt} - ${state.messages.last.content}');
+                    debugPrint(
+                        'Newest: ${state.messages.first.sentAt} - ${state.messages.first.content}');
+                  }
+
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (_scrollController.hasClients &&
+                        state.messages.isNotEmpty) {
+                      _scrollController.jumpTo(
+                        _scrollController.position.maxScrollExtent,
+                      );
+                    }
+                  });
+                }
+              },
               child: BlocBuilder<MessageBloc, MessageState>(
                 builder: (context, state) {
                   if (state is MessageLoadSuccess) {
                     return _buildMessageList(state.messages);
-                  } else if (state is MessageLoadFailure) {
+                  }
+                  if (state is MessageLoadFailure) {
                     return Center(child: Text('Error: ${state.error}'));
-                  } else if (state is MessageOperationFailure) {
-                    return _buildMessageList(state.messages);
                   }
                   return const Center(child: CircularProgressIndicator());
                 },
               ),
-            ),
+            )),
             Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
@@ -286,45 +317,51 @@ class _DirectMessagePageState extends State<DirectMessagePage> {
                 ],
               ),
             ),
-            if (_isEmojiVisible)
-              SizedBox(
-                height: 250,
-                child: EmojiPicker(
-                  onBackspacePressed: () {
-                    final text = _messageController.text;
-                    if (text.isNotEmpty) {
-                      _messageController.value = TextEditingValue(
-                        text: text.characters.skipLast(1).toString(),
-                        selection: TextSelection.collapsed(
-                          offset: text.characters.skipLast(1).length,
+            AnimatedSize(
+              duration: Duration(milliseconds: 200),
+              curve: Curves.easeInOut,
+              child: _isEmojiVisible
+                  ? SizedBox(
+                      height: 250,
+                      child: EmojiPicker(
+                        onBackspacePressed: () {
+                          final text = _messageController.text;
+                          if (text.isNotEmpty) {
+                            _messageController.value = TextEditingValue(
+                              text: text.characters.skipLast(1).toString(),
+                              selection: TextSelection.collapsed(
+                                offset: text.characters.skipLast(1).length,
+                              ),
+                            );
+                          }
+                        },
+                        onEmojiSelected: (category, emoji) =>
+                            _onEmojiSelected(emoji),
+                        config: Config(
+                          bottomActionBarConfig: BottomActionBarConfig(
+                            backgroundColor:
+                                Theme.of(context).scaffoldBackgroundColor,
+                            buttonColor: Theme.of(context).primaryColor,
+                            buttonIconColor: AppColors.amanojaku,
+                          ),
+                          emojiViewConfig: EmojiViewConfig(
+                            columns: 9,
+                            emojiSizeMax: 28,
+                            backgroundColor:
+                                Theme.of(context).scaffoldBackgroundColor,
+                          ),
+                          categoryViewConfig: CategoryViewConfig(
+                            backgroundColor: AppColors.amanojaku,
+                            iconColor: Colors.white,
+                            iconColorSelected: Theme.of(context).primaryColor,
+                            indicatorColor: Theme.of(context).primaryColor,
+                            dividerColor: Colors.white,
+                          ),
                         ),
-                      );
-                    }
-                  },
-                  onEmojiSelected: (category, emoji) => _onEmojiSelected(emoji),
-                  config: Config(
-                    bottomActionBarConfig: BottomActionBarConfig(
-                      backgroundColor:
-                          Theme.of(context).scaffoldBackgroundColor,
-                      buttonColor: Theme.of(context).primaryColor,
-                      buttonIconColor: AppColors.amanojaku,
-                    ),
-                    emojiViewConfig: EmojiViewConfig(
-                      columns: 9,
-                      emojiSizeMax: 28,
-                      backgroundColor:
-                          Theme.of(context).scaffoldBackgroundColor,
-                    ),
-                    categoryViewConfig: CategoryViewConfig(
-                      backgroundColor: AppColors.amanojaku,
-                      iconColor: Colors.white,
-                      iconColorSelected: Theme.of(context).primaryColor,
-                      indicatorColor: Theme.of(context).primaryColor,
-                      dividerColor: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
+                      ),
+                    )
+                  : SizedBox.shrink(),
+            ),
           ],
         ),
       ),

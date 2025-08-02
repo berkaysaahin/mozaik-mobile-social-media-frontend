@@ -10,6 +10,7 @@ import 'package:http/http.dart' as http;
 import 'package:mozaik/app_colors.dart';
 import 'package:mozaik/blocs/auth_bloc.dart';
 import 'package:mozaik/blocs/conversation_bloc.dart';
+import 'package:mozaik/blocs/like_bloc.dart';
 import 'package:mozaik/blocs/message_bloc.dart';
 import 'package:mozaik/blocs/post_bloc.dart';
 import 'package:mozaik/blocs/theme_bloc.dart';
@@ -34,6 +35,7 @@ import 'package:mozaik/pages/register.dart';
 import 'package:mozaik/services/conversation_service.dart';
 import 'package:mozaik/services/google_sign_in_service.dart';
 import 'package:mozaik/services/message_service.dart';
+import 'package:mozaik/services/socket_service.dart';
 import 'package:mozaik/services/user_service.dart';
 import 'package:mozaik/states/auth_state.dart';
 import 'package:mozaik/states/theme_state.dart';
@@ -61,6 +63,7 @@ void main() async {
     baseUrl: dotenv.env['HOST_URL']!,
     client: http.Client(),
   );
+  final socketIOService = SocketIOService();
   final googleSignInService = GoogleSignInService();
   final messageService = MessageService();
   final prefs = await SharedPreferences.getInstance();
@@ -104,9 +107,11 @@ void main() async {
                   : null,
             )..add(FetchPosts()),
           ),
+          BlocProvider<LikeBloc>(create: (_) => LikeBloc()),
           BlocProvider(
             create: (context) => MessageBloc(
               messageService: context.read<MessageService>(),
+              socketService: socketIOService,
             ),
           ),
           BlocProvider(create: (context) => ThemeBloc()),

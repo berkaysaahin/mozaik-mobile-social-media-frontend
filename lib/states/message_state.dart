@@ -17,11 +17,33 @@ class MessageLoadInProgress extends MessageState {
 
 class MessageLoadSuccess extends MessageState {
   final List<Message> messages;
+  final bool isConnected;
+  final bool isSending;
+  final String? error;
 
-  const MessageLoadSuccess({required this.messages});
+  const MessageLoadSuccess({
+    required this.messages,
+    this.isConnected = true,
+    this.isSending = false,
+    this.error,
+  });
 
   @override
-  List<Object> get props => [messages];
+  List<Object?> get props => [messages, isConnected, isSending, error];
+
+  MessageLoadSuccess copyWith({
+    List<Message>? messages,
+    bool? isConnected,
+    bool? isSending,
+    String? error,
+  }) {
+    return MessageLoadSuccess(
+      messages: messages ?? this.messages,
+      isConnected: isConnected ?? this.isConnected,
+      isSending: isSending ?? this.isSending,
+      error: error,
+    );
+  }
 }
 
 class MessageLoadFailure extends MessageState {

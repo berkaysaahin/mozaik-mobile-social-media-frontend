@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:mozaik/models/post_model.dart';
 
 abstract class PostEvent extends Equatable {
   const PostEvent();
@@ -15,11 +16,12 @@ class FetchPosts extends PostEvent {
 
 class FetchPostsByUser extends PostEvent {
   final String id;
+  final String currentUserId;
 
-  const FetchPostsByUser(this.id);
+  const FetchPostsByUser(this.id, this.currentUserId);
 
   @override
-  List<Object?> get props => [id];
+  List<Object?> get props => [id, currentUserId];
 }
 
 class ClearUserPosts extends PostEvent {}
@@ -52,6 +54,12 @@ class CreatePostEvent extends PostEvent {
   @override
   List<Object?> get props =>
       [userId, content, spotifyTrackId, visibility, imageUrl];
+}
+
+class UpdatePosts extends PostEvent {
+  final List<Post> updatedPosts;
+
+  const UpdatePosts(this.updatedPosts);
 }
 
 class DeletePost extends PostEvent {

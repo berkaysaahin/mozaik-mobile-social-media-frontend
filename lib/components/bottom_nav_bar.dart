@@ -34,7 +34,7 @@ class BottomNavBar extends StatelessWidget {
           ),
         ),
       ),
-      height: 68,
+      height: 80,
       alignment: Alignment.topCenter,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),

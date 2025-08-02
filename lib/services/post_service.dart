@@ -7,8 +7,8 @@ class PostService {
   static String baseUrl = dotenv.env['HOST_URL']!;
 
   static Future<List<Post>> fetchPosts({String? currentUserId}) async {
-    final response = await http.get(Uri.parse(
-        '$baseUrl/api/posts/get?user_id=$currentUserId'));
+    final response = await http
+        .get(Uri.parse('$baseUrl/api/posts/get?user_id=$currentUserId'));
 
     if (response.statusCode == 200) {
       final List<dynamic> jsonData = json.decode(response.body);
@@ -18,8 +18,11 @@ class PostService {
     }
   }
 
-  static Future<List<Post>> fetchPostsByUser(String id) async {
-    final url = '$baseUrl/api/posts/user/$id';
+  static Future<List<Post>> fetchPostsByUser(String id,
+      {String? currentUserId}) async {
+    final queryParam =
+        currentUserId != null ? '?current_user_id=$currentUserId' : '';
+    final url = '$baseUrl/api/posts/user/$id$queryParam';
 
     try {
       final response = await http.get(Uri.parse(url));
@@ -74,6 +77,42 @@ class PostService {
 
     if (response.statusCode != 200) {
       throw Exception('Failed to delete post: ${response.body}');
+    }
+  }
+
+  static Future<int> likePost({
+    required int postId,
+    required String userId,
+  }) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/api/posts/$postId/like'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'user_id': userId}),
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return data['like_count'] ?? 0;
+    } else {
+      throw Exception('Failed to like post: ${response.body}');
+    }
+  }
+
+  static Future<int> unlikePost({
+    required int postId,
+    required String userId,
+  }) async {
+    final response = await http.delete(
+      Uri.parse('$baseUrl/api/posts/$postId/like'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'user_id': userId}),
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return data['like_count'] ?? 0;
+    } else {
+      throw Exception('Failed to unlike post: ${response.body}');
     }
   }
 }

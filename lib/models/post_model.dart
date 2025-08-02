@@ -32,6 +32,31 @@ class Post {
     this.imageUrl,
     this.music,
   });
+  Post copyWith({
+    int? likeCount,
+    bool? hasLiked,
+    int? reblogCount,
+    bool? hasReblogged,
+  }) {
+    return Post(
+      id: id,
+      userId: userId,
+      username: username,
+      handle: handle,
+      content: content,
+      profilePic: profilePic,
+      likeCount: likeCount ?? this.likeCount,
+      hasLiked: hasLiked ?? this.hasLiked,
+      reblogCount: reblogCount ?? this.reblogCount,
+      hasReblogged: hasReblogged ?? this.hasReblogged,
+      comments: comments,
+      timestamp: timestamp,
+      imageUrl: imageUrl,
+      music: music,
+      visibility: visibility,
+    );
+  }
+
   factory Post.fromJson(Map<String, dynamic> json) {
     return Post(
       id: json['id'] as int? ?? 0,
@@ -44,7 +69,7 @@ class Post {
       profilePic: json['profile_picture'] as String? ?? '',
       likeCount: int.tryParse(json['like_count'].toString()) ?? 0,
       reblogCount: int.tryParse(json['reblog_count'].toString()) ?? 0,
-      userId: json['user_id'] as String? ?? '',
+      userId: json['user_id']?.toString() ?? '',
       hasLiked: json['has_liked'] as bool? ?? false,
       hasReblogged: json['has_reblogged'] as bool? ?? false,
       visibility: json['visibility'] as String? ?? 'public',
