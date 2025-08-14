@@ -13,7 +13,7 @@ class AppThemes {
       splashColor: Colors.transparent,
       splashFactory: NoSplash.splashFactory,
       highlightColor: Colors.transparent,
-      textTheme: _buildMontserratTextTheme(Colors.black, Colors.grey[700]!),
+      textTheme: _buildSpectralTextTheme(Colors.black, Colors.grey[700]!),
     );
   }
 
@@ -27,46 +27,46 @@ class AppThemes {
       splashColor: Colors.transparent,
       splashFactory: NoSplash.splashFactory,
       highlightColor: Colors.transparent,
-      textTheme: _buildMontserratTextTheme(Colors.white, Colors.grey[400]!),
+      textTheme: _buildSpectralTextTheme(Colors.white, Colors.grey[400]!),
     );
   }
 
-  static TextTheme _buildMontserratTextTheme(
+  static TextTheme _buildSpectralTextTheme(
       Color primaryColor, Color secondaryColor) {
     return TextTheme(
-      headlineSmall: GoogleFonts.plusJakartaSans(
+      headlineSmall: GoogleFonts.outfit(
         fontSize: 23,
         fontWeight: FontWeight.w800,
         color: primaryColor,
       ),
-      titleLarge: GoogleFonts.plusJakartaSans(
+      titleLarge: GoogleFonts.outfit(
         fontSize: 21,
         fontWeight: FontWeight.w700,
         color: primaryColor,
       ),
-      titleMedium: GoogleFonts.plusJakartaSans(
+      titleMedium: GoogleFonts.outfit(
         fontSize: 19,
         fontWeight: FontWeight.w700,
         color: primaryColor,
       ),
-      bodyLarge: GoogleFonts.plusJakartaSans(
+      bodyLarge: GoogleFonts.outfit(
         fontSize: 17,
         fontWeight: FontWeight.w500,
         height: 1.5,
         letterSpacing: 0.5,
         color: primaryColor,
       ),
-      bodyMedium: GoogleFonts.plusJakartaSans(
+      bodyMedium: GoogleFonts.outfit(
         fontSize: 15,
         fontWeight: FontWeight.w400,
         color: primaryColor,
       ),
-      labelLarge: GoogleFonts.plusJakartaSans(
+      labelLarge: GoogleFonts.outfit(
         fontSize: 17,
         fontWeight: FontWeight.w600,
         color: primaryColor,
       ),
-      labelMedium: GoogleFonts.plusJakartaSans(
+      labelMedium: GoogleFonts.outfit(
         fontSize: 15,
         fontWeight: FontWeight.w500,
         color: secondaryColor,

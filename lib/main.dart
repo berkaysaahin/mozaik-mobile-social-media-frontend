@@ -32,6 +32,7 @@ import 'package:mozaik/pages/pick_username.dart';
 import 'package:mozaik/pages/profile.dart';
 import 'package:mozaik/pages/profile_edit.dart';
 import 'package:mozaik/pages/register.dart';
+import 'package:mozaik/services/auth_service.dart';
 import 'package:mozaik/services/conversation_service.dart';
 import 'package:mozaik/services/google_sign_in_service.dart';
 import 'package:mozaik/services/message_service.dart';
@@ -55,6 +56,8 @@ void main() async {
   );
 
   await dotenv.load(fileName: ".env");
+  final authService =
+      AuthService(baseUrl: dotenv.env['HOST_URL']!, client: http.Client());
   final userService = UserService(
     baseUrl: dotenv.env['HOST_URL']!,
     client: http.Client(),
@@ -74,6 +77,7 @@ void main() async {
     MultiRepositoryProvider(
       providers: [
         RepositoryProvider<UserService>.value(value: userService),
+        RepositoryProvider<AuthService>.value(value: authService),
         RepositoryProvider<ConversationService>.value(
             value: conversationService),
         RepositoryProvider<GoogleSignInService>.value(
@@ -85,6 +89,7 @@ void main() async {
           BlocProvider(
             create: (context) => AuthBloc(
               googleSignInService: context.read<GoogleSignInService>(),
+              authService: context.read<AuthService>(),
               userService: context.read<UserService>(),
               prefs: prefs,
             )..add(AuthStatusChecked()),
@@ -157,7 +162,8 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
+  final int initialPageIndex;
+  const MyHomePage({super.key, this.initialPageIndex = 0});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -173,6 +179,7 @@ class _MyHomePageState extends State<MyHomePage>
   @override
   void initState() {
     super.initState();
+    selectedIndex = widget.initialPageIndex;
     _pageController = PageController(initialPage: selectedIndex);
     _tabController = TabController(length: 2, vsync: this);
   }
@@ -182,6 +189,13 @@ class _MyHomePageState extends State<MyHomePage>
     _pageController.dispose();
     _tabController.dispose();
     super.dispose();
+  }
+
+  void switchToPage(int pageIndex) {
+    _pageController.jumpToPage(pageIndex);
+    setState(() {
+      selectedIndex = pageIndex;
+    });
   }
 
   static List<Map<String, dynamic>> appBarConfigs = [

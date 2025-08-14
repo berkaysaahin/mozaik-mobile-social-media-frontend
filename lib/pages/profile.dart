@@ -52,14 +52,7 @@ class __ProfileContentState extends State<_ProfileContent> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<PostBloc>().add(ClearUserPosts());
-      final authState = context.read<AuthBloc>().state;
-      final currentUserId =
-          authState is Authenticated ? authState.user.userId : null;
-      context
-          .read<PostBloc>()
-          .add(FetchPostsByUser(widget.userId, currentUserId!));
-      print(widget.userId);
-      print(currentUserId);
+      context.read<PostBloc>().add(FetchPostsByUser(widget.userId));
     });
   }
 
@@ -69,13 +62,7 @@ class __ProfileContentState extends State<_ProfileContent> {
       child: RefreshIndicator(
         onRefresh: () async {
           context.read<PostBloc>().add(ClearUserPosts());
-          final authState = context.read<AuthBloc>().state;
-          if (authState is Authenticated) {
-            final currentUserId = authState.user.userId;
-            context
-                .read<PostBloc>()
-                .add(FetchPostsByUser(widget.userId, currentUserId));
-          }
+          context.read<PostBloc>().add(FetchPostsByUser(widget.userId));
         },
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),

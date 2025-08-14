@@ -18,30 +18,38 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
   }
 
   Future<void> _onLoadConversations(
-    LoadConversations event,
-    Emitter<ConversationState> emit,
-  ) async {
+      LoadConversations event,
+      Emitter<ConversationState> emit,
+      ) async {
     emit(ConversationLoadInProgress());
     try {
-      final conversations =
-          await _conversationService.getUserConversations(event.userId);
-      emit(ConversationLoadSuccess(conversations));
+      final conversations = await _conversationService.getUserConversations(event.userId);
+
+      emit(ConversationLoadSuccess(conversations ?? []));
     } catch (e) {
-      emit(ConversationLoadFailure(e.toString()));
+      if (e.toString().contains('No conversations')) {
+        emit(ConversationLoadSuccess([]));
+      } else {
+        emit(ConversationLoadFailure(e.toString()));
+      }
     }
   }
 
+
   void _onAddConversation(
-    AddConversation event,
-    Emitter<ConversationState> emit,
-  ) {
+      AddConversation event,
+      Emitter<ConversationState> emit,
+      ) {
     if (state is ConversationLoadSuccess) {
       final updatedConversations = List<Conversation>.from(
         (state as ConversationLoadSuccess).conversations,
       )..insert(0, event.conversation);
       emit(ConversationLoadSuccess(updatedConversations));
+    } else {
+      emit(ConversationLoadSuccess([event.conversation]));
     }
   }
+
 
   void _onUpdateConversation(
     UpdateConversation event,

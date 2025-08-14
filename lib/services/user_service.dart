@@ -12,6 +12,7 @@ class UserService {
   }) : _client = client;
 
   Future<User> fetchUserById(String id, {required String token}) async {
+
     final response = await _client.get(
       Uri.parse('$baseUrl/api/users/$id'),
       headers: {

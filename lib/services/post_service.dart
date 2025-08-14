@@ -19,13 +19,20 @@ class PostService {
   }
 
   static Future<List<Post>> fetchPostsByUser(String id,
-      {String? currentUserId}) async {
-    final queryParam =
-        currentUserId != null ? '?current_user_id=$currentUserId' : '';
-    final url = '$baseUrl/api/posts/user/$id$queryParam';
+      {required String? currentUserId}) async {
+    final Map<String, String> queryParams = currentUserId != null
+        ? {'current_user_id': currentUserId}
+        : <String, String>{};
+
+    final uri = Uri.parse('$baseUrl/api/posts/user/$id').replace(
+      queryParameters: queryParams,
+    );
+    print('Fetching posts for user $id');
+    print('Current user: $currentUserId');
+    print('Final URL: ${uri.toString()}');
 
     try {
-      final response = await http.get(Uri.parse(url));
+      final response = await http.get(uri);
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body) as List;

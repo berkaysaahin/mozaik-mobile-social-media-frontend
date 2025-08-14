@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
 import 'package:mozaik/events/auth_event.dart';
 import 'package:mozaik/models/user_model.dart';
+import 'package:mozaik/services/auth_service.dart';
 import 'package:mozaik/services/google_sign_in_service.dart';
 import 'package:mozaik/states/auth_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,21 +12,52 @@ import '../services/user_service.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final GoogleSignInService _googleSignInService;
+  final AuthService _authService;
   final UserService _userService;
   final SharedPreferences _prefs;
 
   AuthBloc({
+    required AuthService authService,
     required UserService userService,
     required GoogleSignInService googleSignInService,
     required SharedPreferences prefs,
   })  : _userService = userService,
+        _authService = authService,
         _googleSignInService = googleSignInService,
         _prefs = prefs,
         super(AuthInitial()) {
+    on<EmailSignInRequested>(_onEmailSignInRequested);
     on<SignOutRequested>(_onSignOutRequested);
     on<AuthStatusChecked>(_onAuthStatusChecked);
     on<GoogleSignInRequested>(_onGoogleSignInRequested);
     on<UserProfileUpdateRequested>(_onUpdateUserProfile);
+  }
+
+  Future<void> _onEmailSignInRequested(
+    EmailSignInRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoading());
+    try {
+      final token = await _authService.loginWithEmail(
+        email: event.email,
+        password: event.password,
+      );
+
+      final userId = _parseUserIdFromToken(token);
+      if (userId == null) {
+        throw const FormatException('Invalid token format - missing user ID');
+      }
+
+      final user = await _userService.fetchUserById(userId, token: token);
+
+      await _persistAuthData(token, user);
+
+      emit(Authenticated(token: token, user: user));
+    } catch (e, stackTrace) {
+      _logError('Email sign-in', e, stackTrace);
+      emit(AuthError('Email login failed: ${e.toString()}'));
+    }
   }
 
   Future<void> _onGoogleSignInRequested(

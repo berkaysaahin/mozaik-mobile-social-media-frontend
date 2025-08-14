@@ -201,12 +201,9 @@ class _TextPostState extends State<TextPost>
             GestureDetector(
               onTap: () {
                 context.read<PostBloc>().add(ClearUserPosts());
-                final authState = context.read<AuthBloc>().state;
-                final currentUserId =
-                    authState is Authenticated ? authState.user.userId : null;
                 context
                     .read<PostBloc>()
-                    .add(FetchPostsByUser(widget.userId, currentUserId!));
+                    .add(FetchPostsByUser(widget.userId));
                 Navigator.push(
                   context,
                   MaterialPageRoute(

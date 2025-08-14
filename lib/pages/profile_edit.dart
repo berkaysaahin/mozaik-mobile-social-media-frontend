@@ -342,12 +342,11 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     context.read<PostBloc>().add(ClearUserPosts());
     context.read<PostBloc>().add(FetchPosts());
     final authState = context.read<AuthBloc>().state;
-    final currentUserId =
-        authState is Authenticated ? authState.user.userId : null;
+
     if (authState is Authenticated) {
       context
           .read<PostBloc>()
-          .add(FetchPostsByUser(authState.user.userId, currentUserId!));
+          .add(FetchPostsByUser(authState.user.userId));
     }
     if (mounted) {
       Navigator.pop(context);

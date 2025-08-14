@@ -52,7 +52,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     }
 
     try {
-      final posts = await PostService.fetchPostsByUser(event.id);
+      final posts = await PostService.fetchPostsByUser(event.id, currentUserId: currentUserId);
       _viewedUserPostsCache
         ..clear()
         ..addAll(posts);

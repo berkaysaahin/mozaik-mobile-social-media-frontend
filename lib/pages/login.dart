@@ -45,6 +45,17 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  Future<void> _submitLogin() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+
+    context.read<AuthBloc>().add(
+          EmailSignInRequested(email: email, password: password),
+        );
+  }
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -166,7 +177,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                           child: InkWell(
-                            onTap: () {},
+                            onTap: _submitLogin,
                             splashFactory: NoSplash.splashFactory,
                             child: SizedBox(
                               width: double.infinity,

@@ -31,6 +31,7 @@ class ConversationService {
       if (response.statusCode == 201) {
         return Conversation.fromJson(json.decode(response.body));
       } else {
+        print(response.statusCode);
         throw Exception('Failed to create conversation: ${response.body}');
       }
     } catch (e) {
@@ -40,30 +41,42 @@ class ConversationService {
 
   Future<List<Conversation>> getUserConversations(String userId) async {
     try {
-      final response = await client.get(
-        Uri.parse('$baseUrl/api/conversations/conversations/$userId'),
-      );
+      final uri = Uri.parse('$baseUrl/api/conversations/conversations/$userId');
+      final response = await client.get(uri);
 
       if (response.statusCode == 200) {
+        if (response.body.isEmpty) return [];
+
         final List<dynamic> jsonData = json.decode(response.body);
         return jsonData.map((conv) => Conversation.fromJson(conv)).toList();
-      } else {
-        throw Exception('API Error: ${response.statusCode}');
+      }
+      else if (response.statusCode == 404) {
+        return [];
+      }
+      else {
+        throw Exception('API Error: ${response.statusCode} ${response.body}');
       }
     } catch (e) {
       throw Exception('Failed to load conversations: ${e.toString()}');
     }
   }
 
+
   Future<Conversation> getConversationById(String id) async {
     try {
+       Uri uri = Uri.parse('$baseUrl/api/conversations/conversations/single/$id');
+       print(uri);
       final response = await client.get(
-        Uri.parse('$baseUrl/api/conversations/conversations/single/$id'),
+        uri,
       );
+
 
       if (response.statusCode == 200) {
         return Conversation.fromJson(json.decode(response.body));
-      } else {
+      }else if (response.statusCode == 404) {
+        // User has no conversations, return empty list
+        throw Exception('Conversation not found');
+      }  else {
         throw Exception('API Error: ${response.statusCode}');
       }
     } catch (e) {

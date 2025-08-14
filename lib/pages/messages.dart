@@ -10,22 +10,30 @@ import 'package:mozaik/events/conversation_event.dart';
 import 'package:mozaik/states/auth_state.dart';
 import 'package:mozaik/states/conversation_state.dart';
 
-class MessagesPage extends StatelessWidget {
+class MessagesPage extends StatefulWidget {
   final String? initialConversationId;
+
   const MessagesPage({super.key, this.initialConversationId});
 
   @override
-  Widget build(BuildContext context) {
-    final userId = context.select((AuthBloc bloc) {
-      if (bloc.state is Authenticated) {
-        return (bloc.state as Authenticated).user.userId;
-      }
-      return null;
-    });
-    if (userId != null) {
-      context.read<ConversationBloc>().add(LoadConversations(userId));
-    }
+  State<MessagesPage> createState() => _MessagesPageState();
+}
 
+class _MessagesPageState extends State<MessagesPage> {
+  String? userId;
+  @override
+  void initState() {
+    super.initState();
+     userId = context.read<AuthBloc>().state is Authenticated
+        ? (context.read<AuthBloc>().state as Authenticated).user.userId
+        : null;
+
+    if (userId != null) {
+      context.read<ConversationBloc>().add(LoadConversations(userId!));
+    }
+  }
+  @override
+  Widget build(BuildContext context) {
     return BlocConsumer<ConversationBloc, ConversationState>(
       listener: (context, state) {
         if (state is ConversationLoadFailure) {
@@ -45,7 +53,9 @@ class MessagesPage extends StatelessWidget {
         return Scaffold(
           body: RefreshIndicator(
             onRefresh: () async {
-              context.read<ConversationBloc>().add(LoadConversations(userId!));
+              if (userId != null) {
+                context.read<ConversationBloc>().add(LoadConversations(userId!));
+              }
             },
             child: _buildBody(state, context, userId),
           ),
@@ -53,6 +63,7 @@ class MessagesPage extends StatelessWidget {
       },
     );
   }
+
 
   Widget _buildBody(
       ConversationState state, BuildContext context, String? userId) {

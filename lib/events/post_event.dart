@@ -16,12 +16,11 @@ class FetchPosts extends PostEvent {
 
 class FetchPostsByUser extends PostEvent {
   final String id;
-  final String currentUserId;
 
-  const FetchPostsByUser(this.id, this.currentUserId);
+  const FetchPostsByUser(this.id);
 
   @override
-  List<Object?> get props => [id, currentUserId];
+  List<Object?> get props => [id];
 }
 
 class ClearUserPosts extends PostEvent {}

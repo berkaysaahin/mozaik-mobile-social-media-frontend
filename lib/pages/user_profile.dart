@@ -14,6 +14,8 @@ import 'package:mozaik/components/text_post.dart';
 import 'package:mozaik/events/conversation_event.dart';
 import 'package:mozaik/events/post_event.dart';
 import 'package:mozaik/events/user_event.dart';
+import 'package:mozaik/main.dart';
+import 'package:mozaik/pages/home.dart';
 import 'package:mozaik/pages/messages.dart';
 import 'package:mozaik/services/conversation_service.dart';
 import 'package:mozaik/states/auth_state.dart';
@@ -37,12 +39,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   void initState() {
     super.initState();
     context.read<UserBloc>().add(FetchUserById(widget.userId));
-    final authState = context.read<AuthBloc>().state;
-    final currentUserId =
-        authState is Authenticated ? authState.user.userId : null;
-    context
-        .read<PostBloc>()
-        .add(FetchPostsByUser(widget.userId, currentUserId!));
+    context.read<PostBloc>().add(FetchPostsByUser(widget.userId));
   }
 
   Future<void> _resetAndPop(BuildContext context) async {
@@ -50,10 +47,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     context.read<PostBloc>().add(FetchPosts());
     final authState = context.read<AuthBloc>().state;
     if (authState is Authenticated) {
-      final currentUserId = authState.user.userId;
-      context
-          .read<PostBloc>()
-          .add(FetchPostsByUser(authState.user.userId, currentUserId!));
+      context.read<PostBloc>().add(FetchPostsByUser(authState.user.userId));
     }
     if (mounted) {
       Navigator.pop(context);
@@ -99,15 +93,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
               );
 
       conversationBloc.add(AddConversation(conversation));
-
-      Navigator.push(
+      Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
-          builder: (context) => BlocProvider.value(
-            value: conversationBloc,
-            child: MessagesPage(initialConversationId: conversation.id),
+          builder: (_) => MyHomePage(
+            initialPageIndex: 2,
           ),
         ),
+        (route) => false,
       );
     } catch (e) {
       Flushbar(

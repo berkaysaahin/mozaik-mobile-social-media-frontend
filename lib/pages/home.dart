@@ -32,21 +32,23 @@ class _HomePageState extends State<HomePage> {
     final postsToPrecache = posts.take(3);
     for (final post in postsToPrecache) {
       try {
-        if (post.imageUrl != null && !_precachedUrls.contains(post.imageUrl)) {
-          precacheImage(CachedNetworkImageProvider(post.imageUrl!), context);
-          _precachedUrls.add(post.imageUrl!);
+        final imageUrl = post.imageUrl;
+        if (imageUrl != null && imageUrl.isNotEmpty && !_precachedUrls.contains(imageUrl)) {
+          precacheImage(CachedNetworkImageProvider(imageUrl), context);
+          _precachedUrls.add(imageUrl);
         }
-        if (post.music?['cover_art'] != null &&
-            !_precachedUrls.contains(post.music!['cover_art'])) {
-          precacheImage(
-              CachedNetworkImageProvider(post.music!['cover_art']), context);
-          _precachedUrls.add(post.music!['cover_art']);
+
+        final coverArt = post.music?['cover_art'] as String?;
+        if (coverArt != null && coverArt.isNotEmpty && !_precachedUrls.contains(coverArt)) {
+          precacheImage(CachedNetworkImageProvider(coverArt), context);
+          _precachedUrls.add(coverArt);
         }
       } catch (e) {
         debugPrint('Failed to precache image: $e');
       }
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

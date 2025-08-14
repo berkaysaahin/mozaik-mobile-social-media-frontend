@@ -91,7 +91,6 @@ class Conversation extends Equatable {
     }
   }
 
-  /// Creates a copy with updated fields
   Conversation copyWith({
     String? id,
     String? user1,
